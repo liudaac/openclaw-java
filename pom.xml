@@ -90,6 +90,73 @@
                 <version>${assertj.version}</version>
                 <scope>test</scope>
             </dependency>
+            
+            <!-- OpenClaw Modules -->
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-plugin-sdk</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-gateway</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-server</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-agent</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-channel-telegram</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-channel-feishu</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-channel-discord</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-channel-slack</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-tools</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-memory</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-security</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-secrets</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-cli</artifactId>
+                <version>${revision}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
