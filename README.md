@@ -1,165 +1,291 @@
 # OpenClaw Java
 
-[![Version](https://img.shields.io/badge/version-2026.3.9-blue.svg)](https://github.com/openclaw/openclaw-java)
-[![Java](https://img.shields.io/badge/java-17+-orange.svg)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/spring--boot-3.2-green.svg)](https://spring.io/projects/spring-boot)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+OpenClaw Java Edition - 基于 Spring Boot 的 AI Agent 平台
 
-OpenClaw Java 是 [OpenClaw](https://github.com/openclaw/openclaw) 的 Java 实现版本，提供 AI Agent 平台的核心功能。
+## 项目简介
 
-## 🚀 快速开始
+OpenClaw Java 是 OpenClaw 的 Java 实现版本，提供完整的 AI Agent 功能，包括：
+
+- 🤖 多通道支持 (Telegram, Feishu, Discord, Slack)
+- 🛠️ 丰富的工具生态 (Web Search, File Operations, Email, Calendar 等)
+- 🧠 记忆系统 (向量搜索, SQLite/pgvector 存储)
+- 🔒 企业级安全 (SSRF 防护, 输入验证, Secrets 管理)
+- 📊 Dashboard/Control UI (Web 管理界面)
+
+## 技术栈
+
+- **框架**: Spring Boot 3.2, Spring WebFlux
+- **AI 集成**: Spring AI (OpenAI, Anthropic, Ollama)
+- **数据库**: SQLite, PostgreSQL (pgvector)
+- **构建工具**: Maven 3.9+
+- **Java 版本**: 21
+
+## 项目结构
+
+```
+openclaw-java/
+├── openclaw-plugin-sdk      # 插件 SDK
+├── openclaw-gateway         # Gateway 核心
+├── openclaw-server          # HTTP/WebSocket 服务器
+├── openclaw-agent           # Agent 核心
+├── openclaw-channel-telegram   # Telegram 通道
+├── openclaw-channel-feishu     # 飞书通道
+├── openclaw-channel-discord    # Discord 通道
+├── openclaw-channel-slack      # Slack 通道
+├── openclaw-tools           # 工具集
+├── openclaw-memory          # 记忆系统
+├── openclaw-security        # 安全模块
+├── openclaw-secrets         # Secrets 管理
+└── openclaw-cli             # CLI 工具
+```
+
+## 编译
 
 ### 环境要求
-- Java 17+
+
+- JDK 21+
 - Maven 3.9+
-- Docker (可选)
+- (可选) Docker & Docker Compose
 
-### 1. 克隆项目
+### 编译命令
+
 ```bash
-git clone https://github.com/openclaw/openclaw-java.git
+# 克隆项目
+git clone https://github.com/liudaac/openclaw-java.git
 cd openclaw-java
-```
 
-### 2. 配置环境变量
-```bash
-export OPENAI_API_KEY=sk-your-api-key
-export OPENCLAW_GATEWAY_PORT=8080
-```
+# 编译所有模块
+mvn clean install
 
-### 3. 构建项目
-```bash
+# 跳过测试编译
 mvn clean install -DskipTests
+
+# 指定版本编译
+mvn clean install -Drevision=2026.3.9
 ```
 
-### 4. 运行服务
+### 编译输出
+
+编译完成后，可执行 JAR 文件位于：
+- `openclaw-gateway/target/openclaw-gateway-*.jar`
+- `openclaw-server/target/openclaw-server-*.jar`
+- `openclaw-cli/target/openclaw-cli-*.jar`
+
+## 部署
+
+### 方式一：直接运行
+
 ```bash
-cd openclaw-server
-mvn spring-boot:run
+# 运行 Gateway
+java -jar openclaw-gateway/target/openclaw-gateway-2026.3.9-SNAPSHOT.jar
+
+# 运行 Server
+java -jar openclaw-server/target/openclaw-server-2026.3.9-SNAPSHOT.jar
 ```
 
-### 5. 验证
+### 方式二：Docker 部署
+
 ```bash
-curl http://localhost:8080/api/v1/gateway/health
+# 构建 Docker 镜像
+docker build -t openclaw-java:latest .
+
+# 运行容器
+docker run -p 18789:18789 openclaw-java:latest
 ```
 
-## 📦 Docker 部署
+### 方式三：Docker Compose
 
 ```bash
-# 构建并启动
+# 启动所有服务
 docker-compose up -d
 
 # 查看日志
-docker-compose logs -f openclaw-server
+docker-compose logs -f
 
-# 停止
+# 停止服务
 docker-compose down
 ```
 
-## 📡 API 文档
+## 配置
 
-启动后访问: http://localhost:8080/swagger-ui.html
+### 配置文件位置
 
-### 核心端点
+- 主配置: `~/.openclaw/openclaw.json`
+- 环境变量配置: `application.yml`
 
-| 端点 | 描述 |
-|------|------|
-| `/api/v1/gateway/health` | 健康检查 |
-| `/api/v1/agent/spawn` | 创建 Agent |
-| `/api/v1/channels` | 通道列表 |
-| `/api/v1/tools` | 工具列表 |
-| `/api/v1/metrics/prometheus` | Prometheus 指标 |
+### 基本配置示例
 
-## 🏗️ 架构
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    OpenClaw Server                      │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
-│  │   Gateway   │ │    Agent    │ │   Metrics   │       │
-│  │  Controller │ │  Controller │ │  Controller │       │
-│  └─────────────┘ └─────────────┘ └─────────────┘       │
-├─────────────────────────────────────────────────────────┤
-│  Spring Boot + WebFlux + Spring AI + Resilience4j      │
-├─────────────────────────────────────────────────────────┤
-│  Gateway │ Agent │ Channels │ Tools │ Memory │ Security │
-└─────────────────────────────────────────────────────────┘
-```
-
-## 📊 功能特性
-
-### Phase 1: 核心基础设施 ✅
-- HTTP/WebSocket Server
-- LLM Client (OpenAI)
-- Gateway API
-- Agent API (ACP Protocol)
-
-### Phase 2: 通道基础设施 ✅
-- Telegram Webhook
-- Feishu Webhook
-- Inbound/Outbound Adapters
-
-### Phase 3: 工具系统 ✅
-- Browser Tool (Playwright)
-- Image Tool (DALL-E)
-- Cron Tool (Scheduler)
-- Media Handler
-
-### Phase 4: 生产就绪 ✅
-- 测试覆盖 (~60%)
-- Prometheus 监控
-- 性能优化
-- Docker 部署
-
-## 📈 监控
-
-### Prometheus 指标
-```bash
-curl http://localhost:8080/api/v1/metrics/prometheus
+```json
+{
+  "gateway": {
+    "bind": "0.0.0.0",
+    "port": 18789,
+    "auth": {
+      "mode": "token",
+      "token": "your-secure-token"
+    },
+    "controlUi": {
+      "enabled": true,
+      "basePath": "/"
+    }
+  },
+  "llm": {
+    "provider": "openai",
+    "model": "gpt-4",
+    "apiKey": "your-api-key"
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "your-bot-token"
+    },
+    "feishu": {
+      "enabled": true,
+      "appId": "your-app-id",
+      "appSecret": "your-app-secret"
+    }
+  }
+}
 ```
 
-### Grafana 仪表板
-```bash
-open http://localhost:3000
-# 默认账号: admin/admin
-```
+### 环境变量
 
-## 🧪 测试
+| 变量名 | 说明 | 默认值 |
+|--------|------|--------|
+| `OPENCLAW_GATEWAY_BIND` | 绑定地址 | `0.0.0.0` |
+| `OPENCLAW_GATEWAY_PORT` | 端口 | `18789` |
+| `OPENCLAW_GATEWAY_AUTH_TOKEN` | 认证 Token | - |
+| `OPENCLAW_LLM_PROVIDER` | LLM 提供商 | `openai` |
+| `OPENCLAW_LLM_API_KEY` | API Key | - |
+
+## 运行
+
+### 启动 Gateway
 
 ```bash
-# 运行测试
-mvn test
+# 默认启动
+java -jar openclaw-gateway/target/openclaw-gateway-*.jar
 
-# 生成覆盖率报告
-mvn jacoco:report
+# 指定配置文件
+java -jar openclaw-gateway/target/openclaw-gateway-*.jar --spring.config.location=file:/path/to/config.yml
+
+# 指定环境变量
+OPENCLAW_GATEWAY_PORT=8080 java -jar openclaw-gateway/target/openclaw-gateway-*.jar
 ```
 
-## 📚 文档
+### 访问 Dashboard
 
-- [Phase 1 README](./PHASE1_README.md)
-- [Phase 2 Summary](./PHASE2_SUMMARY.md)
-- [Phase 3 Summary](./PHASE3_SUMMARY.md)
-- [Phase 4 Summary](./PHASE4_SUMMARY.md)
-- [Architecture Analysis](./openclaw架构分析报告.md)
+启动后访问：`http://localhost:18789/`
 
-## 🤝 贡献
+Dashboard 功能：
+- 💬 Chat: 与 AI 对话
+- 📊 Status: 查看系统状态
+- ⚙️ Config: 管理配置
+- 📜 Logs: 查看日志
+- 🔧 Tools: 管理工具
 
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/xxx`)
-3. 提交更改 (`git commit -am 'Add feature'`)
-4. 推送分支 (`git push origin feature/xxx`)
-5. 创建 Pull Request
+## 使用说明
 
-## 📄 许可证
+### CLI 命令
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+```bash
+# 查看帮助
+java -jar openclaw-cli/target/openclaw-cli-*.jar --help
 
-## 🙏 致谢
+# 启动 TUI 交互界面
+java -jar openclaw-cli/target/openclaw-cli-*.jar tui
 
-- [OpenClaw](https://github.com/openclaw/openclaw) - 原版 Node.js 实现
-- [Spring Boot](https://spring.io/projects/spring-boot) - Web 框架
-- [Spring AI](https://spring.io/projects/spring-ai) - AI 集成
-- [Resilience4j](https://resilience4j.readme.io/) - 可靠性模式
+# 发送消息
+java -jar openclaw-cli/target/openclaw-cli-*.jar send --channel telegram --to user_id --message "Hello"
 
----
+# 创建备份
+java -jar openclaw-cli/target/openclaw-cli-*.jar backup create
 
-**Made with ❤️ by OpenClaw Team**
+# 验证备份
+java -jar openclaw-cli/target/openclaw-cli-*.jar backup verify /path/to/backup.zip
+```
+
+### API 使用
+
+```bash
+# 发送消息
+curl -X POST http://localhost:18789/api/send \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-token" \
+  -d '{
+    "channel": "telegram",
+    "to": "user_id",
+    "message": "Hello from OpenClaw!"
+  }'
+
+# 获取状态
+curl http://localhost:18789/api/status
+
+# 获取配置
+curl http://localhost:18789/api/config
+```
+
+### WebSocket 连接
+
+```javascript
+const ws = new WebSocket('ws://localhost:18789/ws');
+
+ws.onopen = () => {
+  console.log('Connected to OpenClaw');
+};
+
+ws.onmessage = (event) => {
+  console.log('Received:', event.data);
+};
+
+ws.send(JSON.stringify({
+  type: 'message',
+  channel: 'telegram',
+  to: 'user_id',
+  content: 'Hello'
+}));
+```
+
+## 开发
+
+### 添加新通道
+
+1. 创建新模块 `openclaw-channel-{name}`
+2. 实现 `ChannelAdapter` 接口
+3. 在 `pom.xml` 中添加依赖
+4. 注册到 Gateway
+
+### 添加新工具
+
+1. 在 `openclaw-tools` 模块中创建工具类
+2. 实现 `Tool` 接口
+3. 添加 `@Component` 注解
+4. 工具会自动注册
+
+## 版本管理
+
+本项目使用 Maven Flatten Plugin 进行 CI-friendly 版本管理：
+
+```bash
+# 构建指定版本
+mvn clean install -Drevision=2026.3.10-SNAPSHOT
+
+# 发布版本
+mvn clean deploy -Drevision=2026.3.9
+```
+
+版本号只需在父 POM 的 `<revision>` 属性中修改即可。
+
+## 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+## 许可证
+
+MIT License
+
+## 相关链接
+
+- [OpenClaw Node.js 版本](https://github.com/liudaac/openclaw)
+- [Spring AI 文档](https://docs.spring.io/spring-ai/reference/)
+- [Spring Boot 文档](https://docs.spring.io/spring-boot/docs/current/reference/html/)
