@@ -7,7 +7,7 @@
 
     <groupId>ai.openclaw</groupId>
     <artifactId>openclaw-plugin-sdk</artifactId>
-    <version>2026.3.9-SNAPSHOT</version>
+    <version>${project.version}</version>
     <packaging>jar</packaging>
 
     <name>OpenClaw Plugin SDK</name>

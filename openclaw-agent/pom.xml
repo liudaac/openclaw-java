@@ -7,7 +7,7 @@
 
     <groupId>ai.openclaw</groupId>
     <artifactId>openclaw-agent</artifactId>
-    <version>2026.3.9-SNAPSHOT</version>
+    <version>${project.version}</version>
     <packaging>jar</packaging>
 
     <name>OpenClaw Agent</name>
@@ -24,14 +24,14 @@
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-plugin-sdk</artifactId>
-            <version>2026.3.9-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- OpenClaw Memory -->
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-memory</artifactId>
-            <version>2026.3.9-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- JSON -->

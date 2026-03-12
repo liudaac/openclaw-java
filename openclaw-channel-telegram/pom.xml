@@ -7,7 +7,7 @@
 
     <groupId>ai.openclaw</groupId>
     <artifactId>openclaw-channel-telegram</artifactId>
-    <version>2026.3.9-SNAPSHOT</version>
+    <version>${project.version}</version>
     <packaging>jar</packaging>
 
     <name>OpenClaw Telegram Channel</name>
@@ -25,14 +25,14 @@
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-plugin-sdk</artifactId>
-            <version>2026.3.9-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- OpenClaw Security -->
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-security</artifactId>
-            <version>2026.3.9-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- HTTP Client -->
