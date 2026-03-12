@@ -8,7 +8,7 @@
     <parent>
         <groupId>ai.openclaw</groupId>
         <artifactId>openclaw-java</artifactId>
-        <version>${project.version}</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>openclaw-server</artifactId>
@@ -59,32 +59,32 @@
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-plugin-sdk</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-gateway</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-security</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-agent</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-memory</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-secrets</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
 
         <!-- Resilience4j -->

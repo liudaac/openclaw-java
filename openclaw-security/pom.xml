@@ -8,7 +8,7 @@
     <parent>
         <groupId>ai.openclaw</groupId>
         <artifactId>openclaw</artifactId>
-        <version>${project.version}</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>openclaw-security</artifactId>
