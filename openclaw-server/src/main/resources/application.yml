@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: openclaw-server
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      chat:
+        options:
+          model: gpt-4
+          temperature: 0.7
+
+  webflux:
+    base-path: /api/v1
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+openclaw:
+  gateway:
+    port: ${OPENCLAW_GATEWAY_PORT:8080}
+    max-nodes: ${OPENCLAW_MAX_NODES:100}
+    queue-capacity: ${OPENCLAW_QUEUE_CAPACITY:10000}
+    worker-threads: ${OPENCLAW_WORKER_THREADS:10}
+
+  agent:
+    max-concurrent: ${OPENCLAW_MAX_AGENTS:10}
+    default-timeout-ms: ${OPENCLAW_AGENT_TIMEOUT:60000}
+    enable-streaming: ${OPENCLAW_STREAMING:true}
+
+logging:
+  level:
+    openclaw: INFO
+    org.springframework.web: WARN
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+  ratelimiter:
+    configs:
+      default:
+        limit-refresh-period: 1s
+        limit-for-period: 100
+        timeout-duration: 100ms
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
