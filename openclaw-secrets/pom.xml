@@ -9,6 +9,7 @@
         <groupId>ai.openclaw</groupId>
         <artifactId>openclaw</artifactId>
         <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>openclaw-secrets</artifactId>
