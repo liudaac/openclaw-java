@@ -5,51 +5,55 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ai.openclaw</groupId>
+    <parent>
+        <groupId>ai.openclaw</groupId>
+        <artifactId>openclaw</artifactId>
+        <version>2026.3.9-SNAPSHOT</version>
+    </parent>
+
     <artifactId>openclaw-tools</artifactId>
-    <version>2026.3.9-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>OpenClaw Tools</name>
     <description>Tools and skills for OpenClaw Java Edition</description>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <!-- OpenClaw Plugin SDK -->
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-plugin-sdk</artifactId>
-            <version>2026.3.9-SNAPSHOT</version>
         </dependency>
 
         <!-- OpenClaw Security -->
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-security</artifactId>
-            <version>2026.3.9-SNAPSHOT</version>
         </dependency>
 
-        <!-- JSON -->
+        <!-- Spring Boot Starter -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- Logging -->
+        <!-- JavaMail API -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
         </dependency>
 
-        <!-- Testing -->
+        <!-- Activation Framework -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
