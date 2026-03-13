@@ -87,6 +87,11 @@
             <artifactId>openclaw-secrets</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-cron</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <!-- Resilience4j -->
         <dependency>

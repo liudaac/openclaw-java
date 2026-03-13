@@ -43,6 +43,8 @@
         <module>openclaw-secrets</module>
         <module>openclaw-cli</module>
         <module>openclaw-cron</module>
+        <module>openclaw-browser</module>
+        <module>openclaw-session</module>
     </modules>
 
     <dependencyManagement>
@@ -125,6 +127,16 @@
             <dependency>
                 <groupId>ai.openclaw</groupId>
                 <artifactId>openclaw-cron</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-browser</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-session</artifactId>
                 <version>${revision}</version>
             </dependency>
         </dependencies>

@@ -9,55 +9,51 @@
         <groupId>ai.openclaw</groupId>
         <artifactId>openclaw</artifactId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>openclaw-tools</artifactId>
-    <packaging>jar</packaging>
-
-    <name>OpenClaw Tools</name>
-    <description>Tools and skills for OpenClaw Java Edition</description>
+    <artifactId>openclaw-browser</artifactId>
+    <name>OpenClaw Browser</name>
+    <description>Browser automation using Playwright Java API</description>
 
     <dependencies>
-        <!-- OpenClaw Plugin SDK -->
+        <!-- OpenClaw SDK -->
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-plugin-sdk</artifactId>
         </dependency>
 
-        <!-- OpenClaw Security -->
-        <dependency>
-            <groupId>ai.openclaw</groupId>
-            <artifactId>openclaw-security</artifactId>
-        </dependency>
-
-        <!-- OpenClaw Cron -->
-        <dependency>
-            <groupId>ai.openclaw</groupId>
-            <artifactId>openclaw-cron</artifactId>
-        </dependency>
-
-        <!-- Spring Boot Starter -->
+        <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- JavaMail API -->
+        <!-- Playwright Java -->
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>1.6.2</version>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>1.40.0</version>
         </dependency>
 
-        <!-- Activation Framework -->
+        <!-- WebSocket for extension relay -->
         <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1.1</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-        <!-- Test -->
+        <!-- Jackson for JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- SLF4J -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

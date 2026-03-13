@@ -1,37 +1,37 @@
 package openclaw.tools.cron;
 
+import openclaw.cron.model.CronJob;
+import openclaw.cron.model.JobExecution;
+import openclaw.cron.model.JobStatus;
+import openclaw.cron.service.CronService;
 import openclaw.sdk.tool.AgentTool;
 import openclaw.sdk.tool.ToolExecuteContext;
 import openclaw.sdk.tool.ToolResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
- * Cron job scheduling tool.
+ * Cron job scheduling tool - Enhanced Version.
  *
- * <p>Phase 3 Enhancement - Schedule and manage recurring tasks.</p>
+ * <p>Uses the new openclaw-cron module for persistent job management.</p>
  *
  * @author OpenClaw Team
- * @version 2026.3.9
+ * @version 2026.3.13
  */
 public class CronTool implements AgentTool {
 
-    private final ScheduledExecutorService scheduler;
-    private final Map<String, ScheduledJob> jobs;
-    private final Map<String, JobHistory> history;
+    private static final Logger logger = LoggerFactory.getLogger(CronTool.class);
+
+    private final CronService cronService;
 
     public CronTool() {
-        this.scheduler = Executors.newScheduledThreadPool(5);
-        this.jobs = new ConcurrentHashMap<>();
-        this.history = new ConcurrentHashMap<>();
+        this.cronService = new CronService();
+        this.cronService.initialize();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class CronTool implements AgentTool {
 
     @Override
     public String getDescription() {
-        return "Schedule and manage recurring tasks using cron expressions";
+        return "Schedule and manage recurring tasks using cron expressions (persistent)";
     }
 
     @Override
@@ -49,14 +49,16 @@ public class CronTool implements AgentTool {
         return ToolParameters.builder()
                 .properties(Map.of(
                         "action", PropertySchema.enum_("Cron action", List.of(
-                                "schedule", "list", "cancel", "pause", "resume", "history"
+                                "schedule", "list", "get", "cancel", "pause", "resume", 
+                                "trigger", "history", "stats"
                         )),
-                        "job_id", PropertySchema.string("Job ID (for cancel/pause/resume)"),
+                        "job_id", PropertySchema.string("Job ID (for get/cancel/pause/resume/trigger/history)"),
                         "name", PropertySchema.string("Job name (for schedule)"),
-                        "cron", PropertySchema.string("Cron expression (e.g., '0 0 * * *')"),
+                        "cron", PropertySchema.string("Cron expression (e.g., '0 0 * * *') or @daily/@weekly/@monthly/@hourly"),
                         "command", PropertySchema.string("Command to execute"),
-                        "delay_seconds", PropertySchema.integer("Delay in seconds (for one-time)"),
-                        "timezone", PropertySchema.string("Timezone (default: system)")
+                        "timezone", PropertySchema.string("Timezone (default: UTC)"),
+                        "max_retries", PropertySchema.integer("Max retry attempts (default: 3)"),
+                        "timeout", PropertySchema.integer("Timeout in seconds (default: 60)")
                 ))
                 .required(List.of("action"))
                 .build();
@@ -74,19 +76,26 @@ public class CronTool implements AgentTool {
                         return scheduleJob(args);
                     case "list":
                         return listJobs();
+                    case "get":
+                        return getJob(args);
                     case "cancel":
                         return cancelJob(args);
                     case "pause":
                         return pauseJob(args);
                     case "resume":
                         return resumeJob(args);
+                    case "trigger":
+                        return triggerJob(args);
                     case "history":
                         return showHistory(args);
+                    case "stats":
+                        return showStats(args);
                     default:
                         return ToolResult.failure("Unknown action: " + action);
                 }
 
             } catch (Exception e) {
+                logger.error("Cron operation failed", e);
                 return ToolResult.failure("Cron operation failed: " + e.getMessage());
             }
         });
@@ -96,101 +105,104 @@ public class CronTool implements AgentTool {
         if (!args.containsKey("command")) {
             return ToolResult.failure("Missing required parameter: command");
         }
+        if (!args.containsKey("cron")) {
+            return ToolResult.failure("Missing required parameter: cron");
+        }
 
         String command = args.get("command").toString();
+        String schedule = args.get("cron").toString();
         String name = args.getOrDefault("name", "unnamed-job").toString();
         String timezone = args.getOrDefault("timezone", ZoneId.systemDefault().getId()).toString();
 
-        String jobId = UUID.randomUUID().toString();
-
-        // Check if it's a one-time delay or cron schedule
-        if (args.containsKey("delay_seconds")) {
-            int delay = (int) args.get("delay_seconds");
-            return scheduleOneTime(jobId, name, command, delay, timezone);
-        } else if (args.containsKey("cron")) {
-            String cron = args.get("cron").toString();
-            return scheduleCron(jobId, name, command, cron, timezone);
-        } else {
-            return ToolResult.failure("Missing schedule parameter: cron or delay_seconds");
+        // Handle predefined macros
+        if (schedule.startsWith("@")) {
+            schedule = convertPredefinedMacro(schedule);
         }
-    }
 
-    private ToolResult scheduleOneTime(String jobId, String name, String command, int delaySeconds, String timezone) {
         try {
-            ScheduledFuture<?> future = scheduler.schedule(() -> {
-                executeJob(jobId, name, command);
-            }, delaySeconds, TimeUnit.SECONDS);
-
-            ScheduledJob job = new ScheduledJob(
-                    jobId, name, command, "once",
-                    null, delaySeconds, timezone,
-                    future, JobStatus.SCHEDULED
-            );
-            jobs.put(jobId, job);
-
-            Instant runTime = Instant.now().plusSeconds(delaySeconds);
-            return ToolResult.success(
-                    "Scheduled one-time job: " + name,
-                    Map.of(
-                            "job_id", jobId,
-                            "name", name,
-                            "run_at", runTime.toString(),
-                            "delay_seconds", delaySeconds
-                    )
-            );
-
-        } catch (Exception e) {
-            return ToolResult.failure("Scheduling failed: " + e.getMessage());
-        }
-    }
-
-    private ToolResult scheduleCron(String jobId, String name, String command, String cron, String timezone) {
-        try {
-            // Parse cron and calculate next run
-            long interval = parseCronInterval(cron);
+            CronJob job = cronService.createJob(name, schedule, command).join();
             
-            ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
-                executeJob(jobId, name, command);
-            }, interval, interval, TimeUnit.SECONDS);
-
-            ScheduledJob job = new ScheduledJob(
-                    jobId, name, command, "cron",
-                    cron, 0, timezone,
-                    future, JobStatus.SCHEDULED
-            );
-            jobs.put(jobId, job);
-
+            // Apply additional config
+            if (args.containsKey("max_retries")) {
+                job.setMaxRetries((Integer) args.get("max_retries"));
+            }
+            if (args.containsKey("timeout")) {
+                job.setTimeoutSeconds((Integer) args.get("timeout"));
+            }
+            job.setTimezone(timezone);
+            
             return ToolResult.success(
-                    "Scheduled cron job: " + name,
+                    "Scheduled job: " + name,
                     Map.of(
-                            "job_id", jobId,
-                            "name", name,
-                            "cron", cron,
-                            "timezone", timezone
+                            "job_id", job.getId(),
+                            "name", job.getName(),
+                            "schedule", job.getSchedule(),
+                            "timezone", job.getTimezone(),
+                            "status", job.getStatus().name(),
+                            "next_run", job.getNextRun() != null ? job.getNextRun().toString() : "calculating..."
                     )
             );
-
         } catch (Exception e) {
-            return ToolResult.failure("Cron scheduling failed: " + e.getMessage());
+            return ToolResult.failure("Failed to schedule job: " + e.getMessage());
         }
     }
 
     private ToolResult listJobs() {
-        List<Map<String, Object>> jobList = jobs.values().stream()
-                .map(job -> Map.of(
-                        "job_id", job.id(),
-                        "name", job.name(),
-                        "type", job.type(),
-                        "status", job.status().name(),
-                        "cron", job.cron() != null ? job.cron() : "N/A",
-                        "command", job.command().substring(0, Math.min(50, job.command().length()))
-                ))
-                .toList();
+        try {
+            List<CronJob> jobs = cronService.listJobs().join();
+            
+            List<Map<String, Object>> jobList = jobs.stream()
+                    .map(job -> Map.of(
+                            "job_id", job.getId(),
+                            "name", job.getName(),
+                            "schedule", job.getSchedule(),
+                            "status", job.getStatus().name(),
+                            "run_count", job.getRunCount(),
+                            "fail_count", job.getFailCount(),
+                            "last_run", job.getLastRun() != null ? job.getLastRun().toString() : "never",
+                            "next_run", job.getNextRun() != null ? job.getNextRun().toString() : "N/A"
+                    ))
+                    .collect(Collectors.toList());
 
-        return ToolResult.success(
-                "Found " + jobList.size() + " job(s)",
-                Map.of("jobs", jobList)
-        );
+            return ToolResult.success(
+                    "Found " + jobList.size() + " job(s)",
+                    Map.of("jobs", jobList)
+            );
+        } catch (Exception e) {
+            return ToolResult.failure("Failed to list jobs: " + e.getMessage());
+        }
+    }
+
+    private ToolResult getJob(Map<String, Object> args) {
+        if (!args.containsKey("job_id")) {
+            return ToolResult.failure("Missing required parameter: job_id");
+        }
+
+        String jobId = args.get("job_id").toString();
+        
+        try {
+            CronJob job = cronService.getJob(jobId).join()
+                    .orElseThrow(() -> new IllegalArgumentException("Job not found: " + jobId));
+
+            return ToolResult.success(
+                    "Job details",
+                    Map.of(
+                            "job_id", job.getId(),
+                            "name", job.getName(),
+                            "schedule", job.getSchedule(),
+                            "command", job.getCommand(),
+                            "timezone", job.getTimezone(),
+                            "status",                            job.getStatus().name(),
+                            "run_count", job.getRunCount(),
+                            "fail_count", job.getFailCount(),
+                            "last_run", job.getLastRun() != null ? job.getLastRun().toString() : "never",
+                            "next_run", job.getNextRun() != null ? job.getNextRun().toString() : "N/A",
+                            "created_at", job.getCreatedAt().toString()
+                    )
+            );
+        } catch (Exception e) {
+            return ToolResult.failure("Failed to get job: " + e.getMessage());
+        }
     }
 
     private ToolResult cancelJob(Map<String, Object> args) {
@@ -199,120 +211,139 @@ public class CronTool implements AgentTool {
         }
 
         String jobId = args.get("job_id").toString();
-        ScheduledJob job = jobs.get(jobId);
-
-        if (job == null) {
-            return ToolResult.failure("Job not found: " + jobId);
+        
+        try {
+            boolean deleted = cronService.deleteJob(jobId).join();
+            if (deleted) {
+                return ToolResult.success("Job cancelled and deleted", Map.of("job_id", jobId));
+            } else {
+                return ToolResult.failure("Job not found: " + jobId);
+            }
+        } catch (Exception e) {
+            return ToolResult.failure("Failed to cancel job: " + e.getMessage());
         }
-
-        job.future().cancel(false);
-        jobs.remove(jobId);
-
-        return ToolResult.success(
-                "Cancelled job: " + job.name(),
-                Map.of("job_id", jobId, "name", job.name())
-        );
     }
 
     private ToolResult pauseJob(Map<String, Object> args) {
-        // Simplified - just mark as paused
-        String jobId = args.get("job_id").toString();
-        ScheduledJob job = jobs.get(jobId);
-        
-        if (job == null) {
-            return ToolResult.failure("Job not found: " + jobId);
+        if (!args.containsKey("job_id")) {
+            return ToolResult.failure("Missing required parameter: job_id");
         }
 
-        // Note: Actual pause would require more complex implementation
-        return ToolResult.success(
-                "Job pause not fully implemented",
-                Map.of("job_id", jobId, "status", "paused")
-        );
+        String jobId = args.get("job_id").toString();
+        
+        try {
+            cronService.pauseJob(jobId).join();
+            return ToolResult.success("Job paused", Map.of("job_id", jobId, "status", "PAUSED"));
+        } catch (Exception e) {
+            return ToolResult.failure("Failed to pause job: " + e.getMessage());
+        }
     }
 
     private ToolResult resumeJob(Map<String, Object> args) {
+        if (!args.containsKey("job_id")) {
+            return ToolResult.failure("Missing required parameter: job_id");
+        }
+
         String jobId = args.get("job_id").toString();
-        return ToolResult.success(
-                "Job resume not fully implemented",
-                Map.of("job_id", jobId, "status", "resumed")
-        );
-    }
-
-    private ToolResult showHistory(Map<String, Object> args) {
-        String jobId = args.getOrDefault("job_id", "").toString();
         
-        List<Map<String, Object>> runs = history.values().stream()
-                .filter(h -> jobId.isEmpty() || h.jobId().equals(jobId))
-                .map(h -> Map.of(
-                        "job_id", h.jobId(),
-                        "run_time", h.runTime().toString(),
-                        "success", h.success(),
-                        "output", h.output() != null ? h.output().substring(0, Math.min(100, h.output().length())) : ""
-                ))
-                .toList();
-
-        return ToolResult.success(
-                "Found " + runs.size() + " run(s)",
-                Map.of("history", runs)
-        );
-    }
-
-    private void executeJob(String jobId, String name, String command) {
-        Instant runTime = Instant.now();
         try {
-            // Execute command
-            ProcessBuilder pb = new ProcessBuilder("sh", "-c", command);
-            pb.redirectErrorStream(true);
-            Process process = pb.start();
-            
-            boolean finished = process.waitFor(60, TimeUnit.SECONDS);
-            String output = "";
-            
-            if (finished) {
-                output = new String(process.getInputStream().readAllBytes());
-            } else {
-                process.destroyForcibly();
-                output = "Timeout";
-            }
-
-            history.put(UUID.randomUUID().toString(), new JobHistory(
-                    jobId, runTime, finished && process.exitValue() == 0, output
-            ));
-
+            cronService.resumeJob(jobId).join();
+            return ToolResult.success("Job resumed", Map.of("job_id", jobId, "status", "PENDING"));
         } catch (Exception e) {
-            history.put(UUID.randomUUID().toString(), new JobHistory(
-                    jobId, runTime, false, e.getMessage()
-            ));
+            return ToolResult.failure("Failed to resume job: " + e.getMessage());
         }
     }
 
-    private long parseCronInterval(String cron) {
-        // Simplified cron parsing - just return hourly for demo
-        // In production, use a proper cron library like cron-utils
-        return 3600; // 1 hour default
+    private ToolResult triggerJob(Map<String, Object> args) {
+        if (!args.containsKey("job_id")) {
+            return ToolResult.failure("Missing required parameter: job_id");
+        }
+
+        String jobId = args.get("job_id").toString();
+        
+        try {
+            JobExecution execution = cronService.triggerJob(jobId).join();
+            return ToolResult.success(
+                    "Job triggered",
+                    Map.of(
+                            "job_id", jobId,
+                            "execution_id", execution.getId(),
+                            "status", execution.getStatus().name(),
+                            "output", execution.getOutput() != null ? execution.getOutput() : "",
+                            "duration_ms", execution.getDuration().toMillis()
+                    )
+            );
+        } catch (Exception e) {
+            return ToolResult.failure("Failed to trigger job: " + e.getMessage());
+        }
     }
 
-    // Records
-    private record ScheduledJob(
-            String id,
-            String name,
-            String command,
-            String type,
-            String cron,
-            int delaySeconds,
-            String timezone,
-            ScheduledFuture<?> future,
-            JobStatus status
-    ) {}
+    private ToolResult showHistory(Map<String, Object> args) {
+        if (!args.containsKey("job_id")) {
+            return ToolResult.failure("Missing required parameter: job_id");
+        }
 
-    private record JobHistory(
-            String jobId,
-            Instant runTime,
-            boolean success,
-            String output
-    ) {}
+        String jobId = args.get("job_id").toString();
+        int limit = (Integer) args.getOrDefault("limit", 10);
+        
+        try {
+            List<JobExecution> executions = cronService.getJobHistory(jobId, limit).join();
+            
+            List<Map<String, Object>> history = executions.stream()
+                    .map(exec -> Map.of(
+                            "execution_id", exec.getId(),
+                            "start_time", exec.getStartTime().toString(),
+                            "status", exec.getStatus().name(),
+                            "duration_ms", exec.getDuration().toMillis(),
+                            "output", exec.getOutput() != null ? 
+                                    exec.getOutput().substring(0, Math.min(200, exec.getOutput().length())) : ""
+                    ))
+                    .collect(Collectors.toList());
 
-    private enum JobStatus {
-        SCHEDULED, RUNNING, PAUSED, COMPLETED, FAILED, CANCELLED
+            return ToolResult.success(
+                    "Found " + history.size() + " execution(s)",
+                    Map.of("history", history)
+            );
+        } catch (Exception e) {
+            return ToolResult.failure("Failed to get history: " + e.getMessage());
+        }
+    }
+
+    private ToolResult showStats(Map<String, Object> args) {
+        if (!args.containsKey("job_id")) {
+            return ToolResult.failure("Missing required parameter: job_id");
+        }
+
+        String jobId = args.get("job_id").toString();
+        
+        try {
+            var stats = cronService.getExecutionStats(jobId).join();
+            
+            return ToolResult.success(
+                    "Job statistics",
+                    Map.of(
+                            "total_runs", stats.totalRuns(),
+                            "successful_runs", stats.successfulRuns(),
+                            "failed_runs", stats.failedRuns(),
+                            "success_rate", stats.totalRuns() > 0 ? 
+                                    String.format("%.2f%%", (double) stats.successfulRuns() / stats.totalRuns() * 100) : "N/A",
+                            "average_duration_ms", String.format("%.2f", stats.averageDurationMs()),
+                            "last_run", stats.lastRun() != null ? stats.lastRun().toString() : "never"
+                    )
+            );
+        } catch (Exception e) {
+            return ToolResult.failure("Failed to get stats: " + e.getMessage());
+        }
+    }
+
+    private String convertPredefinedMacro(String macro) {
+        return switch (macro.toLowerCase()) {
+            case "@yearly", "@annually" -> "0 0 1 1 *";
+            case "@monthly" -> "0 0 1 * *";
+            case "@weekly" -> "0 0 * * 0";
+            case "@daily", "@midnight" -> "0 0 * * *";
+            case "@hourly" -> "0 * * * *";
+            default -> throw new IllegalArgumentException("Unknown macro: " + macro);
+        };
     }
 }

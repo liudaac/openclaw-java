@@ -9,55 +9,49 @@
         <groupId>ai.openclaw</groupId>
         <artifactId>openclaw</artifactId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>openclaw-tools</artifactId>
-    <packaging>jar</packaging>
-
-    <name>OpenClaw Tools</name>
-    <description>Tools and skills for OpenClaw Java Edition</description>
+    <artifactId>openclaw-session</artifactId>
+    <name>OpenClaw Session</name>
+    <description>Session persistence and management for OpenClaw</description>
 
     <dependencies>
-        <!-- OpenClaw Plugin SDK -->
+        <!-- OpenClaw SDK -->
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-plugin-sdk</artifactId>
         </dependency>
 
-        <!-- OpenClaw Security -->
-        <dependency>
-            <groupId>ai.openclaw</groupId>
-            <artifactId>openclaw-security</artifactId>
-        </dependency>
-
-        <!-- OpenClaw Cron -->
-        <dependency>
-            <groupId>ai.openclaw</groupId>
-            <artifactId>openclaw-cron</artifactId>
-        </dependency>
-
-        <!-- Spring Boot Starter -->
+        <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- JavaMail API -->
+        <!-- SQLite -->
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>1.6.2</version>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.44.1.0</version>
         </dependency>
 
-        <!-- Activation Framework -->
+        <!-- Jackson for JSON -->
         <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1.1</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
-        <!-- Test -->
+        <!-- SLF4J -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
