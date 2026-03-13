@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>ai.openclaw</groupId>
+        <artifactId>openclaw</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>openclaw-cron</artifactId>
+    <name>OpenClaw Cron</name>
+    <description>Cron job scheduling and management for OpenClaw</description>
+
+    <dependencies>
+        <!-- OpenClaw SDK -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-plugin-sdk</artifactId>
+        </dependency>
+
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- WebSocket for real-time notifications -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <!-- Cron Expression Parser -->
+        <dependency>
+            <groupId>com.cronutils</groupId>
+            <artifactId>cron-utils</artifactId>
+            <version>9.2.1</version>
+        </dependency>
+
+        <!-- SQLite -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.44.1.0</version>
+        </dependency>
+
+        <!-- Resilience4j for retry and circuit breaker -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-retry</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
+        <!-- Jackson for JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- SLF4J -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

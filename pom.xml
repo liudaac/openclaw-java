@@ -42,6 +42,7 @@
         <module>openclaw-security</module>
         <module>openclaw-secrets</module>
         <module>openclaw-cli</module>
+        <module>openclaw-cron</module>
     </modules>
 
     <dependencyManagement>
@@ -119,6 +120,11 @@
             <dependency>
                 <groupId>ai.openclaw</groupId>
                 <artifactId>openclaw-cli</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.openclaw</groupId>
+                <artifactId>openclaw-cron</artifactId>
                 <version>${revision}</version>
             </dependency>
         </dependencies>
