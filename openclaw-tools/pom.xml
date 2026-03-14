@@ -37,6 +37,18 @@
             <artifactId>openclaw-cron</artifactId>
         </dependency>
 
+        <!-- OpenClaw Browser -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-browser</artifactId>
+        </dependency>
+
+        <!-- OpenClaw Session -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-session</artifactId>
+        </dependency>
+
         <!-- Spring Boot Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

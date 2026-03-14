@@ -41,8 +41,9 @@ openclaw-java/
 ├── openclaw-channel-discord     # Discord 通道
 ├── openclaw-channel-slack       # Slack 通道
 ├── openclaw-tools               # 工具集
-│   ├── cron/                    # Cron 工具 (已重构)
-│   ├── browser/                 # Browser 工具 (待重构)
+│   ├── cron/                    # Cron 工具 ✅ 已重构
+│   ├── browser/                 # Browser 工具 ✅ 已重构
+│   ├── session/                 # Session 工具 ✅ 新增
 │   ├── email/
 │   └── ...
 ├── openclaw-memory              # 记忆系统
@@ -50,7 +51,7 @@ openclaw-java/
 ├── openclaw-secrets             # Secrets 管理
 ├── openclaw-cli                 # CLI 工具
 │
-│   # ===== 新增模块 =====
+│   # ===== 核心服务模块 =====
 ├── openclaw-cron                # ⭐ 定时任务模块
 │   ├── model/                   # CronJob, JobStatus, JobExecution
 │   ├── store/                   # SQLite 持久化
@@ -75,12 +76,12 @@ openclaw-java/
 | 模块 | Node.js | Java (当前) | 状态 |
 |------|---------|-------------|------|
 | **Cron** | node-cron + SQLite | cron-utils + SQLite | ✅ 100% |
-| **Browser** | Playwright 原生 | Playwright Java API | ✅ 80% |
-| **Session** | JSONL | SQLite + 缓存 | ✅ 85% |
+| **Browser** | Playwright 原生 | Playwright Java API | ✅ 100% |
+| **Session** | JSONL | SQLite + 缓存 | ✅ 100% |
 | **Channel 流式** | 完整 | SSE + 打字指示 | ✅ 90% |
 | **Gateway** | V3 认证 | V3 认证 + 自动重连 | ✅ 90% |
 | Memory | 完整 | 完整 | ✅ 85% |
-| **总体** | **100%** | **~95%** | ✅ |
+| **总体** | **100%** | **~98%** | ✅ |
 
 ## 编译
 
@@ -390,6 +391,35 @@ mvn clean deploy -Drevision=2026.3.13
 版本号只需在父 POM 的 `<revision>` 属性中修改即可。
 
 ## 更新日志
+
+### 2026.3.14 - Tools 模块重构完成
+
+#### 工具重构
+- **BrowserTool**: 从 CLI 调用重构为 BrowserService 调用
+  - 支持完整会话管理 (create/close/list)
+  - 支持页面操作 (navigate/click/type/fill/select/hover/scroll)
+  - 支持截图 (viewport/element/full-page)
+  - 支持 JavaScript 执行和页面快照
+  - 依赖注入 Spring 组件
+
+- **SessionTool**: 新增会话管理工具
+  - 会话 CRUD (create/get/list/search)
+  - 状态管理 (update_status/archive/delete)
+  - 消息管理 (add_message/get_messages)
+  - 集成 SessionPersistenceService
+
+- **CronTool**: 已使用 CronService (2026.3.13)
+
+#### 架构改进
+- 所有核心工具统一使用 Service 层
+- 消除 CLI 调用，改为原生 Java API
+- 统一依赖注入模式
+- 更好的错误处理和日志记录
+
+#### 完成度
+- 总体: ~95% → ~98%
+- Browser: 80% → 100%
+- Session: 85% → 100%
 
 ### 2026.3.13 - 核心模块优化完成
 
