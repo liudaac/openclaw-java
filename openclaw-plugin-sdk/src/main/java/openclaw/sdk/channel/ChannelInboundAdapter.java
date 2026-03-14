@@ -38,10 +38,10 @@ public interface ChannelInboundAdapter {
     /**
      * Processing result.
      *
-     * @param success whether processing succeeded
+     * @param succeeded whether processing succeeded
      * @param error error message if failed
      */
-    record ProcessResult(boolean success, String error) {
+    record ProcessResult(boolean succeeded, String error) {
         /**
          * Creates a successful result.
          *

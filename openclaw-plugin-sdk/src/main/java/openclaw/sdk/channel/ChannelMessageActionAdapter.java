@@ -88,7 +88,7 @@ public interface ChannelMessageActionAdapter {
      * @param metadata additional metadata
      */
     record ActionResult(
-            boolean success,
+            boolean succeeded,
             Optional<String> message,
             boolean updateMessage,
             Map<String, Object> metadata

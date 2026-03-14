@@ -54,9 +54,9 @@ public interface ChannelSecurityAdapter<ResolvedAccount> {
      * @param account the associated account if valid
      * @param error error message if invalid
      */
-    record WebhookValidationResult(
+    record WebhookValidationResult<T>(
             boolean valid,
-            Optional<ResolvedAccount> account,
+            Optional<T> account,
             Optional<String> error
     ) {
 
@@ -66,8 +66,8 @@ public interface ChannelSecurityAdapter<ResolvedAccount> {
          * @param account the account
          * @return the result
          */
-        public static <T> WebhookValidationResult valid(T account) {
-            return new WebhookValidationResult(true, Optional.ofNullable((ResolvedAccount) account), Optional.empty());
+        public static <T> WebhookValidationResult<T> valid(T account) {
+            return new WebhookValidationResult<>(true, Optional.ofNullable(account), Optional.empty());
         }
 
         /**
@@ -76,8 +76,8 @@ public interface ChannelSecurityAdapter<ResolvedAccount> {
          * @param error the error message
          * @return the result
          */
-        public static WebhookValidationResult invalid(String error) {
-            return new WebhookValidationResult(false, Optional.empty(), Optional.of(error));
+        public static <T> WebhookValidationResult<T> invalid(String error) {
+            return new WebhookValidationResult<>(false, Optional.empty(), Optional.of(error));
         }
     }
 }

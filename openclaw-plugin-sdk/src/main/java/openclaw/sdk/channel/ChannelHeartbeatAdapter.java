@@ -33,7 +33,7 @@ public interface ChannelHeartbeatAdapter {
      * @param shouldReconnect whether reconnection is needed
      */
     record HeartbeatResult(
-            boolean healthy,
+            boolean isHealthy,
             String message,
             boolean shouldReconnect
     ) {
