@@ -1,6 +1,8 @@
 package openclaw.tools.browser;
 
 import openclaw.browser.BrowserService;
+import openclaw.browser.batch.BatchAction;
+import openclaw.browser.batch.BatchResult;
 import openclaw.browser.model.BrowserSession;
 import openclaw.browser.model.BrowserSession.SessionOptions;
 import openclaw.browser.snapshot.PageSnapshot;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +76,8 @@ public class BrowserTool implements AgentTool {
                                 "create_session", "close_session", "list_sessions",
                                 "navigate", "screenshot", "click", "type", "fill", 
                                 "select", "hover", "scroll", "evaluate", "snapshot",
-                                "get_text", "get_html", "get_url", "get_title"
+                                "get_text", "get_html", "get_url", "get_title",
+                                "batch"  // NEW: batch operation
                         )),
                         "session_id", PropertySchema.string("Session ID or alias (optional, uses default if not provided)"),
                         "url", PropertySchema.string("URL to navigate (for navigate/screenshot)"),
@@ -88,7 +92,9 @@ public class BrowserTool implements AgentTool {
                         "headless", PropertySchema.bool("Run in headless mode (default: true)"),
                         "timeout", PropertySchema.integer("Timeout in seconds (default: 30)"),
                         "save_path", PropertySchema.string("Path to save screenshot (optional)"),
-                        "full_page", PropertySchema.bool("Capture full page screenshot (default: false)")
+                        "full_page", PropertySchema.bool("Capture full page screenshot (default: false)"),
+                        "actions", PropertySchema.array("Batch actions (for batch action)"),
+                        "stop_on_error", PropertySchema.bool("Stop batch on first error (default: true)")
                 ))
                 .required(List.of("action"))
                 .build();
@@ -149,6 +155,10 @@ public class BrowserTool implements AgentTool {
                         return getUrl(args);
                     case "get_title":
                         return getTitle(args);
+                    
+                    // Batch
+                    case "batch":
+                        return executeBatch(args);
                     
                     default:
                         return ToolResult.failure("Unknown action: " + action);
@@ -559,6 +569,90 @@ public class BrowserTool implements AgentTool {
         } catch (Exception e) {
             return ToolResult.failure("Get title failed: " + e.getMessage());
         }
+    }
+
+    // ==================== Batch Operations ====================
+
+    private ToolResult executeBatch(Map<String, Object> args) {
+        String alias = args.getOrDefault("session_id", "default").toString();
+        String sessionId = resolveSessionId(alias);
+        boolean stopOnError = (boolean) args.getOrDefault("stop_on_error", true);
+
+        if (!args.containsKey("actions")) {
+            return ToolResult.failure("Missing required parameter: actions");
+        }
+
+        try {
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> actionMaps = (List<Map<String, Object>>) args.get("actions");
+            
+            List<BatchAction> actions = new ArrayList<>();
+            for (Map<String, Object> actionMap : actionMaps) {
+                actions.add(parseBatchAction(actionMap));
+            }
+
+            BatchResult result = browserService.executeBatch(sessionId, actions, stopOnError).join();
+            
+            // Build result summary
+            List<Map<String, Object>> results = new ArrayList<>();
+            for (int i = 0; i < result.results().size(); i++) {
+                var actionResult = result.results().get(i);
+                Map<String, Object> resultMap = new java.util.HashMap<>();
+                resultMap.put("index", i);
+                resultMap.put("ok", actionResult.ok());
+                resultMap.put("duration_ms", actionResult.durationMs());
+                if (!actionResult.ok()) {
+                    resultMap.put("error", actionResult.error());
+                }
+                if (actionResult.result() != null) {
+                    resultMap.put("result", actionResult.result());
+                }
+                results.add(resultMap);
+            }
+
+            return ToolResult.success(
+                    "Batch execution completed: " + result.completedCount() + " succeeded, " + result.failedCount() + " failed",
+                    Map.of(
+                            "completed", result.completedCount(),
+                            "failed", result.failedCount(),
+                            "total_duration_ms", result.totalDurationMs(),
+                            "results", results
+                    )
+            );
+        } catch (Exception e) {
+            return ToolResult.failure("Batch execution failed: " + e.getMessage());
+        }
+    }
+
+    private BatchAction parseBatchAction(Map<String, Object> map) {
+        String kind = map.get("kind").toString();
+        
+        return new BatchAction(
+                kind,
+                map.get("selector") != null ? map.get("selector").toString() : null,
+                map.get("ref") != null ? map.get("ref").toString() : null,
+                map.get("text") != null ? map.get("text").toString() : null,
+                map.get("value") != null ? map.get("value").toString() : null,
+                map.get("script") != null ? map.get("script").toString() : null,
+                map.get("key") != null ? map.get("key").toString() : null,
+                map.get("direction") != null ? map.get("direction").toString() : null,
+                map.get("amount") != null ? (Integer) map.get("amount") : null,
+                map.get("width") != null ? (Integer) map.get("width") : null,
+                map.get("height") != null ? (Integer) map.get("height") : null,
+                map.get("delay_ms") != null ? (Integer) map.get("delay_ms") : null,
+                map.get("time_ms") != null ? (Integer) map.get("time_ms") : null,
+                map.get("timeout_ms") != null ? (Integer) map.get("timeout_ms") : null,
+                map.get("submit") != null ? (Boolean) map.get("submit") : null,
+                map.get("slowly") != null ? (Boolean) map.get("slowly") : null,
+                map.get("double_click") != null ? (Boolean) map.get("double_click") : null,
+                map.get("button") != null ? map.get("button").toString() : null,
+                map.get("modifiers") != null ? ((List<?>) map.get("modifiers")).toArray(new String[0]) : null,
+                map.get("start_selector") != null ? map.get("start_selector").toString() : null,
+                map.get("start_ref") != null ? map.get("start_ref").toString() : null,
+                map.get("end_selector") != null ? map.get("end_selector").toString() : null,
+                map.get("end_ref") != null ? map.get("end_ref").toString() : null,
+                map.get("extra") != null ? (Map<String, Object>) map.get("extra") : null
+        );
     }
 
     // ==================== Helper Methods ====================

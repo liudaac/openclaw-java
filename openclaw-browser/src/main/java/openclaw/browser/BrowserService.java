@@ -2,6 +2,9 @@ package openclaw.browser;
 
 import com.microsoft.playwright.*;
 import openclaw.browser.action.BrowserActions;
+import openclaw.browser.batch.BatchAction;
+import openclaw.browser.batch.BatchExecutor;
+import openclaw.browser.batch.BatchResult;
 import openclaw.browser.model.BrowserSession;
 import openclaw.browser.model.BrowserSession.SessionOptions;
 import openclaw.browser.session.SessionManager;
@@ -11,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -193,5 +197,34 @@ public class BrowserService {
     public CompletableFuture<String> getTitle(String sessionId) {
         return getCurrentPage(sessionId)
             .thenCompose(page -> new BrowserActions(page).getTitle());
+    }
+    
+    // Batch Operations
+    
+    /**
+     * Execute a batch of browser actions.
+     * 
+     * @param sessionId Browser session ID
+     * @param actions List of actions to execute
+     * @param stopOnError If true, stop on first error; if false, continue with remaining actions
+     * @return BatchResult containing results of all actions
+     */
+    public CompletableFuture<BatchResult> executeBatch(String sessionId, List<BatchAction> actions, boolean stopOnError) {
+        return getCurrentPage(sessionId)
+            .thenApply(page -> {
+                BatchExecutor executor = new BatchExecutor(page);
+                return executor.execute(actions, stopOnError);
+            });
+    }
+    
+    /**
+     * Execute a batch of browser actions (convenience method with stopOnError=true).
+     * 
+     * @param sessionId Browser session ID
+     * @param actions List of actions to execute
+     * @return BatchResult containing results of all actions
+     */
+    public CompletableFuture<BatchResult> executeBatch(String sessionId, List<BatchAction> actions) {
+        return executeBatch(sessionId, actions, true);
     }
 }
