@@ -26,6 +26,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-ai.version>1.1.2</spring-ai.version>
         <jackson.version>2.16.0</jackson.version>
+        <junit-jupiter.version>5.14.3</junit-jupiter.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
     </properties>
 
@@ -74,6 +75,14 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- JUnit Jupiter -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <!-- OpenClaw Modules -->
