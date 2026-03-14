@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>ai.openclaw</groupId>
+        <artifactId>openclaw</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>openclaw-cli</artifactId>
+    <packaging>jar</packaging>
+
+    <name>OpenClaw CLI</name>
+    <description>Command Line Interface for OpenClaw Java Edition</description>
+
+    <dependencies>
+        <!-- OpenClaw Plugin SDK -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-plugin-sdk</artifactId>
+        </dependency>
+
+        <!-- OpenClaw Gateway -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-gateway</artifactId>
+        </dependency>
+
+        <!-- OpenClaw Agent -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-agent</artifactId>
+        </dependency>
+
+        <!-- OpenClaw Session -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-session</artifactId>
+        </dependency>
+
+        <!-- Picocli for CLI -->
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>4.7.5</version>
+        </dependency>
+
+        <!-- JLine for TUI -->
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>3.25.0</version>
+        </dependency>
+
+        <!-- Jackson for JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>openclaw.cli.OpenClawCli</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
