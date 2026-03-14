@@ -40,7 +40,7 @@ public class FetchGuard {
      */
     public void validateOrThrow(String url) {
         SsrfPolicy.SsrfValidationResult result = validate(url);
-        if (!result.allowed()) {
+        if (!result.isAllowed()) {
             throw new SsrfException(
                     "SSRF blocked: " + result.reason().orElse("Unknown reason")
             );
@@ -60,7 +60,7 @@ public class FetchGuard {
             FetchFunction<T> fetcher
     ) {
         SsrfPolicy.SsrfValidationResult result = validate(url);
-        if (!result.allowed()) {
+        if (!result.isAllowed()) {
             return CompletableFuture.failedFuture(
                     new SsrfException(result.reason().orElse("SSRF blocked"))
             );

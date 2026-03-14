@@ -171,7 +171,7 @@ public class InputValidator {
      * @param reason the reason if invalid
      */
     public record ValidationResult(
-            boolean valid,
+            boolean isValid,
             Optional<String> reason
     ) {
 

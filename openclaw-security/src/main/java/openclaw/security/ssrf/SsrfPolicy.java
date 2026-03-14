@@ -56,7 +56,7 @@ public interface SsrfPolicy {
      * @param riskLevel the risk level
      */
     record SsrfValidationResult(
-            boolean allowed,
+            boolean isAllowed,
             Optional<String> reason,
             RiskLevel riskLevel
     ) {
