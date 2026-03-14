@@ -5,20 +5,18 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ai.openclaw</groupId>
+    <parent>
+        <groupId>ai.openclaw</groupId>
+        <artifactId>openclaw</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
     <artifactId>openclaw-channel-feishu</artifactId>
-    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <name>OpenClaw Feishu Channel</name>
     <description>Feishu (Lark) channel adapter for OpenClaw Java Edition</description>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.10.0</junit.version>
-    </properties>
 
     <dependencies>
         <!-- OpenClaw Plugin SDK -->
@@ -32,7 +30,6 @@
         <dependency>
             <groupId>ai.openclaw</groupId>
             <artifactId>openclaw-security</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <!-- HTTP Client -->

@@ -5,22 +5,18 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ai.openclaw</groupId>
+    <parent>
+        <groupId>ai.openclaw</groupId>
+        <artifactId>openclaw</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
     <artifactId>openclaw-plugin-sdk</artifactId>
-    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <name>OpenClaw Plugin SDK</name>
     <description>Plugin SDK for OpenClaw Java Edition</description>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.10.0</junit.version>
-        <jackson.version>2.16.0</jackson.version>
-        <slf4j.version>2.0.9</slf4j.version>
-    </properties>
 
     <dependencies>
         <!-- JSON Processing -->
