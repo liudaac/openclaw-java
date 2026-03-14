@@ -45,6 +45,12 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
+        <!-- Project Reactor -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
