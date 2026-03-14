@@ -24,7 +24,7 @@
         <revision>2026.3.9-SNAPSHOT</revision>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-ai.version>1.0.0-M6</spring-ai.version>
+        <spring-ai.version>1.1.2</spring-ai.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
     </properties>
 
