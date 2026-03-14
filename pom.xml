@@ -27,7 +27,7 @@
         <spring-ai.version>1.1.2</spring-ai.version>
         <jackson.version>2.16.0</jackson.version>
         <junit-jupiter.version>5.14.3</junit-jupiter.version>
-        <reactor.version>3.2.22.RELEASE</reactor.version>
+        <reactor.version>3.8.4</reactor.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
     </properties>
 
