@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import openclaw.memory.MemoryEntry;
 import openclaw.memory.MemorySearchResult;
-import openclaw.memory.MemoryStore;
 import openclaw.memory.config.MemoryConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @ConditionalOnProperty(name = "openclaw.memory.storage-type", havingValue = "pgvector")
-public class PgVectorMemoryStore implements MemoryStore {
+public class PgVectorMemoryStore {
     
     private static final Logger logger = LoggerFactory.getLogger(PgVectorMemoryStore.class);
     

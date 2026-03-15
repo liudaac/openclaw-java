@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import openclaw.memory.Embedding;
 import openclaw.memory.MemoryEntry;
 import openclaw.memory.MemorySearchResult;
-import openclaw.memory.MemoryStore;
 import openclaw.memory.config.MemoryConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,15 +21,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * SQLite-based memory store implementation
- * 
- * <p>This is the default (short-term) implementation with minimal dependencies.
- * Uses brute-force search (O(n)) suitable for small-scale deployments.</p>
- */
 @Service
 @ConditionalOnProperty(name = "openclaw.memory.storage-type", havingValue = "sqlite", matchIfMissing = true)
-public class SQLiteMemoryStore implements MemoryStore {
+public class SQLiteMemoryStore {
     
     private static final Logger logger = LoggerFactory.getLogger(SQLiteMemoryStore.class);
     
@@ -103,71 +96,20 @@ public class SQLiteMemoryStore implements MemoryStore {
     }
     
     @Override
-    public CompletableFuture<List<MemoryEntry>> search(String query, int limit) {
-        // This method is for text-based search
-        // For vector search, use searchByVector
-        return CompletableFuture.supplyAsync(() -> {
-            String sql = "SELECT * FROM memories ORDER BY timestamp DESC LIMIT ?";
-            List<MemoryEntry> results = new ArrayList<>();
-            
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                
-                stmt.setInt(1, limit * 10); // Load more for filtering
-                
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        results.add(mapResultSetToEntry(rs));
-                    }
-                }
-                
-            } catch (SQLException e) {
-                logger.error("Failed to search memories", e);
-                throw new RuntimeException("Failed to search memories", e);
-            }
-            
-            return results.stream().limit(limit).toList();
-        });
-    }
-    
-    /**
-     * Vector-based search using brute-force cosine similarity
-     */
-    public CompletableFuture<List<MemorySearchResult>> searchByVector(float[] queryVector, int limit, double minScore) {
-        return CompletableFuture.supplyAsync(() -> {
-            // Load all entries (brute-force approach)
-            String sql = "SELECT * FROM memories";
-            List<ScoredEntry> scoredEntries = new ArrayList<>();
-            
-            try (Connection conn = dataSource.getConnection();
-                 Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(sql)) {
-                
-                while (rs.next()) {
-                    MemoryEntry entry = mapResultSetToEntry(rs);
-                    double score = cosineSimilarity(queryVector, entry.vector());
-                    
-                    if (score >= minScore) {
-                        scoredEntries.add(new ScoredEntry(entry, score));
-                    }
-                }
-                
-            } catch (SQLException e) {
-                logger.error("Failed to search memories by vector", e);
-                throw new RuntimeException("Failed to search memories", e);
-            }
-            
-            // Sort by score and limit
-            return scoredEntries.stream()
-                .sorted((a, b) -> Double.compare(b.score(), a.score()))
-                .limit(limit)
-                .map(se -> new MemorySearchResult(se.entry().id(), se.score(), se.entry()))
-                .toList();
-        });
+    public CompletableFuture<Void> store(MemoryEntry entry, Embedding embedding) {
+        MemoryEntry entryWithVector = new MemoryEntry(
+            entry.id(),
+            entry.text(),
+            embedding.vector(),
+            entry.metadata(),
+            entry.timestamp(),
+            entry.sessionKey()
+        );
+        return store(entryWithVector);
     }
     
     @Override
-    public CompletableFuture<Optional<MemoryEntry>> get(String id) {
+    public CompletableFuture<Optional<MemoryEntry>> retrieve(String id) {
         return CompletableFuture.supplyAsync(() -> {
             String sql = "SELECT * FROM memories WHERE id = ?";
             
@@ -183,8 +125,8 @@ public class SQLiteMemoryStore implements MemoryStore {
                 }
                 
             } catch (SQLException e) {
-                logger.error("Failed to get memory: {}", id, e);
-                throw new RuntimeException("Failed to get memory", e);
+                logger.error("Failed to retrieve memory: {}", id, e);
+                throw new RuntimeException("Failed to retrieve memory", e);
             }
             
             return Optional.empty();
@@ -192,102 +134,67 @@ public class SQLiteMemoryStore implements MemoryStore {
     }
     
     @Override
-    public CompletableFuture<Void> delete(String id) {
-        return CompletableFuture.runAsync(() -> {
-            String sql = "DELETE FROM memories WHERE id = ?";
+    public CompletableFuture<List<MemorySearchResult>> search(String query, int limit) {
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "SELECT * FROM memories ORDER BY timestamp DESC LIMIT ?";
+            List<MemorySearchResult> results = new ArrayList<>();
             
             try (Connection conn = dataSource.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
                 
-                stmt.setString(1, id);
-                stmt.executeUpdate();
-                logger.debug("Deleted memory: {}", id);
+                stmt.setInt(1, limit);
                 
-            } catch (SQLException e) {
-                logger.error("Failed to delete memory: {}", id, e);
-                throw new RuntimeException("Failed to delete memory", e);
-            }
-        });
-    }
-    
-    /**
-     * Load all memories (for cache warmup)
-     */
-    public CompletableFuture<List<MemoryEntry>> loadAll() {
-        return CompletableFuture.supplyAsync(() -> {
-            String sql = "SELECT * FROM memories ORDER BY timestamp DESC";
-            List<MemoryEntry> results = new ArrayList<>();
-            
-            try (Connection conn = dataSource.getConnection();
-                 Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(sql)) {
-                
-                while (rs.next()) {
-                    results.add(mapResultSetToEntry(rs));
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        MemoryEntry entry = mapResultSetToEntry(rs);
+                        results.add(new MemorySearchResult(entry.id(), 1.0, entry));
+                    }
                 }
                 
             } catch (SQLException e) {
-                logger.error("Failed to load all memories", e);
-                throw new RuntimeException("Failed to load memories", e);
+                logger.error("Failed to search memories", e);
+                throw new RuntimeException("Failed to search memories", e);
             }
             
             return results;
         });
     }
     
-    private MemoryEntry mapResultSetToEntry(ResultSet rs) throws SQLException {
-        try {
-            return new MemoryEntry(
-                rs.getString("id"),
-                rs.getString("text"),
-                bytesToFloatArray(rs.getBytes("vector")),
-                objectMapper.readValue(rs.getString("metadata"), Map.class),
-                rs.getLong("timestamp"),
-                rs.getString("session_key")
-            );
-        } catch (JsonProcessingException e) {
-            throw new SQLException("Failed to parse metadata", e);
-        }
+    @Override
+    public CompletableFuture<List<MemorySearchResult>> search(Embedding embedding, int limit, double minScore) {
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "SELECT * FROM memories";
+            List<ScoredEntry> scoredEntries = new ArrayList<>();
+            
+            try (Connection conn = dataSource.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                
+                while (rs.next()) {
+                    MemoryEntry entry = mapResultSetToEntry(rs);
+                    double score = cosineSimilarity(embedding.vector(), entry.vector());
+                    
+                    if (score >= minScore) {
+                        scoredEntries.add(new ScoredEntry(entry, score));
+                    }
+                }
+                
+            } catch (SQLException e) {
+                logger.error("Failed to search memories by embedding", e);
+                throw new RuntimeException("Failed to search memories", e);
+            }
+            
+            return scoredEntries.stream()
+                .sorted((a, b) -> Double.compare(b.score(), a.score()))
+                .limit(limit)
+                .map(se -> new MemorySearchResult(se.entry().id(), se.score(), se.entry()))
+                .toList();
+        });
     }
     
-    private byte[] floatArrayToBytes(float[] floats) {
-        ByteBuffer buffer = ByteBuffer.allocate(floats.length * 4);
-        for (float f : floats) {
-            buffer.putFloat(f);
-        }
-        return buffer.array();
-    }
-    
-    private float[] bytesToFloatArray(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        float[] floats = new float[bytes.length / 4];
-        for (int i = 0; i < floats.length; i++) {
-            floats[i] = buffer.getFloat();
-        }
-        return floats;
-    }
-    
-    private double cosineSimilarity(float[] a, float[] b) {
-        if (a.length != b.length) {
-            throw new IllegalArgumentException("Vectors must have same dimension");
-        }
-        
-        double dotProduct = 0;
-        double normA = 0;
-        double normB = 0;
-        
-        for (int i = 0; i < a.length; i++) {
-            dotProduct += a[i] * b[i];
-            normA += a[i] * a[i];
-            normB += b[i] * b[i];
-        }
-        
-        if (normA == 0 || normB == 0) {
-            return 0;
-        }
-        
-        return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-    }
-    
-    private record ScoredEntry(MemoryEntry entry, double score) {}
-}
+    @Override
+    public CompletableFuture<Boolean> delete(String id) {
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "DELETE FROM memories WHERE id = ?";
+            
+            try (Connection
