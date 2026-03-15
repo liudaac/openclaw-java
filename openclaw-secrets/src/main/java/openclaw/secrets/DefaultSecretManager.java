@@ -56,7 +56,11 @@ public class DefaultSecretManager implements SecretManager {
                 storage.close();
             }
             if (auditLog != null) {
-                auditLog.close();
+                try {
+                    auditLog.close();
+                } catch (Exception e) {
+                    // Ignore close exceptions during shutdown
+                }
             }
             initialized = false;
         });
