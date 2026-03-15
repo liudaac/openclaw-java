@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -44,19 +45,23 @@ public class OpenClawConfig {
         return new ChannelPlugin<Object, Object, Object>() {
             @Override
             public ChannelId getId() {
-                return new ChannelId("mock", "mock");
+                return ChannelId.valueOf("mock");
             }
             
             @Override
             public ChannelMeta getMeta() {
-                return new ChannelMeta("Mock Channel", "1.0", "Mock channel for testing");
+                return ChannelMeta.builder()
+                    .name("Mock Channel")
+                    .description("Mock channel for testing")
+                    .build();
             }
             
             @Override
             public ChannelCapabilities getCapabilities() {
                 return ChannelCapabilities.builder()
-                    .supportsSend(true)
-                    .supportsReceive(true)
+                    .supportsText(true)
+                    .supportsImages(true)
+                    .supportsFiles(true)
                     .supportsTyping(true)
                     .build();
             }

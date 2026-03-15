@@ -66,7 +66,9 @@ public class ConfigController {
             
         }).onErrorResume(e -> {
             logger.error("Failed to read config", e);
-            return Mono.just(ResponseEntity.ok(getDefaultConfig()));
+            ObjectNode errorResult = objectMapper.createObjectNode();
+            errorResult.put("error", "Failed to read config: " + e.getMessage());
+            return Mono.just(ResponseEntity.ok(errorResult));
         });
     }
     

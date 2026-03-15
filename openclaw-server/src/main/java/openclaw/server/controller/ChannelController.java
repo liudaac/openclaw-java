@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -55,30 +56,30 @@ public class ChannelController {
 
             Optional<ChannelOutboundAdapter> outboundAdapter = channelPlugin.getOutboundAdapter();
             if (outboundAdapter.isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of(
-                                "success", false,
-                                "error", "Outbound adapter not available"
-                        ));
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("error", "Outbound adapter not available");
+                return ResponseEntity.badRequest().body(error);
             }
 
             ChannelOutboundAdapter.SendOptions options = ChannelOutboundAdapter.SendOptions.builder()
                     .build();
 
             return outboundAdapter.get().sendText(null, request.chatId(), request.text(), Optional.of(options))
-                    .thenApply(result -> ResponseEntity.ok(Map.of(
-                            "success", result.success(),
-                            "messageId", result.messageId().orElse(null),
-                            "timestamp", System.currentTimeMillis()
-                    )))
+                    .thenApply(result -> {
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", result.success());
+                        response.put("messageId", result.messageId().orElse(null));
+                        response.put("timestamp", System.currentTimeMillis());
+                        return ResponseEntity.ok(response);
+                    })
                     .get();
         }).onErrorResume(e -> {
             logger.error("Failed to send message", e);
-            return Mono.just(ResponseEntity.badRequest()
-                    .body(Map.of(
-                            "success", false,
-                            "error", e.getMessage()
-                    )));
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", e.getMessage());
+            return Mono.just(ResponseEntity.badRequest().body(error));
         });
     }
 
@@ -95,26 +96,26 @@ public class ChannelController {
         return Mono.fromCallable(() -> {
             Optional<ChannelOutboundAdapter> outboundAdapter = channelPlugin.getOutboundAdapter();
             if (outboundAdapter.isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of(
-                                "success", false,
-                                "error", "Outbound adapter not available"
-                        ));
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("error", "Outbound adapter not available");
+                return ResponseEntity.badRequest().body(error);
             }
 
             return outboundAdapter.get().sendTyping(null, chatId)
-                    .thenApply(v -> ResponseEntity.ok(Map.of(
-                            "success", true,
-                            "chatId", chatId
-                    )))
+                    .thenApply(v -> {
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", true);
+                        response.put("chatId", chatId);
+                        return ResponseEntity.ok(response);
+                    })
                     .get();
         }).onErrorResume(e -> {
             logger.error("Failed to send typing indicator", e);
-            return Mono.just(ResponseEntity.badRequest()
-                    .body(Map.of(
-                            "success", false,
-                            "error", e.getMessage()
-                    )));
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", e.getMessage());
+            return Mono.just(ResponseEntity.badRequest().body(error));
         });
     }
 
@@ -125,13 +126,14 @@ public class ChannelController {
     public Mono<ResponseEntity<Map<String, Object>>> getChannelInfo(
             @PathVariable String channel) {
 
-        return Mono.fromCallable(() -> ResponseEntity.ok(Map.of(
-                "channel", channel,
-                "id", channelPlugin.getId().value(),
-                "name", channelPlugin.getMeta().displayName(),
-                "available", true,
-                "capabilities", channelPlugin.getCapabilities()
-        )));
+        return Mono.fromCallable(() -> {
+            Map<String, Object> info = new HashMap<>();
+            info.put("channel", channel);
+            info.put("id", channelPlugin.getId().toString());
+            info.put("name", channelPlugin.getMeta().name());
+            info.put("available", true);
+            return ResponseEntity.ok(info);
+        });
     }
 
     // Request/Response Records

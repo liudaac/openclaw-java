@@ -2,10 +2,7 @@ package openclaw.server.service;
 
 import openclaw.gateway.GatewayService;
 import openclaw.gateway.node.NodeRegistry;
-import openclaw.gateway.queue.QueueStats;
 import openclaw.gateway.queue.WorkQueue;
-import openclaw.gateway.work.DispatchResult;
-import openclaw.gateway.work.DispatchStrategy;
 import openclaw.gateway.work.WorkDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,37 +182,37 @@ public class GatewayServiceImpl implements GatewayService {
         }
         
         @Override
-        public CompletableFuture<QueueStats> getStats() {
+        public CompletableFuture<WorkQueue.QueueStats> getStats() {
             return CompletableFuture.completedFuture(
-                new QueueStats(queue.size(), 10000, totalEnqueued.get(), totalDequeued.get(), 0.0)
+                new WorkQueue.QueueStats(queue.size(), 10000, totalEnqueued.get(), totalDequeued.get(), 0.0)
             );
         }
     }
     
     private class InMemoryWorkDispatcher implements WorkDispatcher {
-        private DispatchStrategy strategy = DispatchStrategy.ROUND_ROBIN;
+        private WorkDispatcher.DispatchStrategy strategy = WorkDispatcher.DispatchStrategy.ROUND_ROBIN;
         
         @Override
-        public CompletableFuture<DispatchResult> dispatch(WorkItem work) {
+        public CompletableFuture<WorkDispatcher.DispatchResult> dispatch(WorkItem work) {
             return CompletableFuture.completedFuture(
-                DispatchResult.success(work.id(), "local")
+                WorkDispatcher.DispatchResult.success(work.id(), "local")
             );
         }
         
         @Override
-        public CompletableFuture<DispatchResult> dispatchToNode(WorkItem work, String nodeId) {
+        public CompletableFuture<WorkDispatcher.DispatchResult> dispatchToNode(WorkItem work, String nodeId) {
             return CompletableFuture.completedFuture(
-                DispatchResult.success(work.id(), nodeId)
+                WorkDispatcher.DispatchResult.success(work.id(), nodeId)
             );
         }
         
         @Override
-        public DispatchStrategy getStrategy() {
+        public WorkDispatcher.DispatchStrategy getStrategy() {
             return strategy;
         }
         
         @Override
-        public void setStrategy(DispatchStrategy strategy) {
+        public void setStrategy(WorkDispatcher.DispatchStrategy strategy) {
             this.strategy = strategy;
         }
     }

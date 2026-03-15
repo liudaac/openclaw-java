@@ -177,7 +177,9 @@ public class ChatController {
             
         }).onErrorResume(e -> {
             logger.error("Failed to abort run", e);
-            return Mono.just(ResponseEntity.internalServerError().body((ObjectNode) null));
+            ObjectNode errorResult = objectMapper.createObjectNode();
+            errorResult.put("error", e.getMessage());
+            return Mono.just(ResponseEntity.internalServerError().body(errorResult));
         });
     }
     
