@@ -28,6 +28,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/api/chat")
 public class ChatController {
     
+    // Helper to wrap ObjectNode as JsonNode for ResponseEntity
+    private ResponseEntity<JsonNode> wrap(ObjectNode node) {
+        return ResponseEntity.ok(node);
+    }
+    
     private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
     
     @Autowired
@@ -145,15 +150,16 @@ public class ChatController {
      * POST /api/chat/abort
      */
     @PostMapping("/abort")
-    public Mono<ResponseEntity<ObjectNode>> abortRun(@RequestBody JsonNode request) {
+    public Mono<ResponseEntity<JsonNode>> abortRun(@RequestBody JsonNode request) {
         return Mono.fromCallable(() -> {
             String sessionKey = request.path("sessionKey").asText();
             String runId = request.path("runId").asText();
             
             ChatSession session = sessions.get(sessionKey);
             if (session == null) {
-                return ResponseEntity.badRequest()
-                    .body(createErrorResponse("Session not found"));
+                ObjectNode error = objectMapper.createObjectNode();
+                error.put("error", "Session not found");
+                return ResponseEntity.badRequest().body(error);
             }
             
             // 中止运行
@@ -173,13 +179,13 @@ public class ChatController {
             result.put("success", true);
             result.put("message", "Run aborted");
             
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok((JsonNode) result);
             
         }).onErrorResume(e -> {
             logger.error("Failed to abort run", e);
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("error", e.getMessage());
-            return Mono.just(ResponseEntity.internalServerError().body(errorResult));
+            return Mono.just(ResponseEntity.internalServerError().body((JsonNode) errorResult));
         });
     }
     
