@@ -49,7 +49,7 @@ public class StatusController {
      * GET /api/status
      */
     @GetMapping("/status")
-    public Mono<ResponseEntity<JsonNode>> getStatus() {
+    public Mono<ResponseEntity<ObjectNode>> getStatus() {
         return Mono.fromCallable(() -> {
             ObjectNode status = objectMapper.createObjectNode();
             
@@ -104,7 +104,7 @@ public class StatusController {
      * GET /api/health
      */
     @GetMapping("/health")
-    public Mono<ResponseEntity<JsonNode>> getHealth() {
+    public Mono<ResponseEntity<ObjectNode>> getHealth() {
         return Mono.fromCallable(() -> {
             ObjectNode health = objectMapper.createObjectNode();
             
@@ -151,7 +151,7 @@ public class StatusController {
      * GET /api/models
      */
     @GetMapping("/models")
-    public Mono<ResponseEntity<JsonNode>> getModels() {
+    public Mono<ResponseEntity<ObjectNode>> getModels() {
         return Mono.fromCallable(() -> {
             ObjectNode result = objectMapper.createObjectNode();
             
@@ -219,7 +219,7 @@ public class StatusController {
      * GET /api/channels/status
      */
     @GetMapping("/channels/status")
-    public Mono<ResponseEntity<JsonNode>> getChannelsStatus() {
+    public Mono<ResponseEntity<ObjectNode>> getChannelsStatus() {
         return Mono.fromCallable(() -> {
             ObjectNode result = objectMapper.createObjectNode();
             
@@ -275,7 +275,7 @@ public class StatusController {
      * GET /api/sessions
      */
     @GetMapping("/sessions")
-    public Mono<ResponseEntity<JsonNode>> getSessions() {
+    public Mono<ResponseEntity<ObjectNode>> getSessions() {
         return Mono.fromCallable(() -> {
             ObjectNode result = objectMapper.createObjectNode();
             
@@ -316,7 +316,7 @@ public class StatusController {
      * GET /api/system/info
      */
     @GetMapping("/system/info")
-    public Mono<ResponseEntity<JsonNode>> getSystemInfo() {
+    public Mono<ResponseEntity<ObjectNode>> getSystemInfo() {
         return Mono.fromCallable(() -> {
             ObjectNode info = objectMapper.createObjectNode();
             
