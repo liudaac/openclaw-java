@@ -74,6 +74,13 @@ public class SessionStateMachine {
     }
     
     /**
+     * Transition session to any state
+     */
+    public CompletableFuture<SessionContext> transition(String sessionKey, SessionState newState) {
+        return transitionState(sessionKey, newState);
+    }
+
+    /**
      * Transition session to ACTIVE state
      */
     public CompletableFuture<SessionContext> activateSession(String sessionKey) {
@@ -171,6 +178,13 @@ public class SessionStateMachine {
      */
     public SessionState getSessionState(String sessionKey) {
         return sessionStates.get(sessionKey);
+    }
+
+    /**
+     * Get current state (alias for getSessionState)
+     */
+    public SessionState getCurrentState(String sessionKey) {
+        return getSessionState(sessionKey);
     }
     
     /**

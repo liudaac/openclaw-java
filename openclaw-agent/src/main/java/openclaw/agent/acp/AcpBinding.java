@@ -1,8 +1,8 @@
 package openclaw.agent.acp;
 
-import openclaw.agent.tool.ToolCall;
-import openclaw.agent.tool.ToolResult;
-import openclaw.channel.core.ChannelMessage;
+import openclaw.sdk.tool.ToolCall;
+import openclaw.sdk.tool.ToolResult;
+import openclaw.sdk.channel.ChannelMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

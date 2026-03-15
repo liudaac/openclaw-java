@@ -2,7 +2,7 @@ package openclaw.agent.acp;
 
 import openclaw.agent.session.SessionStateMachine;
 import openclaw.agent.tool.ToolChainExecutor;
-import openclaw.channel.core.ChannelMessage;
+import openclaw.sdk.channel.ChannelMessage;
 import openclaw.memory.manager.MemoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

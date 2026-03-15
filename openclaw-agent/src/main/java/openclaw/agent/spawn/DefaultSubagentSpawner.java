@@ -2,6 +2,7 @@ package openclaw.agent.spawn;
 
 import openclaw.agent.AcpProtocol;
 import openclaw.agent.AcpProtocol.SpawnRequest;
+import openclaw.agent.AcpProtocol.SpawnResult;
 
 import java.util.List;
 import java.util.Map;

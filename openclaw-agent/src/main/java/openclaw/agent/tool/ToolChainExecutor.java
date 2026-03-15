@@ -167,7 +167,10 @@ public class ToolChainExecutor {
             try {
                 logger.debug("Executing tool: {} (attempt {})", toolCall.toolName(), attempt + 1);
                 
-                ToolExecuteContext toolContext = new ToolExecuteContext(toolCall.args(), context.metadata());
+                ToolExecuteContext toolContext = ToolExecuteContext.builder()
+                    .toolName(toolCall.toolName())
+                    .arguments(toolCall.args())
+                    .build();
                 
                 ToolResult result = tool.execute(toolContext)
                     .get(TOOL_TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -177,11 +180,11 @@ public class ToolChainExecutor {
                     return new ToolExecutionResult(
                         toolCall.toolName(), 
                         true, 
-                        result.output(), 
+                        result.content().orElse(null), 
                         null
                     );
                 } else {
-                    throw new RuntimeException(result.error());
+                    throw new RuntimeException(result.error().orElse("Unknown error"));
                 }
                 
             } catch (Exception e) {
