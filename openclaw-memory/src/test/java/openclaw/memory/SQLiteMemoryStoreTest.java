@@ -35,6 +35,7 @@ class SQLiteMemoryStoreTest {
         // Create temporary SQLite database
         String dbUrl = "jdbc:sqlite:" + tempDir.resolve("test.db").toString();
         DataSource dataSource = () -> DriverManager.getConnection(dbUrl);
+        // Alternative: DataSource dataSource = (DataSource) () -> DriverManager.getConnection(dbUrl);
         
         objectMapper = new ObjectMapper();
         MemoryConfig config = new MemoryConfig();
