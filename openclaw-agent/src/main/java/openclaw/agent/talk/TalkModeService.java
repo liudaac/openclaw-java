@@ -1,9 +1,5 @@
 package openclaw.agent.talk;
 
-import openclaw.sdk.tool.ToolContext;
-import openclaw.sdk.tool.ToolResult;
-import openclaw.sdk.channel.ChannelMessage;
-import openclaw.sdk.channel.OutboundMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

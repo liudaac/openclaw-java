@@ -3,6 +3,7 @@ package openclaw.agent.acp;
 import openclaw.sdk.tool.ToolCall;
 import openclaw.sdk.tool.ToolResult;
 import openclaw.sdk.channel.ChannelMessage;
+import openclaw.sdk.agent.AgentMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
