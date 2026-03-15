@@ -53,7 +53,7 @@ public class GatewayServiceImpl implements GatewayService {
         
         @Override
         public CompletableFuture<Void> register(NodeInfo node) {
-            nodes.put(node.getId(), node);
+            nodes.put(node.id(), node);
             return CompletableFuture.completedFuture(null);
         }
         
@@ -113,7 +113,7 @@ public class GatewayServiceImpl implements GatewayService {
         @Override
         public CompletableFuture<QueueStats> getStats() {
             return CompletableFuture.completedFuture(
-                new QueueStats(queue.size(), totalEnqueued.get(), totalDequeued.get(), 0, 0.0)
+                new QueueStats(queue.size(), totalEnqueued.get(), totalDequeued.get(), 0, 0.0f)
             );
         }
         
