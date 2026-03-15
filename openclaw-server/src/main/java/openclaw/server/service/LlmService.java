@@ -3,7 +3,6 @@ package openclaw.server.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -46,7 +45,7 @@ public class LlmService implements openclaw.sdk.llm.LlmService {
             logger.debug("Sending chat request: {}", message.substring(0, Math.min(100, message.length())));
             String content = chatClient.prompt(message).call().content();
             return filterControlTokens(content);
-        }, Schedulers.boundedElastic()::schedule);
+        });
     }
 
     @Override
@@ -58,7 +57,7 @@ public class LlmService implements openclaw.sdk.llm.LlmService {
                 .call()
                 .content();
             return filterControlTokens(content);
-        }, Schedulers.boundedElastic()::schedule);
+        });
     }
 
     @Override
@@ -75,7 +74,7 @@ public class LlmService implements openclaw.sdk.llm.LlmService {
                 .doOnNext(sb::append)
                 .blockLast();
             return filterControlTokens(sb.toString());
-        }, Schedulers.boundedElastic()::schedule);
+        });
     }
 
     public Flux<String> streamChat(String message) {
