@@ -76,7 +76,7 @@ public class ConfigController {
         
         return Mono.fromCallable(() -> {
             // 验证配置
-            ValidationResult validation = validateConfig(config);
+            ValidationResult validation = doValidateConfig(config);
             if (!validation.isValid()) {
                 return ResponseEntity.badRequest()
                     .body(Map.of(
@@ -211,7 +211,7 @@ public class ConfigController {
             @RequestBody JsonNode config) {
         
         return Mono.fromCallable(() -> {
-            ValidationResult result = validateConfig(config);
+            ValidationResult result = doValidateConfig(config);
             
             if (result.isValid()) {
                 return ResponseEntity.ok(Map.of(
@@ -244,7 +244,7 @@ public class ConfigController {
         
         return Mono.fromCallable(() -> {
             // 先保存配置
-            ValidationResult validation = validateConfig(config);
+            ValidationResult validation = doValidateConfig(config);
             if (!validation.isValid()) {
                 return ResponseEntity.badRequest()
                     .body(Map.of(
@@ -307,7 +307,7 @@ public class ConfigController {
         return config;
     }
     
-    private ValidationResult validateConfig(JsonNode config) {
+    private ValidationResult doValidateConfig(JsonNode config) {
         if (config == null || !config.has("gateway")) {
             return ValidationResult.invalid("Missing 'gateway' section");
         }
