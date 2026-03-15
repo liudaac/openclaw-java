@@ -252,31 +252,31 @@ public class SQLiteMemorySearchEngine implements MemorySearchEngine, AutoCloseab
         }
     }
 
-    public CompletableFuture<MemoryManager.MemoryStats> getStats() {
+    @Override
+    public CompletableFuture<MemoryStats> getStats() {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                int totalEntries = 0;
-                int totalEmbeddings = 0;
+                long totalEntries = 0;
+                long indexSize = 0;
                 
                 try (Statement stmt = connection.createStatement()) {
                     try (ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM memories")) {
                         if (rs.next()) {
-                            totalEntries = rs.getInt(1);
+                            totalEntries = rs.getLong(1);
                         }
                     }
                     
                     try (ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM embeddings")) {
                         if (rs.next()) {
-                            totalEmbeddings = rs.getInt(1);
+                            indexSize = rs.getLong(1);
                         }
                     }
                 }
                 
-                return new MemoryManager.MemoryStats(
+                return new MemoryStats(
                         totalEntries,
-                        totalEmbeddings,
-                        Optional.empty(),
-                        0
+                        indexSize,
+                        System.currentTimeMillis()
                 );
             } catch (SQLException e) {
                 throw new RuntimeException("Failed to get stats", e);
@@ -284,6 +284,7 @@ public class SQLiteMemorySearchEngine implements MemorySearchEngine, AutoCloseab
         });
     }
 
+    @Override
     public CompletableFuture<Void> reindex() {
         return CompletableFuture.runAsync(() -> {
             // Reindex all memories

@@ -95,7 +95,7 @@ public interface MemoryManager {
      *
      * @return the statistics
      */
-    CompletableFuture<MemoryStats> getStats();
+    CompletableFuture<MemorySearchEngine.MemoryStats> getStats();
 
     /**
      * Reindexes all memories.
@@ -163,19 +163,5 @@ public interface MemoryManager {
         }
     }
 
-    /**
-     * Memory statistics.
-     *
-     * @param totalEntries total entries
-     * @param totalEmbeddings total embeddings
-     * @param lastIndexed last indexed timestamp
-     * @param indexSize index size in bytes
-     */
-    record MemoryStats(
-            int totalEntries,
-            int totalEmbeddings,
-            Optional<Long> lastIndexed,
-            long indexSize
-    ) {
-    }
+
 }

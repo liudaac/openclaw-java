@@ -57,7 +57,7 @@ public class DefaultMemoryManager implements MemoryManager {
     }
 
     @Override
-    public CompletableFuture<MemoryStats> getStats() {
+    public CompletableFuture<MemorySearchEngine.MemoryStats> getStats() {
         ensureInitialized();
         return searchEngine.getStats();
     }

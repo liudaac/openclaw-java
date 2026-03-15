@@ -59,6 +59,41 @@ public interface MemorySearchEngine {
     CompletableFuture<Void> updateMemory(String entryId, String content, java.util.Map<String, Object> metadata);
 
     /**
+     * Initialize the search engine.
+     *
+     * @return completion future
+     */
+    CompletableFuture<Void> initialize();
+
+    /**
+     * Close the search engine and release resources.
+     */
+    void close();
+
+    /**
+     * Get search engine statistics.
+     *
+     * @return future with statistics
+     */
+    CompletableFuture<MemoryStats> getStats();
+
+    /**
+     * Reindex all memories.
+     *
+     * @return completion future
+     */
+    CompletableFuture<Void> reindex();
+
+    /**
+     * Memory statistics record.
+     */
+    record MemoryStats(
+            long totalEntries,
+            long indexSize,
+            long lastAccessTime
+    ) {}
+
+    /**
      * Search options.
      *
      * @param limit the result limit
