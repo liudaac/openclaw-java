@@ -107,9 +107,10 @@
 
         <!-- Bucket4j for rate limiting -->
         <dependency>
-            <groupId>com.github.vladimir-bukhtoyarov</groupId>
-            <artifactId>bucket4j-core</artifactId>
-            <version>8.7.0</version>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j_jdk17-core</artifactId>
+            <version>8.17.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- JWT -->
