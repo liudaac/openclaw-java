@@ -30,12 +30,13 @@ public class DefaultContextEngine implements ContextEngine {
     public CompletableFuture<ContextSnapshot> bootstrap(String sessionKey, Map<String, Object> context) {
         return CompletableFuture.supplyAsync(() -> {
             // Apply hooks
+            Map<String, Object> currentContext = context;
             for (ContextHook hook : hooks) {
-                context = hook.onBootstrap(context);
+                currentContext = hook.onBootstrap(currentContext);
             }
 
             ContextSession session = new ContextSession(sessionKey);
-            session.metadata.putAll(context);
+            session.metadata.putAll(currentContext);
             sessions.put(sessionKey, session);
 
             return createSnapshot(session);
@@ -51,15 +52,16 @@ public class DefaultContextEngine implements ContextEngine {
             }
 
             // Apply hooks
+            IngestData currentData = data;
             for (ContextHook hook : hooks) {
-                data = hook.onIngest(data);
+                currentData = hook.onIngest(currentData);
             }
 
             // Add to messages
             ContextMessage message = new ContextMessage(
-                    data.type().name().toLowerCase(),
-                    data.content(),
-                    estimateTokens(data.content())
+                    currentData.type().name().toLowerCase(),
+                    currentData.content(),
+                    estimateTokens(currentData.content())
             );
             session.messages.add(message);
 
@@ -78,11 +80,12 @@ public class DefaultContextEngine implements ContextEngine {
             ContextSnapshot snapshot = createSnapshot(session);
 
             // Apply hooks
+            ContextSnapshot currentSnapshot = snapshot;
             for (ContextHook hook : hooks) {
-                snapshot = hook.onAssemble(snapshot);
+                currentSnapshot = hook.onAssemble(currentSnapshot);
             }
 
-            return snapshot;
+            return currentSnapshot;
         });
     }
 
@@ -102,11 +105,12 @@ public class DefaultContextEngine implements ContextEngine {
             ContextSnapshot snapshot = createSnapshot(session);
 
             // Apply hooks
+            ContextSnapshot currentSnapshot = snapshot;
             for (ContextHook hook : hooks) {
-                snapshot = hook.onCompact(snapshot);
+                currentSnapshot = hook.onCompact(currentSnapshot);
             }
 
-            return snapshot;
+            return currentSnapshot;
         });
     }
 
