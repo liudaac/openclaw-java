@@ -149,6 +149,32 @@ public class CronService {
     public CompletableFuture<List<JobExecution>> getJobHistory(String jobId, int limit) {
         return store.findExecutionsByJob(jobId, limit);
     }
+
+    /**
+     * Get execution statistics.
+     */
+    public CompletableFuture<Map<String, Object>> getExecutionStats(String jobId) {
+        return store.findById(jobId)
+            .thenCompose(opt -> {
+                if (opt.isPresent()) {
+                    CronJob job = opt.get();
+                    return getJobHistory(jobId, 100)
+                        .thenApply(history -> {
+                            long successCount = history.stream().filter(JobExecution::isSuccess).count();
+                            long failCount = history.size() - successCount;
+                            return Map.<String, Object>of(
+                                "jobId", jobId,
+                                "runCount", job.getRunCount(),
+                                "failCount", job.getFailCount(),
+                                "successCount", successCount,
+                                "failCount", failCount,
+                                "totalExecutions", history.size()
+                            );
+                        });
+                }
+                return CompletableFuture.completedFuture(Map.<String, Object>of());
+            });
+    }
     
     // Private methods
     

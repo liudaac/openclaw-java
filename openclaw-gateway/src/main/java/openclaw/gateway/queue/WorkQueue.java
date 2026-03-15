@@ -95,6 +95,24 @@ public interface WorkQueue {
     CompletableFuture<QueueStats> getStats();
 
     /**
+     * Gets the pending count.
+     *
+     * @return the count
+     */
+    default CompletableFuture<Integer> getPendingCount() {
+        return size();
+    }
+
+    /**
+     * Gets the completed count.
+     *
+     * @return the count
+     */
+    default CompletableFuture<Long> getCompletedCount() {
+        return getStats().thenApply(QueueStats::totalDequeued);
+    }
+
+    /**
      * Queue statistics.
      *
      * @param size current size

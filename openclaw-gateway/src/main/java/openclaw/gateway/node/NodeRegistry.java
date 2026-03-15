@@ -70,6 +70,15 @@ public interface NodeRegistry {
     CompletableFuture<Boolean> isNodeHealthy(String nodeId);
 
     /**
+     * Gets the total node count.
+     *
+     * @return the count
+     */
+    default CompletableFuture<Integer> getNodeCount() {
+        return listNodes().thenApply(List::size);
+    }
+
+    /**
      * Node information.
      *
      * @param id the node ID
