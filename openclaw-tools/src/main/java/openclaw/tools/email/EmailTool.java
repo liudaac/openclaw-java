@@ -7,11 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.mail.*;
-import javax.mail.internet.*;
-import javax.mail.util.ByteArrayDataSource;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import jakarta.mail.util.ByteArrayDataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -191,7 +191,7 @@ public class EmailTool implements Tool {
         
         if (useSsl && smtpPort == 465) {
             props.put("mail.smtp.socketFactory.port", "465");
-            props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            props.put("mail.smtp.socketFactory.class", "jakarta.net.ssl.SSLSocketFactory");
         }
         
         Session session = Session.getInstance(props, new Authenticator() {

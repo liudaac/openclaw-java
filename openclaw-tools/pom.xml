@@ -55,18 +55,11 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- JavaMail API -->
+        <!-- Jakarta Mail API -->
         <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>1.6.2</version>
-        </dependency>
-
-        <!-- Activation Framework -->
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1.1</version>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
         </dependency>
 
         <!-- Test -->
