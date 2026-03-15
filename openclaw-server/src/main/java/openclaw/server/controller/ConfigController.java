@@ -45,7 +45,7 @@ public class ConfigController {
      * GET /api/config
      */
     @GetMapping
-    public Mono<ResponseEntity<ObjectNode>> getConfig() {
+    public Mono<ResponseEntity<JsonNode>> getConfig() {
         return Mono.fromCallable(() -> {
             Path configPath = Paths.get(CONFIG_FILE);
             
@@ -71,7 +71,7 @@ public class ConfigController {
      * POST /api/config
      */
     @PostMapping
-    public Mono<ResponseEntity<ObjectNode>> setConfig(
+    public Mono<ResponseEntity<JsonNode>> setConfig(
             @RequestBody JsonNode config,
             @RequestHeader(value = "X-Config-Hash", required = false) String baseHash) {
         
@@ -79,22 +79,20 @@ public class ConfigController {
             // 验证配置
             ValidationResult validation = doValidateConfig(config);
             if (!validation.isValid()) {
-                return ResponseEntity.badRequest()
-                    .body(Map.of(
-                        "success", false,
-                        "error", validation.getError()
-                    ));
+                ObjectNode errorResult = objectMapper.createObjectNode();
+                errorResult.put("success", false);
+                errorResult.put("error", validation.getError());
+                return ResponseEntity.badRequest().body(errorResult);
             }
             
             // 检查 base hash (防止并发修改)
             if (baseHash != null) {
                 String currentHash = calculateConfigHash();
                 if (!baseHash.equals(currentHash)) {
-                    return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(Map.of(
-                            "success", false,
-                            "error", "Config has been modified by another process"
-                        ));
+                    ObjectNode errorResult = objectMapper.createObjectNode();
+                    errorResult.put("success", false);
+                    errorResult.put("error", "Config has been modified by another process");
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResult);
                 }
             }
             
@@ -105,19 +103,19 @@ public class ConfigController {
             
             String newHash = calculateConfigHash();
             
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "hash", newHash,
-                "message", "Configuration saved successfully"
-            ));
+            ObjectNode result = objectMapper.createObjectNode();
+            result.put("success", true);
+            result.put("hash", newHash);
+            result.put("message", "Configuration saved successfully");
+            
+            return ResponseEntity.ok(result);
             
         }).onErrorResume(e -> {
             logger.error("Failed to save config", e);
-            return Mono.just(ResponseEntity.internalServerError()
-                .body(Map.of(
-                    "success", false,
-                    "error", e.getMessage()
-                )));
+            ObjectNode errorResult = objectMapper.createObjectNode();
+            errorResult.put("success", false);
+            errorResult.put("error", e.getMessage());
+            return Mono.just(ResponseEntity.internalServerError().body(errorResult));
         });
     }
     
@@ -127,7 +125,7 @@ public class ConfigController {
      * GET /api/config/schema
      */
     @GetMapping("/schema")
-    public Mono<ResponseEntity<ObjectNode>> getConfigSchema() {
+    public Mono<ResponseEntity<JsonNode>> getConfigSchema() {
         return Mono.fromCallable(() -> {
             ObjectNode schema = objectMapper.createObjectNode();
             
@@ -208,29 +206,28 @@ public class ConfigController {
      * POST /api/config/validate
      */
     @PostMapping("/validate")
-    public Mono<ResponseEntity<ObjectNode>> validateConfig(
+    public Mono<ResponseEntity<JsonNode>> validateConfig(
             @RequestBody JsonNode config) {
         
         return Mono.fromCallable(() -> {
             ValidationResult result = doValidateConfig(config);
             
+            ObjectNode response = objectMapper.createObjectNode();
             if (result.isValid()) {
-                return ResponseEntity.ok(Map.of(
-                    "valid", true,
-                    "message", "Configuration is valid"
-                ));
+                response.put("valid", true);
+                response.put("message", "Configuration is valid");
             } else {
-                return ResponseEntity.ok(Map.of(
-                    "valid", false,
-                    "error", result.getError()
-                ));
+                response.put("valid", false);
+                response.put("error", result.getError());
             }
             
+            return ResponseEntity.ok(response);
+            
         }).onErrorResume(e -> {
-            return Mono.just(ResponseEntity.ok(Map.of(
-                "valid", false,
-                "error", e.getMessage()
-            )));
+            ObjectNode errorResult = objectMapper.createObjectNode();
+            errorResult.put("valid", false);
+            errorResult.put("error", e.getMessage());
+            return Mono.just(ResponseEntity.ok(errorResult));
         });
     }
     
@@ -240,18 +237,17 @@ public class ConfigController {
      * POST /api/config/apply
      */
     @PostMapping("/apply")
-    public Mono<ResponseEntity<ObjectNode>> applyConfig(
+    public Mono<ResponseEntity<JsonNode>> applyConfig(
             @RequestBody JsonNode config) {
         
         return Mono.fromCallable(() -> {
             // 先保存配置
             ValidationResult validation = doValidateConfig(config);
             if (!validation.isValid()) {
-                return ResponseEntity.badRequest()
-                    .body(Map.of(
-                        "success", false,
-                        "error", validation.getError()
-                    ));
+                ObjectNode errorResult = objectMapper.createObjectNode();
+                errorResult.put("success", false);
+                errorResult.put("error", validation.getError());
+                return ResponseEntity.badRequest().body(errorResult);
             }
             
             Path configPath = Paths.get(CONFIG_FILE);
@@ -269,18 +265,18 @@ public class ConfigController {
                 }
             }).start();
             
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Configuration applied. Gateway will restart shortly."
-            ));
+            ObjectNode result = objectMapper.createObjectNode();
+            result.put("success", true);
+            result.put("message", "Configuration applied. Gateway will restart shortly.");
+            
+            return ResponseEntity.ok(result);
             
         }).onErrorResume(e -> {
             logger.error("Failed to apply config", e);
-            return Mono.just(ResponseEntity.internalServerError()
-                .body(Map.of(
-                    "success", false,
-                    "error", e.getMessage()
-                )));
+            ObjectNode errorResult = objectMapper.createObjectNode();
+            errorResult.put("success", false);
+            errorResult.put("error", e.getMessage());
+            return Mono.just(ResponseEntity.internalServerError().body(errorResult));
         });
     }
     

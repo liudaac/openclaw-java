@@ -115,6 +115,12 @@ public class StreamingController {
         // For now, return a mock adapter
         return new ChannelStreamingAdapter() {
             @Override
+            public String getChannelName() { return "mock"; }
+            
+            @Override
+            public boolean isAvailable() { return true; }
+            
+            @Override
             public boolean supportsStreaming() { return true; }
             
             @Override

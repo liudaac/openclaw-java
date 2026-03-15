@@ -111,11 +111,14 @@ public class RetryPolicyManager {
             double multiplier,
             Duration maxWaitDuration) {
         
+        // Create interval function for exponential backoff
+        IntervalFunction intervalFunction = IntervalFunction.ofExponentialBackoff(
+            waitDuration, multiplier, maxWaitDuration
+        );
+        
         RetryConfig config = RetryConfig.<Throwable>custom()
             .maxAttempts(maxRetries + 1) // +1 for initial attempt
-            .waitDuration(waitDuration)
-            .multiplier(multiplier)
-            .maxWaitDuration(maxWaitDuration)
+            .intervalFunction(intervalFunction)
             .retryExceptions(RETRYABLE_EXCEPTIONS.toArray(new Class[0]))
             .failAfterMaxAttempts(true)
             .build();

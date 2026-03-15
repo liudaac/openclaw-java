@@ -184,7 +184,7 @@ public class StreamingResponseHandler {
         
         return new StreamStats(
             streamId,
-            context.chunkCount(),
+            context.chunkCount().get(),
             context.isCancelled(),
             System.currentTimeMillis() - context.startTime()
         );
@@ -199,7 +199,7 @@ public class StreamingResponseHandler {
         activeStreams.forEach((id, context) -> {
             stats.put(id, new StreamStats(
                 id,
-                context.chunkCount(),
+                context.chunkCount().get(),
                 context.isCancelled(),
                 System.currentTimeMillis() - context.startTime()
             ));
@@ -219,7 +219,7 @@ public class StreamingResponseHandler {
         }
         
         // Simple flow control: pause if too many chunks emitted recently
-        long recentChunks = context.chunkCount() - context.lastCheckpoint();
+        long recentChunks = context.chunkCount().get() - context.lastCheckpoint();
         return recentChunks > DEFAULT_BACKPRESSURE_THRESHOLD;
     }
     
@@ -242,7 +242,7 @@ public class StreamingResponseHandler {
         
         if (context != null) {
             logger.debug("Cleaned up stream: {} ({} chunks, {}ms)",
-                streamId, context.chunkCount(), 
+                streamId, context.chunkCount().get(), 
                 System.currentTimeMillis() - context.startTime());
         }
     }

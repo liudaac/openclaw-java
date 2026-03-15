@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
@@ -51,6 +50,7 @@ public class StreamingMessageService {
         // Create streaming request
         StreamingMessageRequest request = new StreamingMessageRequest(
             chatId,
+            null,
             contentStream,
             Map.of("messageId", messageId),
             defaultConfig.getDefaultTimeout()

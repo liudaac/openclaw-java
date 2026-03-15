@@ -1,9 +1,9 @@
 package openclaw.server.service;
 
+import openclaw.gateway.GatewayService;
 import openclaw.gateway.node.NodeInfo;
 import openclaw.gateway.node.NodeRegistry;
 import openclaw.gateway.queue.QueueStats;
-import openclaw.gateway.queue.WorkItem;
 import openclaw.gateway.queue.WorkQueue;
 import openclaw.gateway.work.DispatchResult;
 import openclaw.gateway.work.DispatchStrategy;
@@ -34,6 +34,18 @@ public class GatewayServiceImpl implements GatewayService {
     }
     
     @Override
+    public CompletableFuture<Void> initialize(GatewayConfig config) {
+        logger.info("Initializing gateway service with config: {}", config);
+        return CompletableFuture.completedFuture(null);
+    }
+    
+    @Override
+    public CompletableFuture<Void> shutdown() {
+        logger.info("Shutting down gateway service");
+        return CompletableFuture.completedFuture(null);
+    }
+    
+    @Override
     public NodeRegistry getNodeRegistry() {
         return nodeRegistry;
     }
@@ -48,17 +60,34 @@ public class GatewayServiceImpl implements GatewayService {
         return workDispatcher;
     }
     
+    @Override
+    public CompletableFuture<String> submitWork(WorkItem work) {
+        return workQueue.enqueue(work)
+            .thenCompose(v -> workDispatcher.dispatch(work))
+            .thenApply(result -> work.id());
+    }
+    
+    @Override
+    public CompletableFuture<WorkStatus> getWorkStatus(String workId) {
+        return CompletableFuture.completedFuture(WorkStatus.pending(workId));
+    }
+    
+    @Override
+    public CompletableFuture<Void> cancelWork(String workId) {
+        return CompletableFuture.completedFuture(null);
+    }
+    
     private class InMemoryNodeRegistry implements NodeRegistry {
         private final Map<String, NodeInfo> nodes = new ConcurrentHashMap<>();
         
         @Override
-        public CompletableFuture<Void> register(NodeInfo node) {
+        public CompletableFuture<RegistrationResult> registerNode(NodeInfo node) {
             nodes.put(node.id(), node);
-            return CompletableFuture.completedFuture(null);
+            return CompletableFuture.completedFuture(RegistrationResult.success(node.id()));
         }
         
         @Override
-        public CompletableFuture<Void> unregister(String nodeId) {
+        public CompletableFuture<Void> unregisterNode(String nodeId) {
             nodes.remove(nodeId);
             return CompletableFuture.completedFuture(null);
         }
@@ -74,13 +103,21 @@ public class GatewayServiceImpl implements GatewayService {
         }
         
         @Override
-        public CompletableFuture<Boolean> isNodeHealthy(String nodeId) {
-            return CompletableFuture.completedFuture(nodes.containsKey(nodeId));
+        public CompletableFuture<List<NodeInfo>> listNodesByStatus(NodeStatus status) {
+            List<NodeInfo> filtered = nodes.values().stream()
+                .filter(n -> n.status() == status)
+                .toList();
+            return CompletableFuture.completedFuture(filtered);
         }
         
         @Override
-        public CompletableFuture<Integer> getNodeCount() {
-            return CompletableFuture.completedFuture(nodes.size());
+        public CompletableFuture<Void> heartbeat(String nodeId) {
+            return CompletableFuture.completedFuture(null);
+        }
+        
+        @Override
+        public CompletableFuture<Boolean> isNodeHealthy(String nodeId) {
+            return CompletableFuture.completedFuture(nodes.containsKey(nodeId));
         }
     }
     
@@ -90,14 +127,14 @@ public class GatewayServiceImpl implements GatewayService {
         private final AtomicLong totalDequeued = new AtomicLong(0);
         
         @Override
-        public CompletableFuture<Void> submit(WorkItem work) {
-            queue.offer(work);
+        public CompletableFuture<Void> enqueue(WorkItem item) {
+            queue.offer(item);
             totalEnqueued.incrementAndGet();
             return CompletableFuture.completedFuture(null);
         }
         
         @Override
-        public CompletableFuture<Optional<WorkItem>> poll() {
+        public CompletableFuture<Optional<WorkItem>> dequeue() {
             WorkItem item = queue.poll();
             if (item != null) {
                 totalDequeued.incrementAndGet();
@@ -106,25 +143,53 @@ public class GatewayServiceImpl implements GatewayService {
         }
         
         @Override
+        public CompletableFuture<Optional<WorkItem>> peek() {
+            return CompletableFuture.completedFuture(Optional.ofNullable(queue.peek()));
+        }
+        
+        @Override
         public CompletableFuture<Integer> size() {
             return CompletableFuture.completedFuture(queue.size());
         }
         
         @Override
-        public CompletableFuture<QueueStats> getStats() {
+        public CompletableFuture<Boolean> isEmpty() {
+            return CompletableFuture.completedFuture(queue.isEmpty());
+        }
+        
+        @Override
+        public CompletableFuture<Boolean> isFull() {
+            return CompletableFuture.completedFuture(false);
+        }
+        
+        @Override
+        public CompletableFuture<Void> clear() {
+            queue.clear();
+            return CompletableFuture.completedFuture(null);
+        }
+        
+        @Override
+        public CompletableFuture<List<WorkItem>> getPendingItems() {
+            return CompletableFuture.completedFuture(new ArrayList<>(queue));
+        }
+        
+        @Override
+        public CompletableFuture<Boolean> remove(String workId) {
+            return CompletableFuture.completedFuture(queue.removeIf(item -> item.id().equals(workId)));
+        }
+        
+        @Override
+        public CompletableFuture<Optional<WorkItem>> getItem(String workId) {
             return CompletableFuture.completedFuture(
-                new QueueStats(queue.size(), totalEnqueued.get(), totalDequeued.get(), 0, 0.0f)
+                queue.stream().filter(item -> item.id().equals(workId)).findFirst()
             );
         }
         
         @Override
-        public CompletableFuture<Integer> getPendingCount() {
-            return CompletableFuture.completedFuture(queue.size());
-        }
-        
-        @Override
-        public CompletableFuture<Long> getCompletedCount() {
-            return CompletableFuture.completedFuture(totalDequeued.get());
+        public CompletableFuture<QueueStats> getStats() {
+            return CompletableFuture.completedFuture(
+                new QueueStats(queue.size(), 10000, totalEnqueued.get(), totalDequeued.get(), 0.0)
+            );
         }
     }
     
@@ -134,8 +199,20 @@ public class GatewayServiceImpl implements GatewayService {
         @Override
         public CompletableFuture<DispatchResult> dispatch(WorkItem work) {
             return CompletableFuture.completedFuture(
-                new DispatchResult(true, work.getId(), "local", null)
+                DispatchResult.success(work.id(), "local")
             );
+        }
+        
+        @Override
+        public CompletableFuture<DispatchResult> dispatchToNode(WorkItem work, String nodeId) {
+            return CompletableFuture.completedFuture(
+                DispatchResult.success(work.id(), nodeId)
+            );
+        }
+        
+        @Override
+        public DispatchStrategy getStrategy() {
+            return strategy;
         }
         
         @Override

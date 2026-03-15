@@ -131,15 +131,21 @@ public class CronController {
     @GetMapping("/jobs/{jobId}/stats")
     public Mono<StatsResponse> getJobStats(@PathVariable String jobId) {
         return Mono.fromFuture(cronService.getExecutionStats(jobId))
-                .map(stats -> new StatsResponse(
-                        ((Number) stats.getOrDefault("totalRuns", 0)).longValue(),
-                        ((Number) stats.getOrDefault("successfulRuns", 0)).longValue(),
-                        ((Number) stats.getOrDefault("failedRuns", 0)).longValue(),
-                        ((Number) stats.getOrDefault("totalRuns", 0)).longValue() > 0 ? 
-                                (double) ((Number) stats.getOrDefault("successfulRuns", 0)).longValue() / ((Number) stats.getOrDefault("totalRuns", 0)).longValue() : 0,
-                        ((Number) stats.getOrDefault("averageDurationMs", 0)).longValue(),
+                .map(stats -> {
+                    long totalRuns = ((Number) stats.getOrDefault("totalRuns", 0)).longValue();
+                    long successfulRuns = ((Number) stats.getOrDefault("successfulRuns", 0)).longValue();
+                    long failedRuns = ((Number) stats.getOrDefault("failedRuns", 0)).longValue();
+                    long averageDurationMs = ((Number) stats.getOrDefault("averageDurationMs", 0)).longValue();
+                    
+                    return new StatsResponse(
+                        (int) totalRuns,
+                        (int) successfulRuns,
+                        (int) failedRuns,
+                        totalRuns > 0 ? (double) successfulRuns / totalRuns : 0,
+                        (double) averageDurationMs,
                         stats.getOrDefault("lastRun", null)
-                ));
+                    );
+                });
     }
 
     // Helper methods
@@ -217,7 +223,7 @@ public class CronController {
             int failedRuns,
             double successRate,
             double averageDurationMs,
-            java.time.Instant lastRun
+            Object lastRun
     ) {}
 
     // Exceptions

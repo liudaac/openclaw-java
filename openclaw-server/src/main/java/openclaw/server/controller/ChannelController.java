@@ -1,21 +1,26 @@
 package openclaw.server.controller;
 
-import openclaw.sdk.channel.*;
+import openclaw.sdk.channel.ChannelMessage;
+import openclaw.sdk.channel.ChannelOutboundAdapter;
+import openclaw.sdk.channel.ChannelPlugin;
+import openclaw.sdk.channel.SendResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Channel REST API Controller
  *
  * <p>Provides HTTP endpoints for channel operations.</p>
+ *
+ * @author OpenClaw Team
+ * @version 2026.3.13
  */
 @RestController
 @RequestMapping("/api/v1/channels")
@@ -23,139 +28,95 @@ public class ChannelController {
 
     private static final Logger logger = LoggerFactory.getLogger(ChannelController.class);
 
-    private final Map<ChannelId, ChannelPlugin<?, ?, ?>> channels;
+    private final ChannelPlugin channelPlugin;
 
-    public ChannelController(List<ChannelPlugin<?, ?, ?>> channelPlugins) {
-        this.channels = channelPlugins.stream()
-                .collect(Collectors.toMap(ChannelPlugin::getId, p -> p));
+    public ChannelController(ChannelPlugin channelPlugin) {
+        this.channelPlugin = channelPlugin;
     }
 
     /**
-     * List all available channels
+     * Send a text message
      */
-    @GetMapping
-    public Mono<List<ChannelInfo>> listChannels() {
-        return Mono.just(channels.values().stream()
-                .map(plugin -> new ChannelInfo(
-                        plugin.getId().name(),
-                        plugin.getMeta().name(),
-                        plugin.getMeta().description(),
-                        plugin.getCapabilities()
-                ))
-                .toList());
-    }
+    @PostMapping("/{channel}/send")
+    public Mono<ResponseEntity<Map<String, Object>>> sendMessage(
+            @PathVariable String channel,
+            @RequestBody SendMessageRequest request) {
 
-    /**
-     * Get channel details
-     */
-    @GetMapping("/{channelId}")
-    public Mono<ChannelInfo> getChannel(@PathVariable String channelId) {
-        ChannelPlugin<?, ?, ?> plugin = channels.get(ChannelId.valueOf(channelId.toUpperCase()));
-        if (plugin == null) {
-            return Mono.error(new ChannelNotFoundException("Channel not found: " + channelId));
-        }
+        logger.info("Sending message to channel: {}", channel);
 
-        return Mono.just(new ChannelInfo(
-                plugin.getId().name(),
-                plugin.getMeta().name(),
-                plugin.getMeta().description(),
-                plugin.getCapabilities()
-        ));
-    }
-
-    /**
-     * Send message to channel
-     */
-    @PostMapping("/{channelId}/send")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public Mono<SendResponse> sendMessage(
-            @PathVariable String channelId,
-            @RequestBody SendRequest request) {
-
-        ChannelPlugin<?, ?, ?> plugin = channels.get(ChannelId.valueOf(channelId.toUpperCase()));
-        if (plugin == null) {
-            return Mono.error(new ChannelNotFoundException("Channel not found: " + channelId));
-        }
-
-        Optional<ChannelOutboundAdapter> outbound = plugin.getOutboundAdapter();
-        if (outbound.isEmpty()) {
-            return Mono.error(new ChannelOperationException("Channel does not support outbound messages"));
-        }
-
-        logger.info("Sending message via {} to {}", channelId, request.target());
-
-        // Create message
         ChannelMessage message = ChannelMessage.builder()
                 .text(request.text())
-                .target(request.target())
+                .from(request.from())
+                .fromName(request.fromName())
+                .chatId(request.chatId())
+                .messageId(request.messageId())
+                .metadata(request.metadata())
                 .build();
 
-        return Mono.fromFuture(outbound.get().send(message))
-                .map(result -> new SendResponse(
-                        result.success(),
-                        result.messageId().orElse(null),
-                        result.error().orElse(null)
-                ));
+        return Mono.fromFuture(channelPlugin.sendMessage(message))
+                .map(result -> ResponseEntity.ok(Map.of(
+                        "success", result.success(),
+                        "messageId", result.messageId(),
+                        "timestamp", result.timestamp()
+                )))
+                .onErrorResume(e -> {
+                    logger.error("Failed to send message", e);
+                    return Mono.just(ResponseEntity.badRequest()
+                            .body(Map.of(
+                                    "success", false,
+                                    "error", e.getMessage()
+                            )));
+                });
     }
 
     /**
-     * Get channel health status
+     * Send a typing indicator
      */
-    @GetMapping("/{channelId}/health")
-    public Mono<ChannelHealthResponse> getChannelHealth(@PathVariable String channelId) {
-        ChannelPlugin<?, ?, ?> plugin = channels.get(ChannelId.valueOf(channelId.toUpperCase()));
-        if (plugin == null) {
-            return Mono.error(new ChannelNotFoundException("Channel not found: " + channelId));
-        }
+    @PostMapping("/{channel}/typing")
+    public Mono<ResponseEntity<Map<String, Object>>> sendTyping(
+            @PathVariable String channel,
+            @RequestParam String chatId) {
 
-        // Simple health check
-        return Mono.just(new ChannelHealthResponse(
-                channelId,
-                "UP",
-                System.currentTimeMillis()
-        ));
+        logger.debug("Sending typing indicator to: {}", chatId);
+
+        return Mono.fromFuture(channelPlugin.sendTypingIndicator(chatId))
+                .thenReturn(ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "chatId", chatId
+                )))
+                .onErrorResume(e -> {
+                    logger.error("Failed to send typing indicator", e);
+                    return Mono.just(ResponseEntity.badRequest()
+                            .body(Map.of(
+                                    "success", false,
+                                    "error", e.getMessage()
+                            )));
+                });
+    }
+
+    /**
+     * Get channel info
+     */
+    @GetMapping("/{channel}/info")
+    public Mono<ResponseEntity<Map<String, Object>>> getChannelInfo(
+            @PathVariable String channel) {
+
+        return Mono.fromCallable(() -> ResponseEntity.ok(Map.of(
+                "channel", channel,
+                "name", channelPlugin.getChannelName(),
+                "available", channelPlugin.isAvailable(),
+                "capabilities", channelPlugin.getCapabilities()
+        )));
     }
 
     // Request/Response Records
 
-    public record ChannelInfo(
-            String id,
-            String name,
-            String description,
-            ChannelCapabilities capabilities
-    ) {}
-
-    public record SendRequest(
-            String target,
+    public record SendMessageRequest(
             String text,
-            Map<String, Object> options
-    ) {}
-
-    public record SendResponse(
-            boolean success,
+            String from,
+            String fromName,
+            String chatId,
             String messageId,
-            String error
+            Map<String, Object> metadata
     ) {}
-
-    public record ChannelHealthResponse(
-            String channelId,
-            String status,
-            long timestamp
-    ) {}
-
-    // Exceptions
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public static class ChannelNotFoundException extends RuntimeException {
-        public ChannelNotFoundException(String message) {
-            super(message);
-        }
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public static class ChannelOperationException extends RuntimeException {
-        public ChannelOperationException(String message) {
-            super(message);
-        }
-    }
 }

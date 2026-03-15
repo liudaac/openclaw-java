@@ -142,5 +142,14 @@ public class GatewayWebSocketHandler implements WebSocketHandler {
         return sendMessage(session, new WebSocketMessage("error", Map.of("message", error)));
     }
 
+    /**
+     * Get the current connection count.
+     *
+     * @return the number of active WebSocket connections
+     */
+    public int getConnectionCount() {
+        return sessions.size();
+    }
+
     public record WebSocketMessage(String type, Map<String, Object> payload) {}
 }
