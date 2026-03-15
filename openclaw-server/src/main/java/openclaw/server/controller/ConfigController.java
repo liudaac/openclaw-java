@@ -44,7 +44,7 @@ public class ConfigController {
      * GET /api/config
      */
     @GetMapping
-    public Mono<ResponseEntity<JsonNode>> getConfig() {
+    public Mono<ResponseEntity<ObjectNode>> getConfig() {
         return Mono.fromCallable(() -> {
             Path configPath = Paths.get(CONFIG_FILE);
             
@@ -126,7 +126,7 @@ public class ConfigController {
      * GET /api/config/schema
      */
     @GetMapping("/schema")
-    public Mono<ResponseEntity<JsonNode>> getConfigSchema() {
+    public Mono<ResponseEntity<ObjectNode>> getConfigSchema() {
         return Mono.fromCallable(() -> {
             ObjectNode schema = objectMapper.createObjectNode();
             

@@ -57,7 +57,7 @@ public class LogsController {
      * GET /api/logs?limit={limit}&level={level}
      */
     @GetMapping
-    public Mono<ResponseEntity<JsonNode>> getLogs(
+    public Mono<ResponseEntity<ObjectNode>> getLogs(
             @RequestParam(defaultValue = "100") int limit,
             @RequestParam(defaultValue = "INFO") String level) {
         
@@ -129,7 +129,7 @@ public class LogsController {
      * GET /api/logs/search?query={query}&limit={limit}
      */
     @GetMapping("/search")
-    public Mono<ResponseEntity<JsonNode>> searchLogs(
+    public Mono<ResponseEntity<ObjectNode>> searchLogs(
             @RequestParam String query,
             @RequestParam(defaultValue = "100") int limit) {
         

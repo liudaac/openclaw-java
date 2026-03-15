@@ -87,7 +87,7 @@ public class ChatController {
      * POST /api/chat/send
      */
     @PostMapping("/send")
-    public Mono<ResponseEntity<JsonNode>> sendMessage(@RequestBody JsonNode request) {
+    public Mono<ResponseEntity<ObjectNode>> sendMessage(@RequestBody JsonNode request) {
         return Mono.fromCallable(() -> {
             String sessionKey = request.path("sessionKey").asText();
             String message = request.path("message").asText();
@@ -145,7 +145,7 @@ public class ChatController {
      * POST /api/chat/abort
      */
     @PostMapping("/abort")
-    public Mono<ResponseEntity<JsonNode>> abortRun(@RequestBody JsonNode request) {
+    public Mono<ResponseEntity<ObjectNode>> abortRun(@RequestBody JsonNode request) {
         return Mono.fromCallable(() -> {
             String sessionKey = request.path("sessionKey").asText();
             String runId = request.path("runId").asText();
@@ -187,7 +187,7 @@ public class ChatController {
      * POST /api/chat/inject
      */
     @PostMapping("/inject")
-    public Mono<ResponseEntity<JsonNode>> injectMessage(@RequestBody JsonNode request) {
+    public Mono<ResponseEntity<ObjectNode>> injectMessage(@RequestBody JsonNode request) {
         return Mono.fromCallable(() -> {
             String sessionKey = request.path("sessionKey").asText();
             String content = request.path("content").asText();
