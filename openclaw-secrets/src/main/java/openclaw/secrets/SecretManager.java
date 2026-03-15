@@ -1,7 +1,7 @@
 package openclaw.secrets;
 
 import openclaw.secrets.audit.AuditLog;
-import openclaw.secrets.config.SecretConfig;
+// SecretConfig does not exist, using SecretManagerConfig instead
 import openclaw.secrets.credential.Credential;
 
 import java.nio.file.Path;
@@ -54,6 +54,16 @@ public interface SecretManager {
      * @return the secret value if found
      */
     CompletableFuture<Optional<String>> retrieveSecret(String key);
+
+    /**
+     * Retrieves a secret (alias for retrieveSecret).
+     *
+     * @param key the secret key
+     * @return the secret value if found
+     */
+    default CompletableFuture<Optional<String>> retrieve(String key) {
+        return retrieveSecret(key);
+    }
 
     /**
      * Deletes a secret.
