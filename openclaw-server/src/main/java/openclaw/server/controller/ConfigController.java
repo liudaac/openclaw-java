@@ -28,9 +28,21 @@ import java.util.Map;
 @RequestMapping("/api/config")
 public class ConfigController {
     
-    // Helper method to convert ObjectNode to JsonNode
-    private JsonNode toJsonNode(ObjectNode objectNode) {
-        return objectNode;
+    // Helper methods to ensure correct generic types
+    private ResponseEntity<JsonNode> ok(JsonNode node) {
+        return ResponseEntity.ok(node);
+    }
+    
+    private ResponseEntity<JsonNode> badRequest(JsonNode node) {
+        return ResponseEntity.badRequest().body(node);
+    }
+    
+    private ResponseEntity<JsonNode> conflict(JsonNode node) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(node);
+    }
+    
+    private ResponseEntity<JsonNode> internalServerError(JsonNode node) {
+        return ResponseEntity.internalServerError().body(node);
     }
     
     private static final Logger logger = LoggerFactory.getLogger(ConfigController.class);
@@ -62,13 +74,13 @@ public class ConfigController {
             String content = Files.readString(configPath);
             ObjectNode config = (ObjectNode) objectMapper.readTree(content);
             
-            return ResponseEntity.ok((JsonNode) config);
+            return ok(config);
             
         }).onErrorResume(e -> {
             logger.error("Failed to read config", e);
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("error", "Failed to read config: " + e.getMessage());
-            return Mono.just(ResponseEntity.ok((JsonNode) errorResult));
+            return Mono.just(ok(errorResult));
         });
     }
     
@@ -89,7 +101,7 @@ public class ConfigController {
                 ObjectNode errorResult = objectMapper.createObjectNode();
                 errorResult.put("success", false);
                 errorResult.put("error", validation.getError());
-                return ResponseEntity.badRequest().body(errorResult);
+                return badRequest(errorResult);
             }
             
             // 检查 base hash (防止并发修改)
@@ -99,7 +111,7 @@ public class ConfigController {
                     ObjectNode errorResult = objectMapper.createObjectNode();
                     errorResult.put("success", false);
                     errorResult.put("error", "Config has been modified by another process");
-                    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResult);
+                    return conflict(errorResult);
                 }
             }
             
@@ -115,14 +127,14 @@ public class ConfigController {
             result.put("hash", newHash);
             result.put("message", "Configuration saved successfully");
             
-            return ResponseEntity.ok((JsonNode) result);
+            return ok(result);
             
         }).onErrorResume(e -> {
             logger.error("Failed to save config", e);
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("success", false);
             errorResult.put("error", e.getMessage());
-            return Mono.<ResponseEntity<JsonNode>>just(ResponseEntity.internalServerError().body((JsonNode) errorResult));
+            return Mono.just(internalServerError(errorResult));
         });
     }
     
@@ -199,13 +211,13 @@ public class ConfigController {
             gatewaySchema.set("properties", gatewayProperties);
             schema.set("gateway", gatewaySchema);
             
-            return ResponseEntity.ok((JsonNode) schema);
+            return ok(schema);
             
         }).onErrorResume(e -> {
             logger.error("Failed to generate schema", e);
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("error", e.getMessage());
-            return Mono.just(ResponseEntity.internalServerError().body((JsonNode) errorResult));
+            return Mono.just(internalServerError(errorResult));
         });
     }
     
@@ -230,13 +242,13 @@ public class ConfigController {
                 response.put("error", result.getError());
             }
             
-            return ResponseEntity.ok((JsonNode) response);
+            return ok(response);
             
         }).onErrorResume(e -> {
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("valid", false);
             errorResult.put("error", e.getMessage());
-            return Mono.just(ResponseEntity.ok((JsonNode) errorResult));
+            return Mono.just(ok(errorResult));
         });
     }
     
@@ -278,14 +290,14 @@ public class ConfigController {
             result.put("success", true);
             result.put("message", "Configuration applied. Gateway will restart shortly.");
             
-            return ResponseEntity.ok((JsonNode) result);
+            return ok(result);
             
         }).onErrorResume(e -> {
             logger.error("Failed to apply config", e);
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("success", false);
             errorResult.put("error", e.getMessage());
-            return Mono.<ResponseEntity<JsonNode>>just(ResponseEntity.internalServerError().body((JsonNode) errorResult));
+            return Mono.just(internalServerError(errorResult));
         });
     }
     

@@ -28,9 +28,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/api/chat")
 public class ChatController {
     
-    // Helper to wrap ObjectNode as JsonNode for ResponseEntity
-    private ResponseEntity<JsonNode> wrap(ObjectNode node) {
+    // Helper methods to ensure correct generic types
+    private ResponseEntity<JsonNode> ok(JsonNode node) {
         return ResponseEntity.ok(node);
+    }
+    
+    private ResponseEntity<JsonNode> badRequest(JsonNode node) {
+        return ResponseEntity.badRequest().body(node);
+    }
+    
+    private ResponseEntity<JsonNode> internalServerError(JsonNode node) {
+        return ResponseEntity.internalServerError().body(node);
     }
     
     private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
@@ -159,7 +167,7 @@ public class ChatController {
             if (session == null) {
                 ObjectNode error = objectMapper.createObjectNode();
                 error.put("error", "Session not found");
-                return ResponseEntity.badRequest().body(error);
+                return badRequest(error);
             }
             
             // 中止运行
@@ -179,13 +187,13 @@ public class ChatController {
             result.put("success", true);
             result.put("message", "Run aborted");
             
-            return ResponseEntity.ok((JsonNode) result);
+            return ok(result);
             
         }).onErrorResume(e -> {
             logger.error("Failed to abort run", e);
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("error", e.getMessage());
-            return Mono.<ResponseEntity<JsonNode>>just(ResponseEntity.internalServerError().body((JsonNode) errorResult));
+            return Mono.just(internalServerError(errorResult));
         });
     }
     
