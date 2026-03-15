@@ -3,7 +3,7 @@ package openclaw.agent.tool;
 import openclaw.sdk.tool.AgentTool;
 import openclaw.sdk.tool.ToolExecuteContext;
 import openclaw.sdk.tool.ToolResult;
-import openclaw.server.service.LlmService;
+import openclaw.sdk.llm.LlmService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

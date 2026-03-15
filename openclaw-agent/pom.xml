@@ -31,12 +31,6 @@
             <artifactId>openclaw-memory</artifactId>
         </dependency>
 
-        <!-- OpenClaw Server -->
-        <dependency>
-            <groupId>ai.openclaw</groupId>
-            <artifactId>openclaw-server</artifactId>
-        </dependency>
-
         <!-- jtokkit - Token counting -->
         <dependency>
             <groupId>com.knuddels</groupId>

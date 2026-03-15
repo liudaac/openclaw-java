@@ -13,6 +13,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 /**
  * LLM Service for OpenClaw
@@ -20,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
  * <p>Provides LLM operations using Spring AI.</p>
  */
 @Service
-public class LlmService {
+public class LlmService implements openclaw.sdk.llm.LlmService {
 
     private static final Logger logger = LoggerFactory.getLogger(LlmService.class);
 

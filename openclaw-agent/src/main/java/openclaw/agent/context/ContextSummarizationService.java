@@ -1,7 +1,7 @@
 package openclaw.agent.context;
 
 import openclaw.agent.token.TokenCounterService;
-import openclaw.server.service.LlmService;
+import openclaw.sdk.llm.LlmService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
