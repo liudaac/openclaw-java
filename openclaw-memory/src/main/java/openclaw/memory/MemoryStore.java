@@ -39,6 +39,16 @@ public interface MemoryStore {
     CompletableFuture<Optional<MemoryEntry>> retrieve(String id);
 
     /**
+     * Get a memory entry by ID (alias for retrieve).
+     *
+     * @param id the memory entry ID
+     * @return future with the optional memory entry
+     */
+    default CompletableFuture<Optional<MemoryEntry>> get(String id) {
+        return retrieve(id);
+    }
+
+    /**
      * Search for memories by text similarity.
      *
      * @param query the search query
@@ -56,6 +66,18 @@ public interface MemoryStore {
      * @return future with search results
      */
     CompletableFuture<List<MemorySearchResult>> search(Embedding embedding, int limit, double minScore);
+
+    /**
+     * Search memories by vector (using float array).
+     *
+     * @param queryVector the query vector
+     * @param limit maximum number of results
+     * @param minScore minimum similarity score
+     * @return future with search results
+     */
+    default CompletableFuture<List<MemorySearchResult>> searchByVector(float[] queryVector, int limit, double minScore) {
+        return search(new Embedding(queryVector), limit, minScore);
+    }
 
     /**
      * Delete a memory entry by ID.
@@ -80,6 +102,15 @@ public interface MemoryStore {
      * @return future with list of all entries
      */
     CompletableFuture<List<MemoryEntry>> getAll();
+
+    /**
+     * Load all memories (alias for getAll).
+     *
+     * @return future with list of all entries
+     */
+    default CompletableFuture<List<MemoryEntry>> loadAll() {
+        return getAll();
+    }
 
     /**
      * Get memory entries by metadata filter.
