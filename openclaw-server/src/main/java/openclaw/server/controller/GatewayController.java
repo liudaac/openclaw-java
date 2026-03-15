@@ -102,7 +102,7 @@ public class GatewayController {
 
         return Mono.just(new GatewayStatsResponse(
                 nodeRegistry.getNodeCount().join(),
-                workQueue.getPendingCount(),
+                workQueue.getPendingCount().join(),
                 workQueue.getCompletedCount(),
                 Runtime.getRuntime().availableProcessors()
         ));

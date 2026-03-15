@@ -71,7 +71,7 @@ public class ConfigController {
      * POST /api/config
      */
     @PostMapping
-    public Mono<ResponseEntity<Map<String, Object>>> setConfig(
+    public Mono<ResponseEntity<ObjectNode>> setConfig(
             @RequestBody JsonNode config,
             @RequestHeader(value = "X-Config-Hash", required = false) String baseHash) {
         
@@ -208,7 +208,7 @@ public class ConfigController {
      * POST /api/config/validate
      */
     @PostMapping("/validate")
-    public Mono<ResponseEntity<Map<String, Object>>> validateConfig(
+    public Mono<ResponseEntity<ObjectNode>> validateConfig(
             @RequestBody JsonNode config) {
         
         return Mono.fromCallable(() -> {
@@ -240,7 +240,7 @@ public class ConfigController {
      * POST /api/config/apply
      */
     @PostMapping("/apply")
-    public Mono<ResponseEntity<Map<String, Object>>> applyConfig(
+    public Mono<ResponseEntity<ObjectNode>> applyConfig(
             @RequestBody JsonNode config) {
         
         return Mono.fromCallable(() -> {
