@@ -173,7 +173,7 @@ public class SQLiteCronJobStore implements CronJobStore {
     }
     
     @Override
-    public    public CompletableFuture<List<CronJob>> findByStatus(JobStatus status) {
+    public CompletableFuture<List<CronJob>> findByStatus(JobStatus status) {
         return CompletableFuture.supplyAsync(() -> {
             List<CronJob> jobs = new ArrayList<>();
             try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM jobs WHERE status = ? ORDER BY next_run ASC")) {

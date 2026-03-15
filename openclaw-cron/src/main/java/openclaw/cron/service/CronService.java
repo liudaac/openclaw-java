@@ -212,7 +212,7 @@ public class CronService {
     
     private void handleFailedJob(CronJob job, JobExecution execution) {
         if (job.getFailCount() < job.getMaxRetries()) {
-            logger.warn("Job {} failed, will retry (attempt {}/{}), 
+            logger.warn("Job {} failed, will retry (attempt {}/{})",
                 job.getName(), job.getFailCount(), job.getMaxRetries());
             store.updateStatus(job.getId(), JobStatus.PENDING);
         } else {
