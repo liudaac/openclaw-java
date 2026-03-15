@@ -3,6 +3,11 @@ package openclaw.server.config;
 import openclaw.agent.AcpProtocol;
 import openclaw.gateway.GatewayService;
 import openclaw.sdk.channel.ChannelPlugin;
+import openclaw.sdk.channel.ChannelCapabilities;
+import openclaw.sdk.channel.ChannelId;
+import openclaw.sdk.channel.ChannelMeta;
+import openclaw.sdk.channel.ChannelConfigAdapter;
+import openclaw.sdk.channel.SendResult;
 import openclaw.sdk.tool.AgentTool;
 import openclaw.server.service.AcpProtocolImpl;
 import openclaw.server.service.GatewayServiceImpl;
@@ -11,7 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
  * OpenClaw Configuration
@@ -34,34 +39,31 @@ public class OpenClawConfig {
     }
     
     @Bean
-    public ChannelPlugin channelPlugin() {
+    public ChannelPlugin<?, ?, ?> channelPlugin() {
         // Return a mock implementation for now
-        return new ChannelPlugin() {
+        return new ChannelPlugin<Object, Object, Object>() {
             @Override
-            public String getChannelName() {
-                return "mock";
+            public ChannelId getId() {
+                return new ChannelId("mock", "mock");
             }
             
             @Override
-            public boolean isAvailable() {
-                return true;
+            public ChannelMeta getMeta() {
+                return new ChannelMeta("Mock Channel", "1.0", "Mock channel for testing");
             }
             
             @Override
-            public List<String> getCapabilities() {
-                return List.of("send", "receive", "typing");
+            public ChannelCapabilities getCapabilities() {
+                return ChannelCapabilities.builder()
+                    .supportsSend(true)
+                    .supportsReceive(true)
+                    .supportsTyping(true)
+                    .build();
             }
             
             @Override
-            public java.util.concurrent.CompletableFuture<openclaw.sdk.channel.SendResult> sendMessage(openclaw.sdk.channel.ChannelMessage message) {
-                return java.util.concurrent.CompletableFuture.completedFuture(
-                    new openclaw.sdk.channel.SendResult(true, message.messageId(), System.currentTimeMillis(), null)
-                );
-            }
-            
-            @Override
-            public java.util.concurrent.CompletableFuture<Void> sendTypingIndicator(String chatId) {
-                return java.util.concurrent.CompletableFuture.completedFuture(null);
+            public ChannelConfigAdapter<Object> getConfigAdapter() {
+                return null;
             }
         };
     }

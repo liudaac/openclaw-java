@@ -28,6 +28,11 @@ import java.util.Map;
 @RequestMapping("/api/config")
 public class ConfigController {
     
+    // Helper method to convert ObjectNode to JsonNode
+    private JsonNode toJsonNode(ObjectNode objectNode) {
+        return objectNode;
+    }
+    
     private static final Logger logger = LoggerFactory.getLogger(ConfigController.class);
     
     @Autowired
@@ -45,7 +50,7 @@ public class ConfigController {
      * GET /api/config
      */
     @GetMapping
-    public Mono<ResponseEntity<JsonNode>> getConfig() {
+    public Mono<ResponseEntity<ObjectNode>> getConfig() {
         return Mono.fromCallable(() -> {
             Path configPath = Paths.get(CONFIG_FILE);
             
@@ -55,7 +60,7 @@ public class ConfigController {
             }
             
             String content = Files.readString(configPath);
-            JsonNode config = objectMapper.readTree(content);
+            ObjectNode config = (ObjectNode) objectMapper.readTree(content);
             
             return ResponseEntity.ok(config);
             
@@ -71,7 +76,7 @@ public class ConfigController {
      * POST /api/config
      */
     @PostMapping
-    public Mono<ResponseEntity<JsonNode>> setConfig(
+    public Mono<ResponseEntity<ObjectNode>> setConfig(
             @RequestBody JsonNode config,
             @RequestHeader(value = "X-Config-Hash", required = false) String baseHash) {
         
@@ -125,7 +130,7 @@ public class ConfigController {
      * GET /api/config/schema
      */
     @GetMapping("/schema")
-    public Mono<ResponseEntity<JsonNode>> getConfigSchema() {
+    public Mono<ResponseEntity<ObjectNode>> getConfigSchema() {
         return Mono.fromCallable(() -> {
             ObjectNode schema = objectMapper.createObjectNode();
             
@@ -206,7 +211,7 @@ public class ConfigController {
      * POST /api/config/validate
      */
     @PostMapping("/validate")
-    public Mono<ResponseEntity<JsonNode>> validateConfig(
+    public Mono<ResponseEntity<ObjectNode>> validateConfig(
             @RequestBody JsonNode config) {
         
         return Mono.fromCallable(() -> {
@@ -237,7 +242,7 @@ public class ConfigController {
      * POST /api/config/apply
      */
     @PostMapping("/apply")
-    public Mono<ResponseEntity<JsonNode>> applyConfig(
+    public Mono<ResponseEntity<ObjectNode>> applyConfig(
             @RequestBody JsonNode config) {
         
         return Mono.fromCallable(() -> {

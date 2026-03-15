@@ -12,7 +12,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Channel REST API Controller
@@ -28,9 +27,9 @@ public class ChannelController {
 
     private static final Logger logger = LoggerFactory.getLogger(ChannelController.class);
 
-    private final ChannelPlugin channelPlugin;
+    private final ChannelPlugin<?, ?, ?> channelPlugin;
 
-    public ChannelController(ChannelPlugin channelPlugin) {
+    public ChannelController(ChannelPlugin<?, ?, ?> channelPlugin) {
         this.channelPlugin = channelPlugin;
     }
 
@@ -44,29 +43,43 @@ public class ChannelController {
 
         logger.info("Sending message to channel: {}", channel);
 
-        ChannelMessage message = ChannelMessage.builder()
-                .text(request.text())
-                .from(request.from())
-                .fromName(request.fromName())
-                .chatId(request.chatId())
-                .messageId(request.messageId())
-                .metadata(request.metadata())
-                .build();
+        return Mono.fromCallable(() -> {
+            ChannelMessage message = ChannelMessage.builder()
+                    .text(request.text())
+                    .from(request.from())
+                    .fromName(request.fromName())
+                    .chatId(request.chatId())
+                    .messageId(request.messageId())
+                    .metadata(request.metadata())
+                    .build();
 
-        return Mono.fromFuture(channelPlugin.sendMessage(message))
-                .map(result -> ResponseEntity.ok(Map.of(
-                        "success", result.success(),
-                        "messageId", result.messageId(),
-                        "timestamp", result.timestamp()
-                )))
-                .onErrorResume(e -> {
-                    logger.error("Failed to send message", e);
-                    return Mono.just(ResponseEntity.badRequest()
-                            .body(Map.of(
-                                    "success", false,
-                                    "error", e.getMessage()
-                            )));
-                });
+            Optional<ChannelOutboundAdapter> outboundAdapter = channelPlugin.getOutboundAdapter();
+            if (outboundAdapter.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of(
+                                "success", false,
+                                "error", "Outbound adapter not available"
+                        ));
+            }
+
+            ChannelOutboundAdapter.SendOptions options = ChannelOutboundAdapter.SendOptions.builder()
+                    .build();
+
+            return outboundAdapter.get().sendText(null, request.chatId(), request.text(), Optional.of(options))
+                    .thenApply(result -> ResponseEntity.ok(Map.of(
+                            "success", result.success(),
+                            "messageId", result.messageId().orElse(null),
+                            "timestamp", System.currentTimeMillis()
+                    )))
+                    .get();
+        }).onErrorResume(e -> {
+            logger.error("Failed to send message", e);
+            return Mono.just(ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "success", false,
+                            "error", e.getMessage()
+                    )));
+        });
     }
 
     /**
@@ -79,19 +92,30 @@ public class ChannelController {
 
         logger.debug("Sending typing indicator to: {}", chatId);
 
-        return Mono.fromFuture(channelPlugin.sendTypingIndicator(chatId))
-                .thenReturn(ResponseEntity.ok(Map.of(
-                        "success", true,
-                        "chatId", chatId
-                )))
-                .onErrorResume(e -> {
-                    logger.error("Failed to send typing indicator", e);
-                    return Mono.just(ResponseEntity.badRequest()
-                            .body(Map.of(
-                                    "success", false,
-                                    "error", e.getMessage()
-                            )));
-                });
+        return Mono.fromCallable(() -> {
+            Optional<ChannelOutboundAdapter> outboundAdapter = channelPlugin.getOutboundAdapter();
+            if (outboundAdapter.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of(
+                                "success", false,
+                                "error", "Outbound adapter not available"
+                        ));
+            }
+
+            return outboundAdapter.get().sendTyping(null, chatId)
+                    .thenApply(v -> ResponseEntity.ok(Map.of(
+                            "success", true,
+                            "chatId", chatId
+                    )))
+                    .get();
+        }).onErrorResume(e -> {
+            logger.error("Failed to send typing indicator", e);
+            return Mono.just(ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "success", false,
+                            "error", e.getMessage()
+                    )));
+        });
     }
 
     /**
@@ -103,8 +127,9 @@ public class ChannelController {
 
         return Mono.fromCallable(() -> ResponseEntity.ok(Map.of(
                 "channel", channel,
-                "name", channelPlugin.getChannelName(),
-                "available", channelPlugin.isAvailable(),
+                "id", channelPlugin.getId().value(),
+                "name", channelPlugin.getMeta().displayName(),
+                "available", true,
                 "capabilities", channelPlugin.getCapabilities()
         )));
     }

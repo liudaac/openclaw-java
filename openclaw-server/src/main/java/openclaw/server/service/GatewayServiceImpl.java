@@ -1,7 +1,6 @@
 package openclaw.server.service;
 
 import openclaw.gateway.GatewayService;
-import openclaw.gateway.node.NodeInfo;
 import openclaw.gateway.node.NodeRegistry;
 import openclaw.gateway.queue.QueueStats;
 import openclaw.gateway.queue.WorkQueue;
