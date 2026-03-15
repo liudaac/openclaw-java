@@ -122,7 +122,8 @@ public class ConfigController {
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("success", false);
             errorResult.put("error", e.getMessage());
-            return Mono.just(ResponseEntity.internalServerError().body((JsonNode) errorResult));
+            ResponseEntity<JsonNode> errorResponse = ResponseEntity.internalServerError().body((JsonNode) errorResult);
+            return Mono.just(errorResponse);
         });
     }
     
@@ -285,7 +286,8 @@ public class ConfigController {
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("success", false);
             errorResult.put("error", e.getMessage());
-            return Mono.just(ResponseEntity.internalServerError().body((JsonNode) errorResult));
+            ResponseEntity<JsonNode> errorResponse = ResponseEntity.internalServerError().body((JsonNode) errorResult);
+            return Mono.just(errorResponse);
         });
     }
     
