@@ -78,12 +78,15 @@ public class ToolController {
 
         logger.info("Executing tool: {} with args: {}", toolName, arguments);
 
-        ToolExecuteContext context = new ToolExecuteContext(arguments, Map.of());
+        ToolExecuteContext context = ToolExecuteContext.builder()
+            .toolName(toolName)
+            .arguments(arguments)
+            .build();
 
         return Mono.fromFuture(tool.execute(context))
                 .map(result -> new ToolExecuteResponse(
                         result.success(),
-                        result.output(),
+                        result.content().orElse(null),
                         result.error().orElse(null),
                         result.metadata()
                 ));

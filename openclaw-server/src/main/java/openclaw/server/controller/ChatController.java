@@ -45,7 +45,7 @@ public class ChatController {
      * GET /api/chat/history?sessionKey={sessionKey}
      */
     @GetMapping("/history")
-    public Mono<ResponseEntity<JsonNode>> getChatHistory(
+    public Mono<ResponseEntity<ObjectNode>> getChatHistory(
             @RequestParam String sessionKey,
             @RequestParam(defaultValue = "100") int limit) {
         

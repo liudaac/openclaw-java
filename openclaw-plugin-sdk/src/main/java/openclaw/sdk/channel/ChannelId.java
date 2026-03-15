@@ -34,6 +34,25 @@ public record ChannelId(String id) {
     public static final ChannelId ZALO_USER = new ChannelId("zalouser");
     public static final ChannelId WEB_CHAT = new ChannelId("webchat");
 
+    /**
+     * Returns the channel ID name (same as id).
+     *
+     * @return the name
+     */
+    public String name() {
+        return id;
+    }
+
+    /**
+     * Creates a ChannelId from a string value.
+     *
+     * @param value the value
+     * @return the ChannelId
+     */
+    public static ChannelId valueOf(String value) {
+        return new ChannelId(value);
+    }
+
     @Override
     public String toString() {
         return id;
