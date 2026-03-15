@@ -113,7 +113,7 @@ public class GatewayServiceImpl implements GatewayService {
         @Override
         public CompletableFuture<QueueStats> getStats() {
             return CompletableFuture.completedFuture(
-                new QueueStats(queue.size(), totalEnqueued.get(), totalDequeued.get(), 0)
+                new QueueStats(queue.size(), totalEnqueued.get(), totalDequeued.get(), 0, 0.0)
             );
         }
         
