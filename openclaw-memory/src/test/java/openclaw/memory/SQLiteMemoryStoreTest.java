@@ -8,9 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import javax.sql.DataSource;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.logging.Logger;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,14 +38,15 @@ class SQLiteMemoryStoreTest {
         // Create temporary SQLite database
         String dbUrl = "jdbc:sqlite:" + tempDir.resolve("test.db").toString();
         DataSource dataSource = new DataSource() {
-            @Override
-            public Connection getConnection() throws SQLException {
-                return DriverManager.getConnection(dbUrl);
-            }
-            @Override
-            public Connection getConnection(String username, String password) throws SQLException {
-                return DriverManager.getConnection(dbUrl, username, password);
-            }
+            @Override public Connection getConnection() throws SQLException { return DriverManager.getConnection(dbUrl); }
+            @Override public Connection getConnection(String username, String password) throws SQLException { return DriverManager.getConnection(dbUrl, username, password); }
+            @Override public PrintWriter getLogWriter() { return null; }
+            @Override public void setLogWriter(PrintWriter out) {}
+            @Override public void setLoginTimeout(int seconds) {}
+            @Override public int getLoginTimeout() { return 0; }
+            @Override public Logger getParentLogger() { return Logger.getLogger(""); }
+            @Override public <T> T unwrap(Class<T> iface) { return null; }
+            @Override public boolean isWrapperFor(Class<?> iface) { return false; }
         };
         
         objectMapper = new ObjectMapper();
