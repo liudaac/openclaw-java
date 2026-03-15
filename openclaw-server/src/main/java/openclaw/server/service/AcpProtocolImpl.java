@@ -3,9 +3,7 @@ package openclaw.server.service;
 import openclaw.agent.AcpProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.ChatClient;
-import org.springframework.ai.chat.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -138,8 +136,7 @@ public class AcpProtocolImpl implements AcpProtocol {
         }
         prompt.append("assistant: ");
 
-        ChatResponse response = chatClient.call(new Prompt(prompt.toString()));
-        return response.getResult().getOutput().getContent();
+        return chatClient.prompt(prompt.toString()).call().content();
     }
 
     private static class AgentSession {

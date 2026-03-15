@@ -6,7 +6,7 @@ import openclaw.sdk.channel.ChannelPlugin;
 import openclaw.sdk.tool.AgentTool;
 import openclaw.server.service.AcpProtocolImpl;
 import openclaw.server.service.GatewayServiceImpl;
-import org.springframework.ai.chat.ChatClient;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
