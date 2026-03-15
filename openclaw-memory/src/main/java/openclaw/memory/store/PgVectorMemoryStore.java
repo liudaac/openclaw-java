@@ -33,25 +33,30 @@ public class PgVectorMemoryStore implements MemoryStore {
     private final ObjectMapper objectMapper;
     private final MemoryConfig config;
     
-    private final RowMapper<MemoryEntry> entryRowMapper = (rs, rowNum) -> {
-        try {
-            return new MemoryEntry(
-                rs.getString("id"),
-                rs.getString("text"),
-                vectorStringToFloatArray(rs.getString("vector")),
-                objectMapper.readValue(rs.getString("metadata"), Map.class),
-                rs.getLong("timestamp"),
-                rs.getString("session_key")
-            );
-        } catch (JsonProcessingException e) {
-            throw new SQLException("Failed to parse metadata", e);
-        }
-    };
+    private RowMapper<MemoryEntry> entryRowMapper;
     
     public PgVectorMemoryStore(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper, MemoryConfig config) {
         this.jdbcTemplate = jdbcTemplate;
         this.objectMapper = objectMapper;
         this.config = config;
+        this.entryRowMapper = createEntryRowMapper();
+    }
+    
+    private RowMapper<MemoryEntry> createEntryRowMapper() {
+        return (rs, rowNum) -> {
+            try {
+                return new MemoryEntry(
+                    rs.getString("id"),
+                    rs.getString("text"),
+                    vectorStringToFloatArray(rs.getString("vector")),
+                    objectMapper.readValue(rs.getString("metadata"), Map.class),
+                    rs.getLong("timestamp"),
+                    rs.getString("session_key")
+                );
+            } catch (JsonProcessingException e) {
+                throw new SQLException("Failed to parse metadata", e);
+            }
+        };
     }
     
     @PostConstruct
