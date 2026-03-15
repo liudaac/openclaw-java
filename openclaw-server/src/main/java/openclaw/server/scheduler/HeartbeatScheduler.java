@@ -191,7 +191,7 @@ public class HeartbeatScheduler {
     private void checkGatewayStatus() {
         try {
             var stats = gatewayService.getWorkQueue();
-            int pending = stats.getPendingCount();
+            int pending = stats.getPendingCount().join();
 
             if (pending > 1000) {
                 logger.warn("High pending work count: {}", pending);

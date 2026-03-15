@@ -132,13 +132,13 @@ public class CronController {
     public Mono<StatsResponse> getJobStats(@PathVariable String jobId) {
         return Mono.fromFuture(cronService.getExecutionStats(jobId))
                 .map(stats -> new StatsResponse(
-                        stats.totalRuns(),
-                        stats.successfulRuns(),
-                        stats.failedRuns(),
-                        stats.totalRuns() > 0 ? 
-                                (double) stats.successfulRuns() / stats.totalRuns() : 0,
-                        stats.averageDurationMs(),
-                        stats.lastRun()
+                        ((Number) stats.getOrDefault("totalRuns", 0)).longValue(),
+                        ((Number) stats.getOrDefault("successfulRuns", 0)).longValue(),
+                        ((Number) stats.getOrDefault("failedRuns", 0)).longValue(),
+                        ((Number) stats.getOrDefault("totalRuns", 0)).longValue() > 0 ? 
+                                (double) ((Number) stats.getOrDefault("successfulRuns", 0)).longValue() / ((Number) stats.getOrDefault("totalRuns", 0)).longValue() : 0,
+                        ((Number) stats.getOrDefault("averageDurationMs", 0)).longValue(),
+                        stats.getOrDefault("lastRun", null)
                 ));
     }
 

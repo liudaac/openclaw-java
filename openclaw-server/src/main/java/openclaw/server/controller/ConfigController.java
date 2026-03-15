@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -89,7 +90,7 @@ public class ConfigController {
             if (baseHash != null) {
                 String currentHash = calculateConfigHash();
                 if (!baseHash.equals(currentHash)) {
-                    return ResponseEntity.conflict()
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(Map.of(
                             "success", false,
                             "error", "Config has been modified by another process"

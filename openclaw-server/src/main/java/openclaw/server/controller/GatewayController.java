@@ -101,7 +101,7 @@ public class GatewayController {
         var workQueue = gatewayService.getWorkQueue();
 
         return Mono.just(new GatewayStatsResponse(
-                nodeRegistry.getNodeCount(),
+                nodeRegistry.getNodeCount().join(),
                 workQueue.getPendingCount(),
                 workQueue.getCompletedCount(),
                 Runtime.getRuntime().availableProcessors()
