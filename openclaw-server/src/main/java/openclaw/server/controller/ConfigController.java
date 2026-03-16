@@ -297,7 +297,7 @@ public class ConfigController {
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("success", false);
             errorResult.put("error", e.getMessage());
-            return Mono.just(internalServerError(errorResult));
+            return Mono.<ResponseEntity<JsonNode>>just(internalServerError(errorResult));
         });
     }
     
