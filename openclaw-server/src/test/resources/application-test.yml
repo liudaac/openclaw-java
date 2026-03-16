@@ -1,0 +1,9 @@
+# Test configuration - disable security for controller tests
+spring:
+  security:
+    enabled: false
+
+# Disable auto-configurations that interfere with @WebFluxTest
+spring.autoconfigure.exclude:
+  - org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration
+  - org.springframework.boot.autoconfigure.security.oauth2.resource.reactive.ReactiveOAuth2ResourceServerAutoConfiguration

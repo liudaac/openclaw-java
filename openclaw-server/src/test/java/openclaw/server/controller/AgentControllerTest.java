@@ -2,10 +2,13 @@ package openclaw.server.controller;
 
 import openclaw.agent.AcpProtocol;
 import openclaw.agent.AcpProtocol.*;
+import openclaw.server.config.TestSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
@@ -20,6 +23,8 @@ import static org.mockito.Mockito.when;
  * Agent Controller Tests - Phase 4
  */
 @WebFluxTest(AgentController.class)
+@AutoConfigureWebTestClient(timeout = "10000")
+@Import(TestSecurityConfig.class)
 class AgentControllerTest {
 
     @Autowired

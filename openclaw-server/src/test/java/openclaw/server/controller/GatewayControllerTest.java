@@ -1,10 +1,13 @@
 package openclaw.server.controller;
 
 import openclaw.gateway.GatewayService;
+import openclaw.server.config.TestSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Map;
@@ -15,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Gateway Controller Tests
  */
 @WebFluxTest(GatewayController.class)
+@AutoConfigureWebTestClient(timeout = "10000")
+@Import(TestSecurityConfig.class)
 class GatewayControllerTest {
 
     @Autowired
