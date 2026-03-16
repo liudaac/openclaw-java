@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -219,12 +220,12 @@ public class BrowserTool implements AgentTool {
             List<Map<String, Object>> sessionList = sessions.entrySet().stream()
                     .map(entry -> {
                         BrowserSession session = entry.getValue();
-                        return Map.of(
-                                "session_id", session.getId(),
-                                "profile", session.getProfile(),
-                                "page_count", session.getPages().size(),
-                                "created_at", session.getCreatedAt().toString()
-                        );
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("session_id", session.getId());
+                        map.put("profile", session.getProfile());
+                        map.put("page_count", session.getPages().size());
+                        map.put("created_at", session.getCreatedAt().toString());
+                        return map;
                     })
                     .toList();
 

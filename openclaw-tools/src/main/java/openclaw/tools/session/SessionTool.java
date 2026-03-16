@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -182,12 +183,14 @@ public class SessionTool implements AgentTool {
             List<Session> sessions = sessionService.getRecentSessions(limit).join();
 
             List<Map<String, Object>> sessionList = sessions.stream()
-                    .map(session -> Map.of(
-                            "session_id", session.getId(),
-                            "session_key", session.getSessionKey(),
-                            "model", session.getModel(),
-                            "status", session.getStatus().name()
-                    ))
+                    .map(session -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("session_id", session.getId());
+                        map.put("session_key", session.getSessionKey());
+                        map.put("model", session.getModel());
+                        map.put("status", session.getStatus().name());
+                        return map;
+                    })
                     .collect(Collectors.toList());
 
             return ToolResult.success("Found " + sessionList.size() + " session(s)", Map.of(
@@ -209,12 +212,14 @@ public class SessionTool implements AgentTool {
             List<Session> sessions = sessionService.searchSessions(query).join();
 
             List<Map<String, Object>> sessionList = sessions.stream()
-                    .map(session -> Map.of(
-                            "session_id", session.getId(),
-                            "session_key", session.getSessionKey(),
-                            "model", session.getModel(),
-                            "status", session.getStatus().name()
-                    ))
+                    .map(session -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("session_id", session.getId());
+                        map.put("session_key", session.getSessionKey());
+                        map.put("model", session.getModel());
+                        map.put("status", session.getStatus().name());
+                        return map;
+                    })
                     .collect(Collectors.toList());
 
             return ToolResult.success("Found " + sessionList.size() + " matching session(s)", Map.of(
@@ -313,11 +318,13 @@ public class SessionTool implements AgentTool {
             List<Message> messages = sessionService.getMessages(sessionId, limit).join();
 
             List<Map<String, Object>> messageList = messages.stream()
-                    .map(msg -> Map.of(
-                            "role", msg.getRole(),
-                            "content", msg.getContent(),
-                            "timestamp", msg.getTimestamp().toString()
-                    ))
+                    .map(msg -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("role", msg.getRole());
+                        map.put("content", msg.getContent());
+                        map.put("timestamp", msg.getCreatedAt() != null ? msg.getCreatedAt().toString() : "");
+                        return map;
+                    })
                     .collect(Collectors.toList());
 
             return ToolResult.success("Found " + messageList.size() + " message(s)", Map.of(

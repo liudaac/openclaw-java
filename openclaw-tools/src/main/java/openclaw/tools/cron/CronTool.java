@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -153,16 +154,18 @@ public class CronTool implements AgentTool {
             List<CronJob> jobs = cronService.listJobs().join();
             
             List<Map<String, Object>> jobList = jobs.stream()
-                    .map(job -> Map.of(
-                            "job_id", job.getId(),
-                            "name", job.getName(),
-                            "schedule", job.getSchedule(),
-                            "status", job.getStatus().name(),
-                            "run_count", job.getRunCount(),
-                            "fail_count", job.getFailCount(),
-                            "last_run", job.getLastRun() != null ? job.getLastRun().toString() : "never",
-                            "next_run", job.getNextRun() != null ? job.getNextRun().toString() : "N/A"
-                    ))
+                    .map(job -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("job_id", job.getId());
+                        map.put("name", job.getName());
+                        map.put("schedule", job.getSchedule());
+                        map.put("status", job.getStatus().name());
+                        map.put("run_count", job.getRunCount());
+                        map.put("fail_count", job.getFailCount());
+                        map.put("last_run", job.getLastRun() != null ? job.getLastRun().toString() : "never");
+                        map.put("next_run", job.getNextRun() != null ? job.getNextRun().toString() : "N/A");
+                        return map;
+                    })
                     .collect(Collectors.toList());
 
             return ToolResult.success(
@@ -291,14 +294,16 @@ public class CronTool implements AgentTool {
             List<JobExecution> executions = cronService.getJobHistory(jobId, limit).join();
             
             List<Map<String, Object>> history = executions.stream()
-                    .map(exec -> Map.of(
-                            "execution_id", exec.getId(),
-                            "start_time", exec.getStartTime().toString(),
-                            "status", exec.getStatus().name(),
-                            "duration_ms", exec.getDuration().toMillis(),
-                            "output", exec.getOutput() != null ? 
-                                    exec.getOutput().substring(0, Math.min(200, exec.getOutput().length())) : ""
-                    ))
+                    .map(exec -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("execution_id", exec.getId());
+                        map.put("start_time", exec.getStartTime().toString());
+                        map.put("status", exec.getStatus().name());
+                        map.put("duration_ms", exec.getDuration().toMillis());
+                        map.put("output", exec.getOutput() != null ? 
+                                exec.getOutput().substring(0, Math.min(200, exec.getOutput().length())) : "");
+                        return map;
+                    })
                     .collect(Collectors.toList());
 
             return ToolResult.success(

@@ -299,7 +299,7 @@ public class MediaHandler implements AgentTool {
         return resizeImage(thumbArgs, source);
     }
 
-    private BufferedImage loadImage(String source) throws IOException {
+    private BufferedImage loadImage(String source) throws IOException, InterruptedException {
         if (source.startsWith("http://") || source.startsWith("https://")) {
             // Download and load
             HttpRequest request = HttpRequest.newBuilder()
