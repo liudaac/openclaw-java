@@ -4,6 +4,7 @@ import openclaw.sdk.channel.ChannelInboundAdapter;
 import openclaw.sdk.channel.ChannelMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Optional;
@@ -116,5 +117,38 @@ public class TelegramInboundAdapter implements ChannelInboundAdapter {
      */
     public TelegramChannelPlugin.TelegramAccount getAccount() {
         return account;
+    }
+
+    /**
+     * Setup webhook
+     */
+    public Mono<Boolean> setupWebhook(String url, String secretToken) {
+        return Mono.fromCallable(() -> {
+            logger.info("Setting up webhook: {}", url);
+            // Implementation would call Telegram API
+            return true;
+        });
+    }
+
+    /**
+     * Delete webhook
+     */
+    public Mono<Boolean> deleteWebhook() {
+        return Mono.fromCallable(() -> {
+            logger.info("Deleting webhook");
+            // Implementation would call Telegram API
+            return true;
+        });
+    }
+
+    /**
+     * Get webhook info
+     */
+    public Mono<String> getWebhookInfo() {
+        return Mono.fromCallable(() -> {
+            logger.info("Getting webhook info");
+            // Implementation would call Telegram API
+            return "{\"url\": \"https://api.telegram.org/bot<token>/getWebhookInfo\"}";
+        });
     }
 }

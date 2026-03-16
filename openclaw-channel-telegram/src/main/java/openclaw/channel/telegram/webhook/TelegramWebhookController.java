@@ -73,7 +73,7 @@ public class TelegramWebhookController {
         if (inboundAdapter != null) {
             inboundAdapter.onMessage(channelMessage)
                     .thenAccept(result -> {
-                        if (!result.success()) {
+                        if (!result.succeeded()) {
                             logger.error("Failed to process message: {}", result.error());
                         }
                     });
