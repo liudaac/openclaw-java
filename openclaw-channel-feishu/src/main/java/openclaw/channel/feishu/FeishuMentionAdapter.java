@@ -50,4 +50,3 @@ public class FeishuMentionAdapter implements ChannelMentionAdapter {
         return CompletableFuture.completedFuture(Optional.empty());
     }
 }
-}
