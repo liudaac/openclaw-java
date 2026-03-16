@@ -123,6 +123,7 @@ public class BackupService {
         }
         
         long archiveSize = Files.size(archivePath);
+        Path configPath = Paths.get(CONFIG_FILE);
         
         return new BackupResult(
             true,

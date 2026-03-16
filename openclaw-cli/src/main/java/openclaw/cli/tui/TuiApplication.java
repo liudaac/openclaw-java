@@ -1,7 +1,5 @@
 package openclaw.cli.tui;
 
-import openclaw.cli.service.AgentService;
-import openclaw.cli.service.SessionService;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.InfoCmp;
@@ -27,8 +25,6 @@ public class TuiApplication {
     private static final Logger logger = LoggerFactory.getLogger(TuiApplication.class);
     
     private Terminal terminal;
-    private AgentService agentService;
-    private SessionService sessionService;
     private String currentSession;
     private boolean running = false;
     
@@ -38,8 +34,9 @@ public class TuiApplication {
                 .system(true)
                 .build();
             
-            agentService = new AgentService();
-            sessionService = new SessionService();
+            // TODO: Implement agent and session services
+            // agentService = new AgentService();
+            // sessionService = new SessionService();
             
             // 推断活动 agent
             String activeAgent = inferActiveAgent();
@@ -191,21 +188,9 @@ public class TuiApplication {
      * 发送消息
      */
     private void sendMessage(String message) {
-        if (currentSession == null) {
-            // 创建新会话
-            currentSession = sessionService.createSession();
-            println("Created new session: " + currentSession);
-        }
-        
+        // TODO: Implement session and agent services
         println("You: " + message);
-        
-        // 发送消息到 agent
-        try {
-            String response = agentService.sendMessage(currentSession, message);
-            println("Assistant: " + response);
-        } catch (Exception e) {
-            println("Error: " + e.getMessage());
-        }
+        println("Assistant: (Service not implemented yet)");
     }
     
     /**
