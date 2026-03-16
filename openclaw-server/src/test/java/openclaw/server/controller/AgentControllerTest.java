@@ -67,8 +67,8 @@ class AgentControllerTest {
         when(acpProtocol.getMessages(anyString(), anyInt()))
                 .thenReturn(CompletableFuture.completedFuture(
                         new AgentMessages(java.util.List.of(
-                                new AgentMessage("user", "Hello", System.currentTimeMillis()),
-                                new AgentMessage("assistant", "Hi!", System.currentTimeMillis())
+                                new AgentMessage("user", "Hello", System.currentTimeMillis(), Map.of()),
+                                new AgentMessage("assistant", "Hi!", System.currentTimeMillis(), Map.of())
                         ), false)
                 ));
 

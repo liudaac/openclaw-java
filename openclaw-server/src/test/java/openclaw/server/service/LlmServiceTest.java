@@ -6,14 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.Generation;
-import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.prompt.Prompt;
 
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
@@ -25,14 +22,21 @@ class LlmServiceTest {
     @Mock
     private ChatClient chatClient;
 
+    @Mock
+    private ChatClient.ChatClientRequestSpec requestSpec;
+
+    @Mock
+    private ChatClient.CallResponseSpec responseSpec;
+
     @InjectMocks
     private LlmService llmService;
 
     @Test
     void chatShouldReturnResponse() {
         // Given
-        ChatResponse mockResponse = createMockResponse("Hello, world!");
-        when(chatClient.call(any(Prompt.class))).thenReturn(mockResponse);
+        when(chatClient.prompt(anyString())).thenReturn(requestSpec);
+        when(requestSpec.call()).thenReturn(responseSpec);
+        when(responseSpec.content()).thenReturn("Hello, world!");
 
         // When
         CompletableFuture<String> result = llmService.chat("Hi");
@@ -44,8 +48,11 @@ class LlmServiceTest {
     @Test
     void chatWithSystemPromptShouldCombinePrompts() {
         // Given
-        ChatResponse mockResponse = createMockResponse("I'm helpful!");
-        when(chatClient.call(any(Prompt.class))).thenReturn(mockResponse);
+        when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.system(anyString())).thenReturn(requestSpec);
+        when(requestSpec.user(anyString())).thenReturn(requestSpec);
+        when(requestSpec.call()).thenReturn(responseSpec);
+        when(responseSpec.content()).thenReturn("I'm helpful!");
 
         // When
         CompletableFuture<String> result = llmService.chat(
@@ -60,32 +67,20 @@ class LlmServiceTest {
     @Test
     void isAvailableShouldReturnTrueWhenClientWorks() {
         // Given
-        ChatResponse mockResponse = createMockResponse("OK");
-        when(chatClient.call(any(Prompt.class))).thenReturn(mockResponse);
+        when(chatClient.prompt(anyString())).thenReturn(requestSpec);
+        when(requestSpec.call()).thenReturn(responseSpec);
+        when(responseSpec.content()).thenReturn("OK");
 
-        // When
-        CompletableFuture<Boolean> result = llmService.isAvailable();
-
-        // Then
-        assertThat(result.join()).isTrue();
+        // When & Then
+        assertThat(llmService.isAvailable()).isTrue();
     }
 
     @Test
     void isAvailableShouldReturnFalseWhenClientFails() {
         // Given
-        when(chatClient.call(any(Prompt.class)))
-                .thenThrow(new RuntimeException("Connection failed"));
+        when(chatClient.prompt(anyString())).thenThrow(new RuntimeException("Connection failed"));
 
-        // When
-        CompletableFuture<Boolean> result = llmService.isAvailable();
-
-        // Then
-        assertThat(result.join()).isFalse();
-    }
-
-    private ChatResponse createMockResponse(String content) {
-        AssistantMessage message = new AssistantMessage(content);
-        Generation generation = new Generation(message);
-        return new ChatResponse(java.util.List.of(generation));
+        // When & Then
+        assertThat(llmService.isAvailable()).isFalse();
     }
 }
