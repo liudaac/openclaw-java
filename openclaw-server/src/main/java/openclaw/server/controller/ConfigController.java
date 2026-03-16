@@ -268,7 +268,7 @@ public class ConfigController {
                 ObjectNode errorResult = objectMapper.createObjectNode();
                 errorResult.put("success", false);
                 errorResult.put("error", validation.getError());
-                return ResponseEntity.badRequest().body(errorResult);
+                return badRequest(errorResult);
             }
             
             Path configPath = Paths.get(CONFIG_FILE);
@@ -297,7 +297,7 @@ public class ConfigController {
             ObjectNode errorResult = objectMapper.createObjectNode();
             errorResult.put("success", false);
             errorResult.put("error", e.getMessage());
-            return Mono.<ResponseEntity<JsonNode>>just(internalServerError(errorResult));
+            return Mono.just(internalServerError(errorResult));
         });
     }
     
