@@ -12,7 +12,7 @@ import java.util.Optional;
  * @author OpenClaw Team
  * @version 2026.3.9
  */
-public class FeishuChannelPlugin implements ChannelPlugin<FeishuAccount, Void, Void> {
+public class FeishuChannelPlugin implements ChannelPlugin<FeishuChannelPlugin.FeishuAccount, Void, Void> {
 
     private FeishuConfigAdapter configAdapter;
     private FeishuOutboundAdapter outboundAdapter;

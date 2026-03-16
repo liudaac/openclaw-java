@@ -1,6 +1,6 @@
 package openclaw.channel.feishu;
 
-import openclaw.plugin.sdk.channel.ChannelStreamingAdapter;
+import openclaw.sdk.channel.ChannelStreamingAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

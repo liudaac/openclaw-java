@@ -92,7 +92,7 @@ public class FeishuWebhookController {
             // Process via inbound adapter
             inboundAdapter.onEvent(feishuEvent)
                     .thenAccept(result -> {
-                        if (!result.success()) {
+                        if (!result.succeeded()) {
                             logger.error("Failed to process event: {}", result.error());
                         }
                     });
