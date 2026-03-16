@@ -2,6 +2,7 @@ package openclaw.browser.batch;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.MouseButton;
 import openclaw.browser.action.BrowserActions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,7 +115,12 @@ public class BatchExecutor {
                 } else {
                     Locator.ClickOptions options = new Locator.ClickOptions().setTimeout(timeout);
                     if (action.button() != null) {
-                        options.setButton(action.button());
+                        MouseButton mouseButton = switch (action.button().toLowerCase()) {
+                            case "right" -> MouseButton.RIGHT;
+                            case "middle" -> MouseButton.MIDDLE;
+                            default -> MouseButton.LEFT;
+                        };
+                        options.setButton(mouseButton);
                     }
                     if (action.modifiers() != null) {
                         // Convert modifiers to Playwright format

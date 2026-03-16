@@ -1,6 +1,7 @@
 package openclaw.browser.snapshot;
 
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.ViewportSize;
 
 import java.util.*;
 
@@ -42,8 +43,8 @@ public class PageSnapshot {
         String html = page.content();
         
         // Get viewport info
-        Page.ViewportSize size = page.viewportSize();
-        ViewportInfo viewport = new ViewportInfo(size.width(), size.height());
+        ViewportSize size = page.viewportSize();
+        ViewportInfo viewport = new ViewportInfo(size.width, size.height);
         
         // Capture interactive elements
         List<ElementInfo> elements = new ArrayList<>();
@@ -99,10 +100,8 @@ public class PageSnapshot {
             }
         }
         
-        // Accessibility snapshot
-        AccessibilitySnapshot accessibility = new AccessibilitySnapshot(
-            page.accessibility().snapshot()
-        );
+        // Accessibility snapshot (not available in Playwright Java 1.40.0)
+        AccessibilitySnapshot accessibility = new AccessibilitySnapshot(null);
         
         return new PageSnapshot(url, title, html, elements, links, images, accessibility, viewport);
     }

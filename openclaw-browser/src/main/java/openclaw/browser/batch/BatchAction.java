@@ -39,6 +39,24 @@ public record BatchAction(
     public static final int MAX_WAIT_TIME_MS = 30_000;
     public static final int MAX_TIMEOUT_MS = 60_000;
     
+    /**
+     * Validate action parameters.
+     */
+    public void validate() {
+        if (kind == null || kind.isEmpty()) {
+            throw new IllegalArgumentException("Action kind is required");
+        }
+        if (delayMs != null && delayMs > MAX_CLICK_DELAY_MS) {
+            throw new IllegalArgumentException("Click delay exceeds maximum of " + MAX_CLICK_DELAY_MS + "ms");
+        }
+        if (timeMs != null && timeMs > MAX_WAIT_TIME_MS) {
+            throw new IllegalArgumentException("Wait time exceeds maximum of " + MAX_WAIT_TIME_MS + "ms");
+        }
+        if (timeoutMs != null && timeoutMs > MAX_TIMEOUT_MS) {
+            throw new IllegalArgumentException("Timeout exceeds maximum of " + MAX_TIMEOUT_MS + "ms");
+        }
+    }
+    
     // Private constructor for factory methods
     private BatchAction(String kind, String selector, String ref, String text, String value, 
                         String script, String key, String direction, Integer amount,
@@ -56,7 +74,7 @@ public record BatchAction(
      */
     public static BatchAction click(String selector) {
         return new BatchAction("click", selector, null, null, null, null, null, null, null, 
-            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
+            null, null, null, null, null, null, null, null, null, new String[0], null, null, null, null, null, true);
     }
     
     /**
@@ -64,7 +82,7 @@ public record BatchAction(
      */
     public static BatchAction click(String selector, Integer delayMs, Boolean doubleClick, String button) {
         return new BatchAction("click", selector, null, null, null, null, null, null, null,
-            null, null, delayMs, null, null, null, null, doubleClick, button, null, null, null, null, null, null, true);
+            null, null, delayMs, null, null, null, null, doubleClick, button, new String[0], null, null, null, null, null, true);
     }
     
     /**
@@ -120,7 +138,7 @@ public record BatchAction(
      */
     public static BatchAction drag(String startSelector, String endSelector) {
         return new BatchAction("drag", null, null, null, null, null, null, null, null,
-            null, null, null, null, null, null, null, null, null, startSelector, null, endSelector, null, null, true);
+            null, null, null, null, null, null, null, null, null, new String[0], startSelector, null, endSelector, null, null, true);
     }
     
     /**
