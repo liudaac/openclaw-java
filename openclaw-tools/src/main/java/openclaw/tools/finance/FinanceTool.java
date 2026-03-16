@@ -2,9 +2,9 @@ package openclaw.tools.finance;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import openclaw.plugin.sdk.tool.Tool;
-import openclaw.plugin.sdk.tool.ToolContext;
-import openclaw.plugin.sdk.tool.ToolResult;
+import openclaw.sdk.tool.AgentTool;
+import openclaw.sdk.tool.ToolExecuteContext;
+import openclaw.sdk.tool.ToolResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
  * 对应 Node.js: src/tools/finance.ts
  */
 @Component
-public class FinanceTool implements Tool {
+public class FinanceTool implements AgentTool {
     
     private static final Logger logger = LoggerFactory.getLogger(FinanceTool.class);
     
@@ -106,9 +106,10 @@ public class FinanceTool implements Tool {
     }
     
     @Override
-    public CompletableFuture<ToolResult> execute(Map<String, Object> params, ToolContext context) {
+    public CompletableFuture<ToolResult> execute(ToolExecuteContext context) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                Map<String, Object> params = context.arguments();
                 String operation = (String) params.get("operation");
                 
                 switch (operation) {
@@ -123,12 +124,12 @@ public class FinanceTool implements Tool {
                     case "history":
                         return handleHistory(params);
                     default:
-                        return ToolResult.error("Unknown operation: " + operation);
+                        return ToolResult.failure("Unknown operation: " + operation);
                 }
                 
             } catch (Exception e) {
                 logger.error("Finance query failed", e);
-                return ToolResult.error("Finance query failed: " + e.getMessage());
+                return ToolResult.failure("Finance query failed: " + e.getMessage());
             }
         });
     }
@@ -136,7 +137,7 @@ public class FinanceTool implements Tool {
     private ToolResult handleQuote(Map<String, Object> params) {
         String symbol = (String) params.get("symbol");
         if (symbol == null) {
-            return ToolResult.error("symbol is required for quote operation");
+            return ToolResult.failure("symbol is required for quote operation");
         }
         
         try {
@@ -152,14 +153,14 @@ public class FinanceTool implements Tool {
                 HttpResponse.BodyHandlers.ofString());
             
             if (response.statusCode() != 200) {
-                return ToolResult.error("Finance API error: " + response.statusCode());
+                return ToolResult.failure("Finance API error: " + response.statusCode());
             }
             
             JsonNode root = objectMapper.readTree(response.body());
             JsonNode result = root.path("chart").path("result").get(0);
             
             if (result == null) {
-                return ToolResult.error("No data found for symbol: " + symbol);
+                return ToolResult.failure("No data found for symbol: " + symbol);
             }
             
             JsonNode meta = result.path("meta");
@@ -205,14 +206,14 @@ public class FinanceTool implements Tool {
             
         } catch (Exception e) {
             logger.error("Failed to get quote for: " + symbol, e);
-            return ToolResult.error("Failed to get quote: " + e.getMessage());
+            return ToolResult.failure("Failed to get quote: " + e.getMessage());
         }
     }
     
     private ToolResult handleSearch(Map<String, Object> params) {
         String query = (String) params.get("query");
         if (query == null) {
-            return ToolResult.error("query is required for search operation");
+            return ToolResult.failure("query is required for search operation");
         }
         
         try {
@@ -228,7 +229,7 @@ public class FinanceTool implements Tool {
                 HttpResponse.BodyHandlers.ofString());
             
             if (response.statusCode() != 200) {
-                return ToolResult.error("Search API error: " + response.statusCode());
+                return ToolResult.failure("Search API error: " + response.statusCode());
             }
             
             JsonNode root = objectMapper.readTree(response.body());
@@ -255,14 +256,14 @@ public class FinanceTool implements Tool {
             
         } catch (Exception e) {
             logger.error("Search failed for: " + query, e);
-            return ToolResult.error("Search failed: " + e.getMessage());
+            return ToolResult.failure("Search failed: " + e.getMessage());
         }
     }
     
     private ToolResult handleCrypto(Map<String, Object> params) {
         String symbol = (String) params.get("symbol");
         if (symbol == null) {
-            return ToolResult.error("symbol is required for crypto operation");
+            return ToolResult.failure("symbol is required for crypto operation");
         }
         
         // 加密货币符号格式化 (例如 BTC -> BTC-USD)
@@ -281,7 +282,7 @@ public class FinanceTool implements Tool {
         String to = (String) params.get("to");
         
         if (from == null || to == null) {
-            return ToolResult.error("from and to are required for forex operation");
+            return ToolResult.failure("from and to are required for forex operation");
         }
         
         // 外汇符号格式化 (例如 USD -> CNY = USDCNY=X)
@@ -298,7 +299,7 @@ public class FinanceTool implements Tool {
         String interval = (String) params.getOrDefault("interval", "1d");
         
         if (symbol == null) {
-            return ToolResult.error("symbol is required for history operation");
+            return ToolResult.failure("symbol is required for history operation");
         }
         
         try {
@@ -315,14 +316,14 @@ public class FinanceTool implements Tool {
                 HttpResponse.BodyHandlers.ofString());
             
             if (response.statusCode() != 200) {
-                return ToolResult.error("History API error: " + response.statusCode());
+                return ToolResult.failure("History API error: " + response.statusCode());
             }
             
             JsonNode root = objectMapper.readTree(response.body());
             JsonNode result = root.path("chart").path("result").get(0);
             
             if (result == null) {
-                return ToolResult.error("No history data found for symbol: " + symbol);
+                return ToolResult.failure("No history data found for symbol: " + symbol);
             }
             
             JsonNode timestamps = result.path("timestamp");
@@ -357,7 +358,7 @@ public class FinanceTool implements Tool {
             
         } catch (Exception e) {
             logger.error("Failed to get history for: " + symbol, e);
-            return ToolResult.error("Failed to get history: " + e.getMessage());
+            return ToolResult.failure("Failed to get history: " + e.getMessage());
         }
     }
     

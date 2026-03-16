@@ -89,12 +89,12 @@ public class BrowserTool implements AgentTool {
                         "amount", PropertySchema.integer("Scroll amount in pixels (default: 500)"),
                         "width", PropertySchema.integer("Viewport width (default: 1280)"),
                         "height", PropertySchema.integer("Viewport height (default: 720)"),
-                        "headless", PropertySchema.bool("Run in headless mode (default: true)"),
+                        "headless", PropertySchema.boolean_("Run in headless mode (default: true)"),
                         "timeout", PropertySchema.integer("Timeout in seconds (default: 30)"),
                         "save_path", PropertySchema.string("Path to save screenshot (optional)"),
-                        "full_page", PropertySchema.bool("Capture full page screenshot (default: false)"),
-                        "actions", PropertySchema.array("Batch actions (for batch action)"),
-                        "stop_on_error", PropertySchema.bool("Stop batch on first error (default: true)")
+                        "full_page", PropertySchema.boolean_("Capture full page screenshot (default: false)"),
+                        "actions", PropertySchema.array("Batch actions (for batch action)", PropertySchema.string("Action")),
+                        "stop_on_error", PropertySchema.boolean_("Stop batch on first error (default: true)")
                 ))
                 .required(List.of("action"))
                 .build();
@@ -179,11 +179,7 @@ public class BrowserTool implements AgentTool {
         int height = (int) args.getOrDefault("height", 720);
         boolean headless = (boolean) args.getOrDefault("headless", true);
 
-        SessionOptions options = SessionOptions.builder()
-                .viewportWidth(width)
-                .viewportHeight(height)
-                .headless(headless)
-                .build();
+        SessionOptions options = new SessionOptions(width, height, null, "en-US", "UTC", headless, Map.of());
 
         try {
             BrowserSession session = browserService.createSession(alias, options).join();
@@ -226,7 +222,7 @@ public class BrowserTool implements AgentTool {
                         return Map.of(
                                 "session_id", session.getId(),
                                 "profile", session.getProfile(),
-                                "page_count", session.getPageCount(),
+                                "page_count", session.getPages().size(),
                                 "created_at", session.getCreatedAt().toString()
                         );
                     })
@@ -255,7 +251,7 @@ public class BrowserTool implements AgentTool {
 
         // SSRF check
         var validation = fetchGuard.validate(url);
-        if (!validation.allowed()) {
+        if (!validation.isAllowed()) {
             return ToolResult.failure("URL blocked: " + validation.reason().orElse("Unknown"));
         }
 
@@ -490,8 +486,8 @@ public class BrowserTool implements AgentTool {
                             "elements", snapshot.getElements().size(),
                             "links", snapshot.getLinks().size(),
                             "images", snapshot.getImages().size(),
-                            "text_preview", snapshot.getTextContent().substring(0, 
-                                    Math.min(500, snapshot.getTextContent().length()))
+                            "text_preview", snapshot.getHtml().replaceAll("<[^>]*>", "").substring(0, 
+                                    Math.min(500, snapshot.getHtml().replaceAll("<[^>]*>", "").length()))
                     )
             );
         } catch (Exception e) {

@@ -2,9 +2,9 @@ package openclaw.tools.weather;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import openclaw.plugin.sdk.tool.Tool;
-import openclaw.plugin.sdk.tool.ToolContext;
-import openclaw.plugin.sdk.tool.ToolResult;
+import openclaw.sdk.tool.AgentTool;
+import openclaw.sdk.tool.ToolExecuteContext;
+import openclaw.sdk.tool.ToolResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -34,7 +34,7 @@ import java.util.concurrent.CompletableFuture;
  * 对应 Node.js: src/tools/weather.ts
  */
 @Component
-public class WeatherTool implements Tool {
+public class WeatherTool implements AgentTool {
     
     private static final Logger logger = LoggerFactory.getLogger(WeatherTool.class);
     
@@ -100,9 +100,10 @@ public class WeatherTool implements Tool {
     }
     
     @Override
-    public CompletableFuture<ToolResult> execute(Map<String, Object> params, ToolContext context) {
+    public CompletableFuture<ToolResult> execute(ToolExecuteContext context) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                Map<String, Object> params = context.arguments();
                 String location = (String) params.get("location");
                 String operation = (String) params.getOrDefault("operation", "current");
                 int days = (int) params.getOrDefault("days", 3);
@@ -112,7 +113,7 @@ public class WeatherTool implements Tool {
                 // 地理编码：获取城市坐标
                 GeocodingResult geoResult = geocodeLocation(location).join();
                 if (geoResult == null) {
-                    return ToolResult.error("Location not found: " + location);
+                    return ToolResult.failure("Location not found: " + location);
                 }
                 
                 // 获取天气数据
@@ -121,12 +122,12 @@ public class WeatherTool implements Tool {
                 } else if ("forecast".equals(operation)) {
                     return getForecast(geoResult, days, language, units);
                 } else {
-                    return ToolResult.error("Unknown operation: " + operation);
+                    return ToolResult.failure("Unknown operation: " + operation);
                 }
                 
             } catch (Exception e) {
                 logger.error("Weather query failed", e);
-                return ToolResult.error("Weather query failed: " + e.getMessage());
+                return ToolResult.failure("Weather query failed: " + e.getMessage());
             }
         });
     }
@@ -182,7 +183,7 @@ public class WeatherTool implements Tool {
                 HttpResponse.BodyHandlers.ofString());
             
             if (response.statusCode() != 200) {
-                return ToolResult.error("Weather API error: " + response.statusCode());
+                return ToolResult.failure("Weather API error: " + response.statusCode());
             }
             
             JsonNode root = objectMapper.readTree(response.body());
@@ -213,11 +214,11 @@ public class WeatherTool implements Tool {
             result.put("time", time);
             result.put("isDay", current.path("is_day").asInt() == 1);
             
-            return ToolResult.success(result);
+            return ToolResult.success("Weather data retrieved", result);
             
         } catch (Exception e) {
             logger.error("Failed to get current weather", e);
-            return ToolResult.error("Failed to get weather: " + e.getMessage());
+            return ToolResult.failure("Failed to get weather: " + e.getMessage());
         }
     }
     
@@ -235,7 +236,7 @@ public class WeatherTool implements Tool {
                 HttpResponse.BodyHandlers.ofString());
             
             if (response.statusCode() != 200) {
-                return ToolResult.error("Weather API error: " + response.statusCode());
+                return ToolResult.failure("Weather API error: " + response.statusCode());
             }
             
             JsonNode root = objectMapper.readTree(response.body());
@@ -269,11 +270,11 @@ public class WeatherTool implements Tool {
             result.put("days", days);
             result.put("forecast", forecastList);
             
-            return ToolResult.success(result);
+            return ToolResult.success("Weather data retrieved", result);
             
         } catch (Exception e) {
             logger.error("Failed to get forecast", e);
-            return ToolResult.error("Failed to get forecast: " + e.getMessage());
+            return ToolResult.failure("Failed to get forecast: " + e.getMessage());
         }
     }
     

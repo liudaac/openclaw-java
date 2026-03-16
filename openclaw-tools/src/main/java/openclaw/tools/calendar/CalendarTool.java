@@ -1,8 +1,8 @@
 package openclaw.tools.calendar;
 
-import openclaw.plugin.sdk.tool.Tool;
-import openclaw.plugin.sdk.tool.ToolContext;
-import openclaw.plugin.sdk.tool.ToolResult;
+import openclaw.sdk.tool.AgentTool;
+import openclaw.sdk.tool.ToolExecuteContext;
+import openclaw.sdk.tool.ToolResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
  * 对应 Node.js: src/tools/calendar.ts
  */
 @Component
-public class CalendarTool implements Tool {
+public class CalendarTool implements AgentTool {
     
     private static final Logger logger = LoggerFactory.getLogger(CalendarTool.class);
     
@@ -120,9 +120,10 @@ public class CalendarTool implements Tool {
     }
     
     @Override
-    public CompletableFuture<ToolResult> execute(Map<String, Object> params, ToolContext context) {
+    public CompletableFuture<ToolResult> execute(ToolExecuteContext context) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                Map<String, Object> params = context.arguments();
                 String operation = (String) params.get("operation");
                 
                 switch (operation) {
@@ -143,12 +144,12 @@ public class CalendarTool implements Tool {
                     case "event":
                         return handleEvent(params);
                     default:
-                        return ToolResult.error("Unknown operation: " + operation);
+                        return ToolResult.failure("Unknown operation: " + operation);
                 }
                 
             } catch (Exception e) {
                 logger.error("Calendar operation failed", e);
-                return ToolResult.error("Calendar operation failed: " + e.getMessage());
+                return ToolResult.failure("Calendar operation failed: " + e.getMessage());
             }
         });
     }
@@ -191,7 +192,7 @@ public class CalendarTool implements Tool {
         String timezone = (String) params.get("fromTimezone");
         
         if (datetime == null) {
-            return ToolResult.error("datetime is required for parse operation");
+            return ToolResult.failure("datetime is required for parse operation");
         }
         
         try {
@@ -215,7 +216,7 @@ public class CalendarTool implements Tool {
             ));
             
         } catch (DateTimeParseException e) {
-            return ToolResult.error("Failed to parse datetime: " + e.getMessage());
+            return ToolResult.failure("Failed to parse datetime: " + e.getMessage());
         }
     }
     
@@ -224,7 +225,7 @@ public class CalendarTool implements Tool {
         String format = (String) params.get("format");
         
         if (datetime == null || format == null) {
-            return ToolResult.error("datetime and format are required");
+            return ToolResult.failure("datetime and format are required");
         }
         
         try {
@@ -237,7 +238,7 @@ public class CalendarTool implements Tool {
             ));
             
         } catch (DateTimeParseException e) {
-            return ToolResult.error("Failed to format datetime: " + e.getMessage());
+            return ToolResult.failure("Failed to format datetime: " + e.getMessage());
         }
     }
     
@@ -247,7 +248,7 @@ public class CalendarTool implements Tool {
         String unit = (String) params.getOrDefault("unit", "seconds");
         
         if (start == null || end == null) {
-            return ToolResult.error("start and end are required for diff operation");
+            return ToolResult.failure("start and end are required for diff operation");
         }
         
         try {
@@ -285,7 +286,7 @@ public class CalendarTool implements Tool {
             ));
             
         } catch (DateTimeParseException e) {
-            return ToolResult.error("Failed to parse datetime: " + e.getMessage());
+            return ToolResult.failure("Failed to parse datetime: " + e.getMessage());
         }
     }
     
@@ -295,7 +296,7 @@ public class CalendarTool implements Tool {
         String toTimezone = (String) params.get("toTimezone");
         
         if (datetime == null || fromTimezone == null || toTimezone == null) {
-            return ToolResult.error("datetime, fromTimezone, and toTimezone are required");
+            return ToolResult.failure("datetime, fromTimezone, and toTimezone are required");
         }
         
         try {
@@ -312,7 +313,7 @@ public class CalendarTool implements Tool {
             ));
             
         } catch (DateTimeParseException e) {
-            return ToolResult.error("Failed to parse datetime: " + e.getMessage());
+            return ToolResult.failure("Failed to parse datetime: " + e.getMessage());
         }
     }
     
@@ -330,7 +331,7 @@ public class CalendarTool implements Tool {
         String unit = (String) params.get("unit");
         
         if (datetime == null || amount == null || unit == null) {
-            return ToolResult.error("datetime, amount, and unit are required");
+            return ToolResult.failure("datetime, amount, and unit are required");
         }
         
         if (!isAdd) {
@@ -373,7 +374,7 @@ public class CalendarTool implements Tool {
             ));
             
         } catch (DateTimeParseException e) {
-            return ToolResult.error("Failed to parse datetime: " + e.getMessage());
+            return ToolResult.failure("Failed to parse datetime: " + e.getMessage());
         }
     }
     
@@ -382,7 +383,7 @@ public class CalendarTool implements Tool {
         Map<String, Object> event = (Map<String, Object>) params.get("event");
         
         if (event == null) {
-            return ToolResult.error("event is required for event operation");
+            return ToolResult.failure("event is required for event operation");
         }
         
         String title = (String) event.get("title");

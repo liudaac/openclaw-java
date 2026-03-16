@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -186,18 +187,18 @@ public class CronTool implements AgentTool {
 
             return ToolResult.success(
                     "Job details",
-                    Map.of(
-                            "job_id", job.getId(),
-                            "name", job.getName(),
-                            "schedule", job.getSchedule(),
-                            "command", job.getCommand(),
-                            "timezone", job.getTimezone(),
-                            "status",                            job.getStatus().name(),
-                            "run_count", job.getRunCount(),
-                            "fail_count", job.getFailCount(),
-                            "last_run", job.getLastRun() != null ? job.getLastRun().toString() : "never",
-                            "next_run", job.getNextRun() != null ? job.getNextRun().toString() : "N/A",
-                            "created_at", job.getCreatedAt().toString()
+                    Map.ofEntries(
+                            Map.entry("job_id", job.getId()),
+                            Map.entry("name", job.getName()),
+                            Map.entry("schedule", job.getSchedule()),
+                            Map.entry("command", job.getCommand()),
+                            Map.entry("timezone", job.getTimezone()),
+                            Map.entry("status", job.getStatus().name()),
+                            Map.entry("run_count", job.getRunCount()),
+                            Map.entry("fail_count", job.getFailCount()),
+                            Map.entry("last_run", job.getLastRun() != null ? job.getLastRun().toString() : "never"),
+                            Map.entry("next_run", job.getNextRun() != null ? job.getNextRun().toString() : "N/A"),
+                            Map.entry("created_at", job.getCreatedAt().toString())
                     )
             );
         } catch (Exception e) {
@@ -317,18 +318,18 @@ public class CronTool implements AgentTool {
         String jobId = args.get("job_id").toString();
         
         try {
-            var stats = cronService.getExecutionStats(jobId).join();
+            Map<String, Object> stats = cronService.getExecutionStats(jobId).join();
             
             return ToolResult.success(
                     "Job statistics",
                     Map.of(
-                            "total_runs", stats.totalRuns(),
-                            "successful_runs", stats.successfulRuns(),
-                            "failed_runs", stats.failedRuns(),
-                            "success_rate", stats.totalRuns() > 0 ? 
-                                    String.format("%.2f%%", (double) stats.successfulRuns() / stats.totalRuns() * 100) : "N/A",
-                            "average_duration_ms", String.format("%.2f", stats.averageDurationMs()),
-                            "last_run", stats.lastRun() != null ? stats.lastRun().toString() : "never"
+                            "total_runs", stats.get("totalRuns"),
+                            "successful_runs", stats.get("successfulRuns"),
+                            "failed_runs", stats.get("failedRuns"),
+                            "success_rate", (int) stats.get("totalRuns") > 0 ? 
+                                    String.format("%.2f%%", (double) (int) stats.get("successfulRuns") / (int) stats.get("totalRuns") * 100) : "N/A",
+                            "average_duration_ms", String.format("%.2f", stats.get("averageDurationMs")),
+                            "last_run", stats.get("lastRun") != null ? stats.get("lastRun").toString() : "never"
                     )
             );
         } catch (Exception e) {

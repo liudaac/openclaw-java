@@ -77,7 +77,7 @@ public class MediaHandler implements AgentTool {
                                 "png", "jpg", "jpeg", "gif", "webp", "bmp"
                         )),
                         "quality", PropertySchema.integer("JPEG quality (1-100, default: 85)"),
-                        "maintain_aspect", PropertySchema.bool("Maintain aspect ratio (default: true)")
+                        "maintain_aspect", PropertySchema.boolean_("Maintain aspect ratio (default: true)")
                 ))
                 .required(List.of("action", "source"))
                 .build();

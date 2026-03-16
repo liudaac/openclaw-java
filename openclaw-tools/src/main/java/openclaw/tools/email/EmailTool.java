@@ -1,8 +1,8 @@
 package openclaw.tools.email;
 
-import openclaw.plugin.sdk.tool.Tool;
-import openclaw.plugin.sdk.tool.ToolContext;
-import openclaw.plugin.sdk.tool.ToolResult;
+import openclaw.sdk.tool.AgentTool;
+import openclaw.sdk.tool.ToolExecuteContext;
+import openclaw.sdk.tool.ToolResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
  * 对应 Node.js: src/tools/email.ts
  */
 @Component
-public class EmailTool implements Tool {
+public class EmailTool implements AgentTool {
     
     private static final Logger logger = LoggerFactory.getLogger(EmailTool.class);
     
@@ -119,9 +119,10 @@ public class EmailTool implements Tool {
     }
     
     @Override
-    public CompletableFuture<ToolResult> execute(Map<String, Object> params, ToolContext context) {
+    public CompletableFuture<ToolResult> execute(ToolExecuteContext context) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                Map<String, Object> params = context.arguments();
                 // 解析参数
                 List<String> to = parseStringList(params.get("to"));
                 List<String> cc = parseStringList(params.getOrDefault("cc", Collections.emptyList()));
@@ -148,7 +149,7 @@ public class EmailTool implements Tool {
                 }
                 
                 if (smtpHost == null || username == null || password == null) {
-                    return ToolResult.error("SMTP configuration not provided");
+                    return ToolResult.failure("SMTP configuration not provided");
                 }
                 
                 // 发送邮件
@@ -158,18 +159,18 @@ public class EmailTool implements Tool {
                 );
                 
                 if (result.isSuccess()) {
-                    return ToolResult.success(Map.of(
+                    return ToolResult.success("Email sent successfully", Map.of(
                         "messageId", result.getMessageId(),
                         "recipients", result.getRecipientCount(),
                         "attachments", result.getAttachmentCount()
                     ));
                 } else {
-                    return ToolResult.error(result.getErrorMessage());
+                    return ToolResult.failure(result.getErrorMessage());
                 }
                 
             } catch (Exception e) {
                 logger.error("Failed to send email", e);
-                return ToolResult.error("Failed to send email: " + e.getMessage());
+                return ToolResult.failure("Failed to send email: " + e.getMessage());
             }
         });
     }
