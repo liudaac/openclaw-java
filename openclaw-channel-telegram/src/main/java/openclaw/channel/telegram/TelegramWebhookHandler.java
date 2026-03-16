@@ -81,10 +81,12 @@ public class TelegramWebhookHandler {
             }
             
             // 6. 传递给 InboundAdapter
-            inboundAdapter.onMessage(message).subscribe(
-                result -> logger.debug("Message processed: {}", updateId),
-                error -> logger.error("Error processing message: {}", updateId, error)
-            );
+            inboundAdapter.onMessage(message).thenAccept(
+                result -> logger.debug("Message processed: {}", updateId)
+            ).exceptionally(error -> {
+                logger.error("Error processing message: {}", updateId, error);
+                return null;
+            });
             
             return ResponseEntity.ok("OK");
             
@@ -233,14 +235,14 @@ public class TelegramWebhookHandler {
             .from(userId)
             .fromName(firstName != null ? firstName : username)
             .chatId(chatId)
-            .chatType(chatType)
-            .chatTitle(chatTitle)
             .timestamp(date)
-            .replyToMessageId(replyToMessageId)
-            .threadId(threadId)
             .metadata(Map.of(
                 "username", username != null ? username : "",
-                "isBot", from.path("is_bot").asBoolean(false)
+                "isBot", from.path("is_bot").asBoolean(false),
+                "chatType", chatType != null ? chatType : "",
+                "chatTitle", chatTitle != null ? chatTitle : "",
+                "replyToMessageId", replyToMessageId != null ? replyToMessageId : "",
+                "threadId", threadId != null ? threadId : ""
             ))
             .build();
     }

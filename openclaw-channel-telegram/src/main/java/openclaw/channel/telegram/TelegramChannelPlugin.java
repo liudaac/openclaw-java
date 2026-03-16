@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
  * @author OpenClaw Team
  * @version 2026.3.9
  */
-public class TelegramChannelPlugin implements ChannelPlugin<TelegramAccount, Void, Void> {
+public class TelegramChannelPlugin implements ChannelPlugin<TelegramChannelPlugin.TelegramAccount, Void, Void> {
 
     private TelegramConfigAdapter configAdapter;
     private TelegramOutboundAdapter outboundAdapter;

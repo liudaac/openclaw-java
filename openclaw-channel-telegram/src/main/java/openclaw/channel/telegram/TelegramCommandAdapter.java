@@ -34,6 +34,7 @@ public class TelegramCommandAdapter implements ChannelCommandAdapter {
                 new CommandDefinition(
                         "settings",
                         "Open settings",
+                        "",
                         false,
                         Map.of("ru", "настройки", "es", "configuración")
                 )
