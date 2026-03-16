@@ -1,65 +1,44 @@
 package openclaw.channel.discord;
 
 import openclaw.sdk.channel.ChannelMentionAdapter;
-import openclaw.sdk.channel.MentionParseResult;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * Discord Mention Adapter
+ * Discord mention adapter.
  */
 public class DiscordMentionAdapter implements ChannelMentionAdapter {
 
-    private static final Pattern USER_MENTION_PATTERN = Pattern.compile("<@!?(\\d+)>");
-    private static final Pattern ROLE_MENTION_PATTERN = Pattern.compile("<@&(\\d+)>");
-    private static final Pattern CHANNEL_MENTION_PATTERN = Pattern.compile("<#(\\d+)>");
-
     @Override
-    public CompletableFuture<MentionParseResult> parse(String text) {
-        return CompletableFuture.supplyAsync(() -> {
-            StringBuilder parsed = new StringBuilder(text);
-
-            // Parse user mentions
-            Matcher userMatcher = USER_MENTION_PATTERN.matcher(parsed);
-            while (userMatcher.find()) {
-                String userId = userMatcher.group(1);
-                // In a real implementation, fetch user info from Discord API
-                parsed.replace(userMatcher.start(), userMatcher.end(), "@" + userId);
-            }
-
-            // Parse role mentions
-            Matcher roleMatcher = ROLE_MENTION_PATTERN.matcher(parsed);
-            while (roleMatcher.find()) {
-                String roleId = roleMatcher.group(1);
-                parsed.replace(roleMatcher.start(), roleMatcher.end(), "@role:" + roleId);
-            }
-
-            // Parse channel mentions
-            Matcher channelMatcher = CHANNEL_MENTION_PATTERN.matcher(parsed);
-            while (channelMatcher.find()) {
-                String channelId = channelMatcher.group(1);
-                parsed.replace(channelMatcher.start(), channelMatcher.end(), "#" + channelId);
-            }
-
-            return new MentionParseResult(parsed.toString(), true, Optional.empty());
-        });
+    public String formatMention(String userId, Optional<String> userName) {
+        return "<@" + userId + ">";
     }
 
     @Override
-    public CompletableFuture<String> formatMention(String userId, Optional<String> displayName) {
-        return CompletableFuture.completedFuture("<@" + userId + ">");
+    public List<ParsedMention> parseMentions(String text) {
+        List<ParsedMention> mentions = new java.util.ArrayList<>();
+
+        // Parse <@userId> mentions
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("<@!?(\\d+)>");
+        java.util.regex.Matcher matcher = pattern.matcher(text);
+
+        while (matcher.find()) {
+            String userId = matcher.group(1);
+            mentions.add(new ParsedMention(
+                    userId,
+                    Optional.empty(),
+                    matcher.start(),
+                    matcher.end()
+            ));
+        }
+
+        return mentions;
     }
 
     @Override
-    public CompletableFuture<String> formatChannelMention(String channelId) {
-        return CompletableFuture.completedFuture("<#" + channelId + ">");
-    }
-
-    @Override
-    public CompletableFuture<String> formatRoleMention(String roleId) {
-        return CompletableFuture.completedFuture("<@&" + roleId + ">");
+    public CompletableFuture<Optional<String>> resolveMention(String mention) {
+        return CompletableFuture.completedFuture(Optional.empty());
     }
 }
