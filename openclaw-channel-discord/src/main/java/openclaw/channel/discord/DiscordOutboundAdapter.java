@@ -1,9 +1,9 @@
 package openclaw.channel.discord;
 
 import openclaw.sdk.channel.ChannelOutboundAdapter;
-import openclaw.sdk.channel.SendMessageRequest;
 import openclaw.sdk.channel.SendResult;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -12,14 +12,21 @@ import java.util.concurrent.CompletableFuture;
 public class DiscordOutboundAdapter implements ChannelOutboundAdapter {
 
     @Override
-    public CompletableFuture<SendResult> sendMessage(Object account, SendMessageRequest request) {
+    public CompletableFuture<SendResult> sendText(Object account, String to, String message, Optional<SendOptions> options) {
         return CompletableFuture.completedFuture(
-                SendResult.success("msg_" + System.currentTimeMillis())
+                new SendResult(true, Optional.of("msg_" + System.currentTimeMillis()), Optional.empty())
         );
     }
 
     @Override
-    public CompletableFuture<Void> sendTyping(Object account, String chatId) {
+    public CompletableFuture<SendResult> sendMedia(Object account, String to, Optional<String> message, String mediaUrl, Optional<SendOptions> options) {
+        return CompletableFuture.completedFuture(
+                new SendResult(true, Optional.of("msg_" + System.currentTimeMillis()), Optional.empty())
+        );
+    }
+
+    @Override
+    public CompletableFuture<Void> sendTyping(Object account, String to) {
         return CompletableFuture.completedFuture(null);
     }
 }

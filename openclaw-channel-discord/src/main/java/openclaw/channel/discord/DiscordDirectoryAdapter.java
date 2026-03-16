@@ -12,19 +12,19 @@ import java.util.concurrent.CompletableFuture;
 public class DiscordDirectoryAdapter implements ChannelDirectoryAdapter {
 
     @Override
-    public CompletableFuture<DirectoryResult> queryDirectory(Object account, DirectoryQuery query) {
-        return CompletableFuture.completedFuture(
-                new DirectoryResult(List.of(), false, Optional.empty())
-        );
+    public CompletableFuture<List<DirectoryUser>> searchUsers(Object account, String query) {
+        return CompletableFuture.completedFuture(List.of());
     }
 
     @Override
-    public CompletableFuture<Optional<DirectoryEntry>> getEntry(Object account, String entryId) {
+    public CompletableFuture<Optional<DirectoryUser>> getUser(Object account, String userId) {
         return CompletableFuture.completedFuture(Optional.empty());
     }
 
     @Override
-    public CompletableFuture<Boolean> isAvailable(Object account) {
-        return CompletableFuture.completedFuture(true);
+    public CompletableFuture<DirectoryUser> getCurrentUser(Object account) {
+        return CompletableFuture.completedFuture(
+                new DirectoryUser("0", "Unknown", "Unknown", Optional.empty(), Optional.empty(), false, java.util.Map.of())
+        );
     }
 }

@@ -30,7 +30,7 @@ public class DiscordConfigAdapter implements ChannelConfigAdapter<DiscordChannel
     }
 
     @Override
-    public CompletableFuture<Optional<DiscordChannelPlugin.DiscordAccount>> parse(Map<String, Object> config) {
+    public CompletableFuture<Optional<DiscordChannelPlugin.DiscordAccount>> resolveAccount(Map<String, Object> config) {
         return CompletableFuture.supplyAsync(() -> {
             String token = config.get("botToken").toString();
             String username = config.getOrDefault("botUsername", "").toString();
@@ -57,6 +57,11 @@ public class DiscordConfigAdapter implements ChannelConfigAdapter<DiscordChannel
                 "required", List.of("botToken")
         );
 
-        return new ChannelConfigSchema(schema, Map.of());
+        return new ChannelConfigSchema(schema, Optional.of(Map.of()));
+    }
+
+    @Override
+    public Map<String, Object> getDefaults() {
+        return Map.of();
     }
 }
