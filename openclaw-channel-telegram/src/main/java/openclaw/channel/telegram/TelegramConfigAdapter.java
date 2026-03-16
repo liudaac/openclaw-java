@@ -4,6 +4,7 @@ import openclaw.sdk.channel.ChannelConfigAdapter;
 import openclaw.sdk.channel.ChannelConfigSchema;
 import openclaw.sdk.channel.ConfigUiHint;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -19,7 +20,7 @@ public class TelegramConfigAdapter implements ChannelConfigAdapter<TelegramChann
     @Override
     public CompletableFuture<ConfigValidationResult> validate(Map<String, Object> config) {
         return CompletableFuture.supplyAsync(() -> {
-            java.util.List<String> errors = new java.util.ArrayList<>();
+            List<String> errors = new java.util.ArrayList<>();
 
             // Check required fields
             if (!config.containsKey("botToken")) {
@@ -63,7 +64,7 @@ public class TelegramConfigAdapter implements ChannelConfigAdapter<TelegramChann
             String apiUrl = config.getOrDefault("apiUrl", "https://api.telegram.org").toString();
             Optional<String> webhook = Optional.ofNullable(config.get("webhookUrl")).map(Object::toString);
 
-            return Optional.of(new telegramChannelPlugin.TelegramAccount(
+            return Optional.of(new TelegramChannelPlugin.TelegramAccount(
                     token, username, webhook, apiUrl
             ));
         });

@@ -2,7 +2,6 @@ package openclaw.channel.telegram;
 
 import openclaw.sdk.channel.ChannelInboundAdapter;
 import openclaw.sdk.channel.ChannelMessage;
-import openclaw.sdk.channel.ProcessResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +32,7 @@ public class TelegramInboundAdapter implements ChannelInboundAdapter {
     }
 
     @Override
-    public CompletableFuture<ProcessResult> onMessage(ChannelMessage message) {
+    public CompletableFuture<ChannelInboundAdapter.ProcessResult> onMessage(ChannelMessage message) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 logger.debug("Processing inbound message: {}", message.messageId());
@@ -52,11 +51,11 @@ public class TelegramInboundAdapter implements ChannelInboundAdapter {
                     sendAutoReply(message);
                 }
 
-                return ProcessResult.success();
+                return ChannelInboundAdapter.ProcessResult.success();
 
             } catch (Exception e) {
                 logger.error("Failed to process message: {}", e.getMessage());
-                return ProcessResult.failure(e.getMessage());
+                return ChannelInboundAdapter.ProcessResult.failure(e.getMessage());
             }
         });
     }
