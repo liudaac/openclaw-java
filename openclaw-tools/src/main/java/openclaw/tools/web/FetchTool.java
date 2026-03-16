@@ -73,7 +73,7 @@ public class FetchTool implements AgentTool {
 
                 // SSRF check
                 var validation = fetchGuard.validate(url);
-                if (!validation.allowed()) {
+                if (!validation.isAllowed()) {
                     return ToolResult.failure("URL blocked by security policy: " + validation.reason().orElse("Unknown"));
                 }
 

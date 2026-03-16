@@ -3,6 +3,8 @@ package openclaw.tools.weather;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import openclaw.sdk.tool.AgentTool;
+import openclaw.sdk.tool.AgentTool.PropertySchema;
+import openclaw.sdk.tool.AgentTool.ToolParameters;
 import openclaw.sdk.tool.ToolExecuteContext;
 import openclaw.sdk.tool.ToolResult;
 import org.slf4j.Logger;
@@ -62,6 +64,20 @@ public class WeatherTool implements AgentTool {
     }
     
     @Override
+    public ToolParameters getParameters() {
+        return ToolParameters.builder()
+                .properties(Map.of(
+                        "location", PropertySchema.string("City name or location (e.g., 'Beijing', 'New York', 'London')"),
+                        "operation", PropertySchema.enum_("Weather operation", List.of("current", "forecast")),
+                        "days", PropertySchema.integer("Number of forecast days (1-14)"),
+                        "language", PropertySchema.string("Language for weather description (default: en)"),
+                        "units", PropertySchema.enum_("Temperature units", List.of("metric", "imperial"))
+                ))
+                .required(List.of("location"))
+                .build();
+    }
+
+    // Deprecated: use getParameters() instead
     public String getSchema() {
         return """
             {

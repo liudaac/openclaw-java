@@ -3,6 +3,8 @@ package openclaw.tools.finance;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import openclaw.sdk.tool.AgentTool;
+import openclaw.sdk.tool.AgentTool.PropertySchema;
+import openclaw.sdk.tool.AgentTool.ToolParameters;
 import openclaw.sdk.tool.ToolExecuteContext;
 import openclaw.sdk.tool.ToolResult;
 import org.slf4j.Logger;
@@ -60,6 +62,22 @@ public class FinanceTool implements AgentTool {
     }
     
     @Override
+    public ToolParameters getParameters() {
+        return ToolParameters.builder()
+                .properties(Map.of(
+                        "operation", PropertySchema.enum_("Finance operation", List.of("quote", "search", "crypto", "forex", "history")),
+                        "symbol", PropertySchema.string("Stock symbol (e.g., 'AAPL', 'MSFT', 'TSLA')"),
+                        "query", PropertySchema.string("Search query for stock lookup"),
+                        "from", PropertySchema.string("From currency for forex (e.g., 'USD')"),
+                        "to", PropertySchema.string("To currency for forex (e.g., 'EUR')"),
+                        "period", PropertySchema.enum_("Historical data period", List.of("1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max")),
+                        "interval", PropertySchema.enum_("Data interval", List.of("1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1wk", "1mo", "3mo"))
+                ))
+                .required(List.of("operation"))
+                .build();
+    }
+
+    // Deprecated: use getParameters() instead
     public String getSchema() {
         return """
             {
@@ -202,7 +220,7 @@ public class FinanceTool implements AgentTool {
             resultMap.put("volume", volume);
             resultMap.put("timestamp", System.currentTimeMillis());
             
-            return ToolResult.success(resultMap);
+            return ToolResult.success("Quote data retrieved", resultMap);
             
         } catch (Exception e) {
             logger.error("Failed to get quote for: " + symbol, e);
@@ -248,7 +266,7 @@ public class FinanceTool implements AgentTool {
                 results.add(item);
             }
             
-            return ToolResult.success(Map.of(
+            return ToolResult.success("Finance data", Map.of(
                 "query", query,
                 "count", results.size(),
                 "results", results
@@ -348,7 +366,7 @@ public class FinanceTool implements AgentTool {
                 history.add(dataPoint);
             }
             
-            return ToolResult.success(Map.of(
+            return ToolResult.success("Finance data", Map.of(
                 "symbol", symbol,
                 "period", period,
                 "interval", interval,

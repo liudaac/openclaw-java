@@ -71,30 +71,30 @@ public class BrowserTool implements AgentTool {
     @Override
     public ToolParameters getParameters() {
         return ToolParameters.builder()
-                .properties(Map.of(
-                        "action", PropertySchema.enum_("Browser action", List.of(
+                .properties(Map.ofEntries(
+                        Map.entry("action", PropertySchema.enum_("Browser action", List.of(
                                 "create_session", "close_session", "list_sessions",
                                 "navigate", "screenshot", "click", "type", "fill", 
                                 "select", "hover", "scroll", "evaluate", "snapshot",
                                 "get_text", "get_html", "get_url", "get_title",
                                 "batch"  // NEW: batch operation
-                        )),
-                        "session_id", PropertySchema.string("Session ID or alias (optional, uses default if not provided)"),
-                        "url", PropertySchema.string("URL to navigate (for navigate/screenshot)"),
-                        "selector", PropertySchema.string("CSS selector (for click/type/fill/select/hover/get_text)"),
-                        "text", PropertySchema.string("Text to type (for type/fill action)"),
-                        "value", PropertySchema.string("Value to select (for select action)"),
-                        "script", PropertySchema.string("JavaScript to evaluate (for evaluate action)"),
-                        "direction", PropertySchema.enum_("Scroll direction", List.of("up", "down", "left", "right")),
-                        "amount", PropertySchema.integer("Scroll amount in pixels (default: 500)"),
-                        "width", PropertySchema.integer("Viewport width (default: 1280)"),
-                        "height", PropertySchema.integer("Viewport height (default: 720)"),
-                        "headless", PropertySchema.boolean_("Run in headless mode (default: true)"),
-                        "timeout", PropertySchema.integer("Timeout in seconds (default: 30)"),
-                        "save_path", PropertySchema.string("Path to save screenshot (optional)"),
-                        "full_page", PropertySchema.boolean_("Capture full page screenshot (default: false)"),
-                        "actions", PropertySchema.array("Batch actions (for batch action)", PropertySchema.string("Action")),
-                        "stop_on_error", PropertySchema.boolean_("Stop batch on first error (default: true)")
+                        ))),
+                        Map.entry("session_id", PropertySchema.string("Session ID or alias (optional, uses default if not provided)")),
+                        Map.entry("url", PropertySchema.string("URL to navigate (for navigate/screenshot)")),
+                        Map.entry("selector", PropertySchema.string("CSS selector (for click/type/fill/select/hover/get_text)")),
+                        Map.entry("text", PropertySchema.string("Text to type (for type/fill action)")),
+                        Map.entry("value", PropertySchema.string("Value to select (for select action)")),
+                        Map.entry("script", PropertySchema.string("JavaScript to evaluate (for evaluate action)")),
+                        Map.entry("direction", PropertySchema.enum_("Scroll direction", List.of("up", "down", "left", "right"))),
+                        Map.entry("amount", PropertySchema.integer("Scroll amount in pixels (default: 500)")),
+                        Map.entry("width", PropertySchema.integer("Viewport width (default: 1280)")),
+                        Map.entry("height", PropertySchema.integer("Viewport height (default: 720)")),
+                        Map.entry("headless", PropertySchema.boolean_("Run in headless mode (default: true)")),
+                        Map.entry("timeout", PropertySchema.integer("Timeout in seconds (default: 30)")),
+                        Map.entry("save_path", PropertySchema.string("Path to save screenshot (optional)")),
+                        Map.entry("full_page", PropertySchema.boolean_("Capture full page screenshot (default: false)")),
+                        Map.entry("actions", PropertySchema.array("Batch actions (for batch action)", PropertySchema.string("Action"))),
+                        Map.entry("stop_on_error", PropertySchema.boolean_("Stop batch on first error (default: true)"))
                 ))
                 .required(List.of("action"))
                 .build();

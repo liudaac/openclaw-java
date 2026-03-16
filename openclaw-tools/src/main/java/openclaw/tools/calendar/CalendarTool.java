@@ -1,6 +1,8 @@
 package openclaw.tools.calendar;
 
 import openclaw.sdk.tool.AgentTool;
+import openclaw.sdk.tool.AgentTool.PropertySchema;
+import openclaw.sdk.tool.AgentTool.ToolParameters;
 import openclaw.sdk.tool.ToolExecuteContext;
 import openclaw.sdk.tool.ToolResult;
 import org.slf4j.Logger;
@@ -51,6 +53,30 @@ public class CalendarTool implements AgentTool {
     }
     
     @Override
+    public ToolParameters getParameters() {
+        return ToolParameters.builder()
+                .properties(Map.ofEntries(
+                        Map.entry("operation", PropertySchema.enum_("Calendar operation to perform", List.of("now", "parse", "format", "diff", "convert", "add", "subtract", "event"))),
+                        Map.entry("datetime", PropertySchema.string("Date/time string to parse or format")),
+                        Map.entry("format", PropertySchema.string("Output format pattern (e.g., 'yyyy-MM-dd HH:mm:ss')")),
+                        Map.entry("inputFormat", PropertySchema.string("Input format pattern for parsing")),
+                        Map.entry("fromZone", PropertySchema.string("Source timezone (e.g., 'UTC', 'America/New_York')")),
+                        Map.entry("toZone", PropertySchema.string("Target timezone (e.g., 'Asia/Shanghai')")),
+                        Map.entry("amount", PropertySchema.integer("Amount to add/subtract")),
+                        Map.entry("unit", PropertySchema.enum_("Time unit", List.of("seconds", "minutes", "hours", "days", "weeks", "months", "years"))),
+                        Map.entry("eventTitle", PropertySchema.string("Event title")),
+                        Map.entry("eventDescription", PropertySchema.string("Event description")),
+                        Map.entry("eventStart", PropertySchema.string("Event start time")),
+                        Map.entry("eventEnd", PropertySchema.string("Event end time")),
+                        Map.entry("eventAllDay", PropertySchema.boolean_("All day event")),
+                        Map.entry("eventLocation", PropertySchema.string("Event location")),
+                        Map.entry("eventReminder", PropertySchema.integer("Reminder minutes before event"))
+                ))
+                .required(List.of("operation"))
+                .build();
+    }
+
+    // Deprecated: use getParameters() instead
     public String getSchema() {
         return """
             {
@@ -168,21 +194,21 @@ public class CalendarTool implements AgentTool {
             formatted = now.format(ISO_FORMATTER);
         }
         
-        return ToolResult.success(Map.of(
-            "datetime", formatted,
-            "timestamp", now.toInstant().toEpochMilli(),
-            "timezone", zone.getId(),
-            "iso", now.format(ISO_FORMATTER),
-            "date", now.format(DATE_FORMATTER),
-            "time", now.format(TIME_FORMATTER),
-            "year", now.getYear(),
-            "month", now.getMonthValue(),
-            "day", now.getDayOfMonth(),
-            "hour", now.getHour(),
-            "minute", now.getMinute(),
-            "second", now.getSecond(),
-            "dayOfWeek", now.getDayOfWeek().toString(),
-            "dayOfYear", now.getDayOfYear()
+        return ToolResult.success("Current time", Map.ofEntries(
+            Map.entry("datetime", formatted),
+            Map.entry("timestamp", now.toInstant().toEpochMilli()),
+            Map.entry("timezone", zone.getId()),
+            Map.entry("iso", now.format(ISO_FORMATTER)),
+            Map.entry("date", now.format(DATE_FORMATTER)),
+            Map.entry("time", now.format(TIME_FORMATTER)),
+            Map.entry("year", now.getYear()),
+            Map.entry("month", now.getMonthValue()),
+            Map.entry("day", now.getDayOfMonth()),
+            Map.entry("hour", now.getHour()),
+            Map.entry("minute", now.getMinute()),
+            Map.entry("second", now.getSecond()),
+            Map.entry("dayOfWeek", now.getDayOfWeek().toString()),
+            Map.entry("dayOfYear", now.getDayOfYear())
         ));
     }
     
@@ -207,7 +233,7 @@ public class CalendarTool implements AgentTool {
             ZoneId zone = timezone != null ? ZoneId.of(timezone) : ZoneId.systemDefault();
             ZonedDateTime zonedDateTime = localDateTime.atZone(zone);
             
-            return ToolResult.success(Map.of(
+            return ToolResult.success("Calendar result", Map.of(
                 "timestamp", zonedDateTime.toInstant().toEpochMilli(),
                 "iso", zonedDateTime.format(ISO_FORMATTER),
                 "date", zonedDateTime.format(DATE_FORMATTER),
@@ -232,7 +258,7 @@ public class CalendarTool implements AgentTool {
             ZonedDateTime zonedDateTime = ZonedDateTime.parse(datetime, ISO_FORMATTER);
             String formatted = zonedDateTime.format(DateTimeFormatter.ofPattern(format));
             
-            return ToolResult.success(Map.of(
+            return ToolResult.success("Calendar result", Map.of(
                 "formatted", formatted,
                 "original", datetime
             ));
@@ -275,7 +301,7 @@ public class CalendarTool implements AgentTool {
                     diffValue = duration.getSeconds();
             }
             
-            return ToolResult.success(Map.of(
+            return ToolResult.success("Calendar result", Map.of(
                 "diff", diffValue,
                 "unit", unit,
                 "inSeconds", duration.getSeconds(),
@@ -303,7 +329,7 @@ public class CalendarTool implements AgentTool {
             ZonedDateTime sourceTime = ZonedDateTime.parse(datetime, ISO_FORMATTER);
             ZonedDateTime targetTime = sourceTime.withZoneSameInstant(ZoneId.of(toTimezone));
             
-            return ToolResult.success(Map.of(
+            return ToolResult.success("Calendar result", Map.of(
                 "original", datetime,
                 "originalTimezone", fromTimezone,
                 "converted", targetTime.format(ISO_FORMATTER),
@@ -365,7 +391,7 @@ public class CalendarTool implements AgentTool {
                     break;
             }
             
-            return ToolResult.success(Map.of(
+            return ToolResult.success("Calendar result", Map.of(
                 "original", datetime,
                 "result", zonedDateTime.format(ISO_FORMATTER),
                 "operation", isAdd ? "add" : "subtract",
@@ -431,7 +457,7 @@ public class CalendarTool implements AgentTool {
         ical.append("END:VEVENT\n");
         ical.append("END:VCALENDAR");
         
-        return ToolResult.success(Map.of(
+        return ToolResult.success("Calendar result", Map.of(
             "ical", ical.toString(),
             "title", title,
             "start", start,

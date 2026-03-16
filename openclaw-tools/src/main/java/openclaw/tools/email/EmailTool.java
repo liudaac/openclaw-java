@@ -1,6 +1,8 @@
 package openclaw.tools.email;
 
 import openclaw.sdk.tool.AgentTool;
+import openclaw.sdk.tool.AgentTool.PropertySchema;
+import openclaw.sdk.tool.AgentTool.ToolParameters;
 import openclaw.sdk.tool.ToolExecuteContext;
 import openclaw.sdk.tool.ToolResult;
 import org.slf4j.Logger;
@@ -46,6 +48,27 @@ public class EmailTool implements AgentTool {
     }
     
     @Override
+    public ToolParameters getParameters() {
+        return ToolParameters.builder()
+                .properties(Map.ofEntries(
+                        Map.entry("to", PropertySchema.array("List of recipient email addresses", PropertySchema.string("Email address"))),
+                        Map.entry("cc", PropertySchema.array("List of CC email addresses", PropertySchema.string("Email address"))),
+                        Map.entry("bcc", PropertySchema.array("List of BCC email addresses", PropertySchema.string("Email address"))),
+                        Map.entry("subject", PropertySchema.string("Email subject")),
+                        Map.entry("body", PropertySchema.string("Email body content")),
+                        Map.entry("isHtml", PropertySchema.boolean_("Whether body is HTML (default: false)")),
+                        Map.entry("attachments", PropertySchema.array("List of attachments", PropertySchema.string("Attachment path"))),
+                        Map.entry("smtpHost", PropertySchema.string("SMTP server host (optional, uses env var)")),
+                        Map.entry("smtpPort", PropertySchema.integer("SMTP server port (optional, uses env var)")),
+                        Map.entry("username", PropertySchema.string("SMTP username (optional, uses env var)")),
+                        Map.entry("password", PropertySchema.string("SMTP password (optional, uses env var)")),
+                        Map.entry("useSsl", PropertySchema.boolean_("Use SSL/TLS (default: true)"))
+                ))
+                .required(List.of("to", "subject", "body"))
+                .build();
+    }
+
+    // Deprecated: use getParameters() instead
     public String getSchema() {
         return """
             {
