@@ -2,7 +2,6 @@ package openclaw.browser.action;
 
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.LoadState;
-import com.microsoft.playwright.options.ScreenshotOptions;
 import openclaw.browser.snapshot.PageSnapshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,7 +178,7 @@ public class BrowserActions {
         });
     }
     
-    public CompletableFuture<byte[]> screenshot(ScreenshotOptions options) {
+    public CompletableFuture<byte[]> screenshot(Page.ScreenshotOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             return page.screenshot(options);
         });

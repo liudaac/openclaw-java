@@ -39,197 +39,127 @@ public record BatchAction(
     public static final int MAX_WAIT_TIME_MS = 30_000;
     public static final int MAX_TIMEOUT_MS = 60_000;
     
+    // Private constructor for factory methods
+    private BatchAction(String kind, String selector, String ref, String text, String value, 
+                        String script, String key, String direction, Integer amount,
+                        Integer width, Integer height, Integer delayMs, Integer timeMs, Integer timeoutMs,
+                        Boolean submit, Boolean slowly, Boolean doubleClick, String button, String[] modifiers,
+                        String startSelector, String startRef, String endSelector, String endRef,
+                        Map<String, Object> extra, boolean dummy) {
+        this(kind, selector, ref, text, value, script, key, direction, amount, 
+             width, height, delayMs, timeMs, timeoutMs, submit, slowly, doubleClick, 
+             button, modifiers, startSelector, startRef, endSelector, endRef, extra);
+    }
+    
     /**
      * Create a click action.
      */
     public static BatchAction click(String selector) {
-        return new BatchAction("click", selector, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new BatchAction("click", selector, null, null, null, null, null, null, null, 
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a click action with options.
      */
     public static BatchAction click(String selector, Integer delayMs, Boolean doubleClick, String button) {
-        return new BatchAction("click", selector, null, null, null, null, null, null, null, null, delayMs, null, null, null, null, doubleClick, button, null, null, null, null, null, null);
+        return new BatchAction("click", selector, null, null, null, null, null, null, null,
+            null, null, delayMs, null, null, null, null, doubleClick, button, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a type action.
      */
     public static BatchAction type(String selector, String text) {
-        return new BatchAction("type", selector, null, text, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new BatchAction("type", selector, null, text, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a type action with options.
      */
     public static BatchAction type(String selector, String text, Boolean submit, Boolean slowly) {
-        return new BatchAction("type", selector, null, text, null, null, null, null, null, null, null, null, null, submit, slowly, null, null, null, null, null, null, null, null);
+        return new BatchAction("type", selector, null, text, null, null, null, null, null,
+            null, null, null, null, null, submit, slowly, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a fill action.
      */
     public static BatchAction fill(String selector, String text) {
-        return new BatchAction("fill", selector, null, text, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new BatchAction("fill", selector, null, text, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a select action.
      */
     public static BatchAction select(String selector, String value) {
-        return new BatchAction("select", selector, null, null, value, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new BatchAction("select", selector, null, null, value, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a hover action.
      */
     public static BatchAction hover(String selector) {
-        return new BatchAction("hover", selector, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new BatchAction("hover", selector, null, null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a scroll action.
      */
     public static BatchAction scroll(String direction, int amount) {
-        return new BatchAction("scroll", null, null, null, null, null, null, direction, amount, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new BatchAction("scroll", null, null, null, null, null, null, direction, amount,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a drag action.
      */
     public static BatchAction drag(String startSelector, String endSelector) {
-        return new BatchAction("drag", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, startSelector, null, endSelector, null, null);
+        return new BatchAction("drag", null, null, null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, startSelector, null, endSelector, null, null, true);
     }
     
     /**
      * Create a press key action.
      */
     public static BatchAction press(String key) {
-        return new BatchAction("press", null, null, null, null, null, key, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new BatchAction("press", null, null, null, null, null, key, null, null,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create an evaluate action.
      */
     public static BatchAction evaluate(String script) {
-        return new BatchAction("evaluate", null, null, null, null, script, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new BatchAction("evaluate", null, null, null, null, script, null, null, null,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a wait action.
      */
     public static BatchAction wait(int timeMs) {
-        return new BatchAction("wait", null, null, null, null, null, null, null, null, null, null, timeMs, null, null, null, null, null, null, null, null, null, null, null);
+        return new BatchAction("wait", null, null, null, null, null, null, null, null,
+            null, null, null, timeMs, null, null, null, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a resize action.
      */
     public static BatchAction resize(int width, int height) {
-        return new BatchAction("resize", null, null, null, null, null, null, null, null, width, height, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new BatchAction("resize", null, null, null, null, null, null, null, null,
+            width, height, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
     }
     
     /**
      * Create a close action.
      */
     public static BatchAction close() {
-        return new BatchAction("close", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    }
-    
-    /**
-     * Create a navigate action.
-     */
-    public static BatchAction navigate(String url) {
-        return new BatchAction("navigate", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-            Map.of("url", url));
-    }
-    
-    /**
-     * Create a screenshot action.
-     */
-    public static BatchAction screenshot(String selector) {
-        return new BatchAction("screenshot", selector, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    }
-    
-    /**
-     * Validate this action.
-     */
-    public void validate() {
-        if (kind == null || kind.isEmpty()) {
-            throw new IllegalArgumentException("Action kind is required");
-        }
-        
-        switch (kind) {
-            case "click", "type", "fill", "select", "hover", "screenshot" -> {
-                if (selector == null && ref == null) {
-                    throw new IllegalArgumentException(kind + " action requires selector or ref");
-                }
-            }
-            case "scroll" -> {
-                if (direction == null) {
-                    throw new IllegalArgumentException("scroll action requires direction");
-                }
-                if (amount == null || amount < 0) {
-                    throw new IllegalArgumentException("scroll action requires positive amount");
-                }
-            }
-            case "drag" -> {
-                if ((startSelector == null && startRef == null) || (endSelector == null && endRef == null)) {
-                    throw new IllegalArgumentException("drag action requires start and end selectors/refs");
-                }
-            }
-            case "press" -> {
-                if (key == null || key.isEmpty()) {
-                    throw new IllegalArgumentException("press action requires key");
-                }
-            }
-            case "evaluate" -> {
-                if (script == null || script.isEmpty()) {
-                    throw new IllegalArgumentException("evaluate action requires script");
-                }
-            }
-            case "wait" -> {
-                if (timeMs == null || timeMs < 0 || timeMs > MAX_WAIT_TIME_MS) {
-                    throw new IllegalArgumentException("wait timeMs must be between 0 and " + MAX_WAIT_TIME_MS);
-                }
-            }
-            case "resize" -> {
-                if (width == null || height == null || width <= 0 || height <= 0) {
-                    throw new IllegalArgumentException("resize action requires positive width and height");
-                }
-            }
-            case "type", "fill" -> {
-                if (selector == null && ref == null) {
-                    throw new IllegalArgumentException(kind + " action requires selector or ref");
-                }
-                if (text == null) {
-                    throw new IllegalArgumentException(kind + " action requires text");
-                }
-            }
-            case "select" -> {
-                if (selector == null && ref == null) {
-                    throw new IllegalArgumentException("select action requires selector or ref");
-                }
-                if (value == null) {
-                    throw new IllegalArgumentException("select action requires value");
-                }
-            }
-            case "navigate" -> {
-                if (extra == null || !extra.containsKey("url")) {
-                    throw new IllegalArgumentException("navigate action requires url");
-                }
-            }
-        }
-        
-        // Validate delayMs
-        if (delayMs != null && (delayMs < 0 || delayMs > MAX_CLICK_DELAY_MS)) {
-            throw new IllegalArgumentException("delayMs must be between 0 and " + MAX_CLICK_DELAY_MS);
-        }
-        
-        // Validate timeoutMs
-        if (timeoutMs != null && (timeoutMs < 0 || timeoutMs > MAX_TIMEOUT_MS)) {
-            throw new IllegalArgumentException("timeoutMs must be between 0 and " + MAX_TIMEOUT_MS);
-        }
+        return new BatchAction("close", null, null, null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
     }
 }

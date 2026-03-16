@@ -42,7 +42,7 @@ public class PageSnapshot {
         String html = page.content();
         
         // Get viewport info
-        ViewportSize size = page.viewportSize();
+        Page.ViewportSize size = page.viewportSize();
         ViewportInfo viewport = new ViewportInfo(size.width(), size.height());
         
         // Capture interactive elements
@@ -101,7 +101,7 @@ public class PageSnapshot {
         
         // Accessibility snapshot
         AccessibilitySnapshot accessibility = new AccessibilitySnapshot(
-            page.accessibility().snapshot(new Page.SnapshotOptions())
+            page.accessibility().snapshot()
         );
         
         return new PageSnapshot(url, title, html, elements, links, images, accessibility, viewport);
