@@ -1,6 +1,8 @@
 package openclaw.server.controller;
 
 import openclaw.gateway.GatewayService;
+import openclaw.gateway.node.NodeRegistry;
+import openclaw.gateway.queue.WorkQueue;
 import openclaw.server.config.TestSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +13,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 /**
  * Gateway Controller Tests
@@ -27,6 +31,12 @@ class GatewayControllerTest {
 
     @MockBean
     private GatewayService gatewayService;
+
+    @MockBean
+    private NodeRegistry nodeRegistry;
+
+    @MockBean
+    private WorkQueue workQueue;
 
     @Test
     void healthCheckShouldReturnUp() {
@@ -43,14 +53,22 @@ class GatewayControllerTest {
 
     @Test
     void statsShouldReturnGatewayStats() {
+        // Setup mocks
+        when(gatewayService.getNodeRegistry()).thenReturn(nodeRegistry);
+        when(gatewayService.getWorkQueue()).thenReturn(workQueue);
+        when(nodeRegistry.getNodeCount()).thenReturn(CompletableFuture.completedFuture(5));
+        when(workQueue.getPendingCount()).thenReturn(CompletableFuture.completedFuture(10));
+        when(workQueue.getCompletedCount()).thenReturn(CompletableFuture.completedFuture(100L));
+
         webClient.get()
                 .uri("/api/v1/gateway/stats")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(GatewayController.GatewayStatsResponse.class)
                 .value(stats -> {
-                    assertThat(stats.activeNodes()).isGreaterThanOrEqualTo(0);
-                    assertThat(stats.pendingWork()).isGreaterThanOrEqualTo(0);
+                    assertThat(stats.activeNodes()).isEqualTo(5);
+                    assertThat(stats.pendingWork()).isEqualTo(10);
+                    assertThat(stats.completedWork()).isEqualTo(100L);
                 });
     }
 }
