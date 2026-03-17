@@ -1,0 +1,57 @@
+# OpenClaw Store Configuration
+# Choose your storage backend: memory, file, or redis
+
+openclaw:
+  store:
+    # Store type: memory | file | redis
+    type: file
+    
+    # Session configuration (applies to all store types)
+    session:
+      # Session TTL (time to live)
+      ttl: PT24H
+      # Maximum messages per session
+      max-messages: 1000
+      # Auto cleanup inactive sessions
+      auto-cleanup: true
+      # Cleanup interval
+      cleanup-interval: PT30M
+    
+    # File store configuration (used when type=file)
+    file:
+      # Base directory for file storage
+      base-dir: ${user.home}/.openclaw/store
+      # File extension
+      extension: .json
+      # Auto compact interval
+      compact-interval: PT1H
+    
+    # Redis store configuration (used when type=redis)
+    redis:
+      # Redis host
+      host: localhost
+      # Redis port
+      port: 6379
+      # Redis password (optional)
+      password:
+      # Redis database
+      database: 0
+      # Connection timeout
+      timeout: PT5S
+      # Key prefix
+      key-prefix: openclaw:
+
+# Redis configuration (required when store.type=redis)
+spring:
+  data:
+    redis:
+      host: ${openclaw.store.redis.host:localhost}
+      port: ${openclaw.store.redis.port:6379}
+      password: ${openclaw.store.redis.password:}
+      database: ${openclaw.store.redis.database:0}
+      timeout: ${openclaw.store.redis.timeout:5000}
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
