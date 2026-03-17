@@ -1,0 +1,18 @@
+# HEARTBEAT.md - Periodic Tasks
+
+# Keep this file empty (or with only comments) to skip heartbeat API calls.
+
+# Add tasks below when you want the agent to check something periodically.
+
+## Example Tasks
+
+- [ ] Check email for urgent messages
+- [ ] Review calendar for upcoming events (next 24-48h)
+- [ ] Check weather if going out
+- [ ] Monitor system status
+
+## Notes
+
+- Tasks are checked every 30 minutes by default
+- Agent will reply HEARTBEAT_OK if nothing needs attention
+- If there are actionable items, agent will report them

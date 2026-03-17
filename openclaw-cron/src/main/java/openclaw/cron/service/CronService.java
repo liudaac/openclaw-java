@@ -1,8 +1,10 @@
 package openclaw.cron.service;
 
+import openclaw.agent.heartbeat.HeartbeatService;
 import openclaw.cron.executor.IsolatedJobExecutor;
 import openclaw.cron.executor.JobExecutor;
 import openclaw.cron.model.CronJob;
+import openclaw.cron.model.CronJob.WakeMode;
 import openclaw.cron.model.JobExecution;
 import openclaw.cron.model.JobStatus;
 import openclaw.cron.scheduler.CronExpressionParser;
@@ -10,6 +12,7 @@ import openclaw.cron.store.CronJobStore;
 import openclaw.cron.store.SQLiteCronJobStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
@@ -41,12 +44,20 @@ public class CronService {
     private final ScheduledExecutorService scheduler;
     private final Map<String, ScheduledFuture<?>> scheduledTasks;
     
+    private HeartbeatService heartbeatService;
+    
     public CronService() {
         this.store = new SQLiteCronJobStore(Paths.get("data/cron"));
         this.executor = new IsolatedJobExecutor();
         this.parser = new CronExpressionParser();
         this.scheduler = Executors.newScheduledThreadPool(5);
         this.scheduledTasks = new ConcurrentHashMap<>();
+    }
+    
+    @Autowired(required = false)
+    public void setHeartbeatService(HeartbeatService heartbeatService) {
+        this.heartbeatService = heartbeatService;
+        logger.info("Heartbeat service injected into CronService");
     }
     
     @PostConstruct
@@ -211,6 +222,23 @@ public class CronService {
     private void runJob(CronJob job) {
         logger.info("Running job: {}", job.getName());
         
+        // Check wake mode
+        if (job.getWakeMode() == WakeMode.NEXT_HEARTBEAT && heartbeatService != null) {
+            logger.debug("Job {} scheduled for next heartbeat", job.getId());
+            // Request heartbeat execution
+            heartbeatService.requestHeartbeatNow(
+                "cron:" + job.getId(),
+                job.getAgentId(),
+                job.getSessionKey()
+            ).thenRun(() -> {
+                // Update status and reschedule
+                store.updateStatus(job.getId(), JobStatus.PENDING)
+                    .thenRun(() -> scheduleJob(job));
+            });
+            return;
+        }
+        
+        // Execute immediately (NOW mode or no heartbeat service)
         store.updateStatus(job.getId(), JobStatus.RUNNING)
             .thenCompose(v -> executeJob(job))
             .thenAccept(execution -> {

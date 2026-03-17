@@ -38,6 +38,14 @@ public class CronJob {
     private long timeoutSeconds;       // Execution timeout
     private String workingDirectory;   // Working directory for execution
     
+    // Wake mode for heartbeat integration
+    private WakeMode wakeMode;         // "now" or "next-heartbeat"
+    private String sessionTarget;      // "main" or "isolated"
+    private String agentId;            // Target agent ID
+    private String sessionKey;         // Target session key
+    private String deliveryChannel;    // Delivery channel
+    private String deliveryTo;         // Delivery target
+    
     public CronJob() {
         this.id = UUID.randomUUID().toString();
         this.status = JobStatus.PENDING;
@@ -50,6 +58,8 @@ public class CronJob {
         this.isolated = true;
         this.timeoutSeconds = 60;
         this.timezone = "UTC";
+        this.wakeMode = WakeMode.NEXT_HEARTBEAT;  // Default to next heartbeat
+        this.sessionTarget = "isolated";            // Default to isolated execution
     }
     
     public CronJob(String name, String schedule, String command) {
@@ -208,6 +218,60 @@ public class CronJob {
         this.updatedAt = Instant.now();
     }
     
+    public WakeMode getWakeMode() {
+        return wakeMode;
+    }
+    
+    public void setWakeMode(WakeMode wakeMode) {
+        this.wakeMode = wakeMode;
+        this.updatedAt = Instant.now();
+    }
+    
+    public String getSessionTarget() {
+        return sessionTarget;
+    }
+    
+    public void setSessionTarget(String sessionTarget) {
+        this.sessionTarget = sessionTarget;
+        this.updatedAt = Instant.now();
+    }
+    
+    public String getAgentId() {
+        return agentId;
+    }
+    
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+        this.updatedAt = Instant.now();
+    }
+    
+    public String getSessionKey() {
+        return sessionKey;
+    }
+    
+    public void setSessionKey(String sessionKey) {
+        this.sessionKey = sessionKey;
+        this.updatedAt = Instant.now();
+    }
+    
+    public String getDeliveryChannel() {
+        return deliveryChannel;
+    }
+    
+    public void setDeliveryChannel(String deliveryChannel) {
+        this.deliveryChannel = deliveryChannel;
+        this.updatedAt = Instant.now();
+    }
+    
+    public String getDeliveryTo() {
+        return deliveryTo;
+    }
+    
+    public void setDeliveryTo(String deliveryTo) {
+        this.deliveryTo = deliveryTo;
+        this.updatedAt = Instant.now();
+    }
+    
     /**
      * Check if the job can be transitioned to the given status.
      */
@@ -245,7 +309,44 @@ public class CronJob {
     
     @Override
     public String toString() {
-        return String.format("CronJob{id='%s', name='%s', status=%s, schedule='%s'}", 
-            id, name, status, schedule);
+        return String.format("CronJob{id='%s', name='%s', status=%s, schedule='%s', wakeMode=%s}", 
+            id, name, status, schedule, wakeMode);
+    }
+    
+    /**
+     * Wake mode for cron job execution.
+     */
+    public enum WakeMode {
+        /**
+         * Execute immediately when triggered.
+         */
+        NOW("now"),
+        
+        /**
+         * Wait for next heartbeat to execute.
+         */
+        NEXT_HEARTBEAT("next-heartbeat");
+        
+        private final String value;
+        
+        WakeMode(String value) {
+            this.value = value;
+        }
+        
+        public String getValue() {
+            return value;
+        }
+        
+        public static WakeMode fromString(String value) {
+            if (value == null) {
+                return NEXT_HEARTBEAT;
+            }
+            for (WakeMode mode : values()) {
+                if (mode.value.equalsIgnoreCase(value) || mode.name().equalsIgnoreCase(value)) {
+                    return mode;
+                }
+            }
+            return NEXT_HEARTBEAT;
+        }
     }
 }
