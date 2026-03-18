@@ -49,6 +49,27 @@
             <artifactId>openclaw-session</artifactId>
         </dependency>
 
+        <!-- OpenClaw Brave Provider -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-provider-brave</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- OpenClaw Perplexity Provider -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-provider-perplexity</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- OpenClaw Google Provider -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-provider-google</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Spring Boot Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
