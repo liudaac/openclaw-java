@@ -25,6 +25,26 @@ public class MiniMaxProvider extends OpenAICompatibleProvider {
     @Override
     public List<ModelInfo> getModels() {
         return List.of(
+                // M2.7 series - new default models
+                new ModelInfo(
+                        "minimax-m2.7",
+                        "MiniMax-M2.7",
+                        "MiniMax M2.7 model - improved performance and capabilities",
+                        8192,
+                        4096,
+                        false,
+                        true
+                ),
+                new ModelInfo(
+                        "minimax-m2.7-highspeed",
+                        "MiniMax-M2.7-HighSpeed",
+                        "MiniMax M2.7 high-speed variant for faster responses",
+                        8192,
+                        4096,
+                        false,
+                        true
+                ),
+                // Legacy models
                 new ModelInfo(
                         "abab5.5-chat",
                         "MiniMax abab5.5",
@@ -53,5 +73,11 @@ public class MiniMaxProvider extends OpenAICompatibleProvider {
                         true
                 )
         );
+    }
+
+    @Override
+    public String getDefaultModel() {
+        // Updated default to M2.7 as per original update
+        return "minimax-m2.7";
     }
 }
