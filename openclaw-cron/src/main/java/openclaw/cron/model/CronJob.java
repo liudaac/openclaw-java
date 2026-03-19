@@ -45,6 +45,7 @@ public class CronJob {
     private String sessionKey;         // Target session key
     private String deliveryChannel;    // Delivery channel
     private String deliveryTo;         // Delivery target
+    private Instant scheduledTime;     // Scheduled execution time
     
     public CronJob() {
         this.id = UUID.randomUUID().toString();
@@ -269,6 +270,15 @@ public class CronJob {
     
     public void setDeliveryTo(String deliveryTo) {
         this.deliveryTo = deliveryTo;
+        this.updatedAt = Instant.now();
+    }
+    
+    public Instant getScheduledTime() {
+        return scheduledTime;
+    }
+    
+    public void setScheduledTime(Instant scheduledTime) {
+        this.scheduledTime = scheduledTime;
         this.updatedAt = Instant.now();
     }
     
