@@ -88,6 +88,14 @@ public abstract class OpenAICompatibleProvider implements LLMProvider {
     protected String buildRequestBody(ChatRequest request) throws IOException {
         ObjectNode root = mapper.createObjectNode();
         root.put("model", request.model());
+        
+        // Strip prompt cache fields for non-OpenAI-compatible endpoints
+        // This prevents HTTP 400 errors on third-party providers
+        if (!isOpenAICompatibleEndpoint()) {
+            // Remove prompt_cache_key and prompt_cache_retention if present
+            root.remove("prompt_cache_key");
+            root.remove("prompt_cache_retention");
+        }
 
         ArrayNode messagesArray = root.putArray("messages");
         for (Message message : request.messages()) {
@@ -142,6 +150,20 @@ public abstract class OpenAICompatibleProvider implements LLMProvider {
         }
 
         return mapper.writeValueAsString(root);
+    }
+    
+    /**
+     * Checks if this provider is a native OpenAI or Azure OpenAI endpoint.
+     * Non-OpenAI-compatible endpoints should not receive prompt cache fields.
+     */
+    protected boolean isOpenAICompatibleEndpoint() {
+        // Native OpenAI endpoints
+        if (baseUrl.contains("api.openai.com") || 
+            baseUrl.contains("openai.azure.com")) {
+            return true;
+        }
+        // Third-party OpenAI-compatible providers should not receive prompt cache
+        return false;
     }
 
     /**
