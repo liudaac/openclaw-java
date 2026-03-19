@@ -172,14 +172,14 @@ public class DMAllowlistService {
 ### Phase 1: 关键修复 (今日完成) ✅
 1. [x] Agent Prompt Cache 修复 - `OpenAICompatibleProvider.java`
 2. [x] 设备配对共享认证 - `DevicePairingService.java`
-3. [ ] MiniMax 模型更新 (待实施)
+3. [x] MiniMax 模型更新 - `MiniMaxProvider.java`
 
-### Phase 2: 功能增强 (明日)
-4. [ ] Cron 交付持久化
-5. [ ] Discord DM 允许列表
-6. [ ] 会话管理改进
+### Phase 2: 功能增强 (今日完成) ✅
+4. [x] Cron 交付持久化 - `CronDeliveryService.java`
+5. [x] Discord DM 允许列表 - `DMAllowlistService.java`
+6. [ ] 会话管理改进 (待实施)
 
-### Phase 3: 测试验证 (后日)
+### Phase 3: 测试验证 (明日)
 7. [ ] 单元测试
 8. [ ] 集成测试
 9. [ ] 回归测试
@@ -195,6 +195,23 @@ public class DMAllowlistService {
 - **文件**: `openclaw-gateway/src/main/java/openclaw/gateway/auth/DevicePairingService.java` (新增)
 - **改动**: 创建设备配对服务，包含共享认证令牌、单次使用验证、自动过期清理
 - **原版**: 1d3e596021
+
+### 提交 3: feat(models): add MiniMax M2.7 models and update default
+- **文件**: `openclaw-tools/src/main/java/openclaw/tools/llm/MiniMaxProvider.java`
+- **改动**: 添加 minimax-m2.7 和 minimax-m2.7-highspeed 模型，更新默认模型
+- **原版**: b64f4e313d (#49691)
+
+### 提交 4: feat(cron): persist outbound sends and skip stale deliveries
+- **文件**: 
+  - `openclaw-cron/src/main/java/openclaw/cron/delivery/CronDeliveryService.java` (新增)
+  - `openclaw-cron/src/main/java/openclaw/cron/model/CronJob.java`
+- **改动**: 添加 Cron 交付持久化服务，跳过超过1小时的过期交付
+- **原版**: a290f5e50f (#50092)
+
+### 提交 5: feat(discord): enforce strict DM component allowlist auth
+- **文件**: `openclaw-channel-discord/src/main/java/openclaw/channel/discord/security/DMAllowlistService.java` (新增)
+- **改动**: 添加 Discord DM 组件允许列表服务，严格验证用户权限
+- **原版**: 0f0cecd2e8 (#49997)
 
 ---
 
