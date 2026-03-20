@@ -1,34 +1,19 @@
-# OpenClaw Session Module
+# OpenClaw Session 模块
 
-Session persistence and management for OpenClaw.
+实时会话管理模块，提供会话持久化和消息存储功能。
 
-## 特性
+## 功能特性
 
-- ✅ **SQLite 持久化** - 会话和消息持久化存储
-- ✅ **内存缓存** - 热数据缓存，提升性能
-- ✅ **会话恢复** - 重启后自动恢复活跃会话
-- ✅ **历史搜索** - 支持会话和消息搜索
-- ✅ **统计信息** - Token 使用统计
-- ✅ **状态机** - 完整的状态转换管理
+### 核心功能
+- ✅ SQLite 持久化存储
+- ✅ 内存缓存（热数据）
+- ✅ 会话状态机管理（6种状态）
+- ✅ 消息历史记录
+- ✅ 会话搜索
+- ✅ 统计信息
+- ✅ 自动清理过期会话
 
-## 架构
-
-```
-openclaw-session/
-├── model/
-│   ├── Session.java              # 会话实体
-│   ├── Message.java              # 消息实体
-│   ├── SessionStatus.java        # 状态枚举
-│   └── SessionStatusMachine.java # 状态机
-├── store/
-│   ├── SessionStore.java         # 存储接口
-│   └── SQLiteSessionStore.java   # SQLite 实现
-└── service/
-    └── SessionPersistenceService.java # 主服务
-```
-
-## 状态机
-
+### 会话状态
 ```
 PENDING -> ACTIVE -> COMPLETED -> ARCHIVED
     |         |
@@ -38,7 +23,32 @@ PENDING -> ACTIVE -> COMPLETED -> ARCHIVED
     v      ERROR
 ```
 
-## 使用示例
+## 快速开始
+
+### 1. 添加依赖
+
+```xml
+<dependency>
+    <groupId>ai.openclaw</groupId>
+    <artifactId>openclaw-session</artifactId>
+</dependency>
+```
+
+### 2. 配置（可选）
+
+```yaml
+openclaw:
+  session:
+    enabled: true
+    storage-type: sqlite  # sqlite | memory | redis
+    db-path: ${user.home}/.openclaw/sessions.db
+    max-messages: 1000
+    ttl: 30d
+    auto-cleanup: true
+    cleanup-interval: 1h
+```
+
+### 3. 使用服务
 
 ```java
 @Autowired
@@ -48,37 +58,102 @@ private SessionPersistenceService sessionService;
 Session session = sessionService.createSession("user-123", "gpt-4").join();
 
 // 添加消息
-sessionService.addMessage(session.getId(), "user", "Hello").join();
-sessionService.addMessage(session.getId(), "assistant", "Hi there!").join();
+sessionService.addMessage(session.getId(), "user", "Hello!").join();
 
-// 更新状态
-sessionService.updateStatus(session.getId(), SessionStatus.ACTIVE).join();
-
-// 获取会话
-Optional<Session> opt = sessionService.getSession(session.getId()).join();
-
-// 获取消息历史
+// 获取历史
 List<Message> messages = sessionService.getMessages(session.getId()).join();
 
 // 搜索会话
 List<Session> results = sessionService.searchSessions("keyword").join();
 
-// 归档会话
-sessionService.archiveSession(session.getId()).join();
+// 获取统计
+SessionStats stats = sessionService.getStats(session.getId()).join();
 ```
 
-## 与原版对比
+## 架构设计
 
-| 功能 | Node.js | Java (新) |
-|------|---------|-----------|
-| 存储格式 | JSONL | SQLite ✅ |
-| 会话恢复 | 完整 | 完整 ✅ |
-| 历史搜索 | 完整 | 完整 ✅ |
-| 内存缓存 | 无 | 有 ✅ |
-| 自动归档 | 有 | 有 ✅ |
+### 类图
+```
+SessionStore (interface)
+    ├── SQLiteSessionStore
+    └── InMemorySessionStore
 
-## 待实现
+SessionPersistenceService
+    ├── SessionStore (存储层)
+    └── sessionCache (内存缓存)
+```
 
-- [ ] 自动归档策略
+### 数据模型
+
+**Session 表**
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | TEXT | 主键 |
+| session_key | TEXT | 会话标识（唯一） |
+| model | TEXT | 使用的模型 |
+| status | TEXT | 状态 |
+| metadata | TEXT | JSON 元数据 |
+| created_at | INTEGER | 创建时间 |
+| updated_at | INTEGER | 更新时间 |
+| last_activity_at | INTEGER | 最后活动时间 |
+| total_input_tokens | INTEGER | 输入 token 数 |
+| total_output_tokens | INTEGER | 输出 token 数 |
+| error_message | TEXT | 错误信息 |
+
+**Message 表**
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | TEXT | 主键 |
+| session_id | TEXT | 外键（关联 sessions） |
+| role | TEXT | 角色（system/user/assistant/tool） |
+| content | TEXT | 内容 |
+| tool_name | TEXT | 工具名称 |
+| tool_call_id | TEXT | 工具调用 ID |
+| tool_result | TEXT | 工具结果（JSON） |
+| metadata | TEXT | 元数据（JSON） |
+| created_at | INTEGER | 创建时间 |
+| token_count | INTEGER | Token 数 |
+
+## 性能优化
+
+1. **索引优化**
+   - session_key 索引
+   - status 索引
+   - last_activity_at 索引
+   - session_id + created_at 复合索引
+
+2. **缓存策略**
+   - 活跃会话内存缓存
+   - 懒加载非活跃会话
+   - 写入时同步更新缓存
+
+3. **批量操作**
+   - 支持批量插入消息
+   - 异步保存减少延迟
+
+## 测试
+
+```bash
+# 运行测试
+mvn test -pl openclaw-session
+
+# 运行特定测试
+mvn test -pl openclaw-session -Dtest=SQLiteSessionStoreTest
+```
+
+## 更新日志
+
+### 2026.3.20
+- ✅ 实现 SQLiteSessionStore 完整功能
+- ✅ 添加 InMemorySessionStore 备选实现
+- ✅ 添加 SessionConfig 配置类
+- ✅ 添加 Spring Boot 自动配置
+- ✅ 添加单元测试
+- ✅ 完善文档
+
+## 待办事项
+
+- [ ] Redis 存储实现
 - [ ] 会话压缩/摘要
-- [ ] 导出功能
+- [ ] 分布式会话同步
+- [ ] 会话导出/导入

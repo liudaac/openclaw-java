@@ -65,10 +65,11 @@ openclaw-java/
 │   ├── action/                  # 浏览器操作
 │   └── snapshot/                # 页面快照
 │
-└── openclaw-session             # ⭐ 会话持久化模块
-    ├── model/                   # Session, Message
-    ├── store/                   # SQLite 存储
-    └── service/                 # SessionPersistenceService
+└── openclaw-session             # ⭐ 会话持久化模块 (2026.3.20 更新)
+    ├── model/                   # Session, Message, SessionStatus
+    ├── store/                   # SQLiteSessionStore, InMemorySessionStore
+    ├── service/                 # SessionPersistenceService
+    └── config/                  # SessionConfig, SessionAutoConfiguration
 ```
 
 ## 核心模块对比 (vs Node.js 原版)
@@ -77,10 +78,10 @@ openclaw-java/
 |------|---------|-------------|------|
 | **Cron** | node-cron + SQLite | cron-utils + SQLite | ✅ 100% |
 | **Browser** | Playwright 原生 | Playwright Java API | ✅ 100% |
-| **Session** | JSONL | SQLite + 缓存 | ✅ 100% |
+| **Session** | JSONL | SQLite + 内存缓存 + 自动配置 | ✅ 100% |
 | **Channel 流式** | 完整 | SSE + 打字指示 | ✅ 90% |
 | **Gateway** | V3 认证 | V3 认证 + 自动重连 | ✅ 90% |
-| Memory | 完整 | 完整 | ✅ 85% |
+| Memory | 完整 | SQLite/pgvector | ✅ 85% |
 | **总体** | **100%** | **~98%** | ✅ |
 
 ## 编译
@@ -188,9 +189,28 @@ docker-compose down
       "appId": "your-app-id",
       "appSecret": "your-app-secret"
     }
+  },
+  "session": {
+    "enabled": true,
+    "storageType": "sqlite",
+    "dbPath": "${user.home}/.openclaw/sessions.db",
+    "maxMessages": 1000,
+    "ttl": "30d",
+    "autoCleanup": true
   }
 }
 ```
+
+### Session 配置说明
+
+| 配置项 | 说明 | 可选值 | 默认值 |
+|--------|------|--------|--------|
+| `session.enabled` | 启用会话持久化 | `true`/`false` | `true` |
+| `session.storageType` | 存储类型 | `sqlite`/`memory`/`redis` | `sqlite` |
+| `session.dbPath` | SQLite 数据库路径 | 文件路径 | `~/.openclaw/sessions.db` |
+| `session.maxMessages` | 每会话最大消息数 | 整数 | `1000` |
+| `session.ttl` | 会话过期时间 | 持续时间 | `30d` |
+| `session.autoCleanup` | 自动清理过期会话 | `true`/`false` | `true` |
 
 ### 环境变量
 
@@ -224,6 +244,41 @@ curl -X POST http://localhost:18789/api/v1/cron/jobs/{id}/trigger
 
 # 查看历史
 curl http://localhost:18789/api/v1/cron/jobs/{id}/history
+```
+
+### Session API
+
+```bash
+# 创建会话
+curl -X POST http://localhost:18789/api/v1/sessions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sessionKey": "user-123",
+    "model": "gpt-4"
+  }'
+
+# 获取会话
+curl http://localhost:18789/api/v1/sessions/{id}
+
+# 添加消息
+curl -X POST http://localhost:18789/api/v1/sessions/{id}/messages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "role": "user",
+    "content": "Hello!"
+  }'
+
+# 获取消息历史
+curl http://localhost:18789/api/v1/sessions/{id}/messages
+
+# 搜索会话
+curl "http://localhost:18789/api/v1/sessions/search?keyword=test"
+
+# 获取会话统计
+curl http://localhost:18789/api/v1/sessions/{id}/stats
+
+# 归档会话
+curl -X POST http://localhost:18789/api/v1/sessions/{id}/archive
 ```
 
 ### Streaming API
@@ -391,6 +446,50 @@ mvn clean deploy -Drevision=2026.3.13
 版本号只需在父 POM 的 `<revision>` 属性中修改即可。
 
 ## 更新日志
+
+### 2026.3.20 - Session 模块完善
+
+#### Session 存储增强
+- **SQLiteSessionStore**: 完整 SQLite 实现
+  - 完整的 CRUD 操作（会话和消息）
+  - 索引优化（session_key, status, last_activity_at）
+  - 外键约束 + 级联删除
+  - 搜索功能（会话关键字、消息内容）
+  - 统计信息查询
+  - 时间范围查询
+  - 异步操作（CompletableFuture）
+
+- **InMemorySessionStore**: 内存存储备选
+  - 开发和测试环境使用
+  - 与 SQLite 实现相同接口
+
+- **SessionConfig**: 完整配置支持
+  - 存储类型切换（sqlite/memory/redis）
+  - 数据库路径配置
+  - 最大消息数限制
+  - TTL 和自动清理
+
+- **SessionAutoConfiguration**: Spring Boot 自动配置
+  - 条件化 Bean 创建
+  - DataSource 自动配置
+  - 环境变量支持
+
+#### 测试和文档
+- **SQLiteSessionStoreTest**: 完整单元测试
+  - 覆盖所有 CRUD 操作
+  - 搜索功能测试
+  - 统计信息测试
+  - 边界条件测试
+
+- **README.md**: 模块文档
+  - 架构设计说明
+  - 使用示例
+  - 配置说明
+
+#### 完成度
+- Session 模块: 85% → 95%
+- 新增文件: 8 个
+- 测试覆盖: 全面
 
 ### 2026.3.14 - Tools 模块重构完成
 

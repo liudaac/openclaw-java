@@ -29,6 +29,12 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- Spring JDBC -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+
         <!-- SQLite -->
         <dependency>
             <groupId>org.xerial</groupId>
