@@ -4,6 +4,7 @@ import openclaw.session.model.Message;
 import openclaw.session.model.Session;
 import openclaw.session.model.SessionStatus;
 import openclaw.session.config.SessionConfig;
+import openclaw.session.store.SessionStore.SessionStats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
