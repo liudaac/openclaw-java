@@ -163,8 +163,13 @@ public class GeminiWebSearchProvider implements WebSearchProvider {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> parseResponse(String body, String query, long startTime,
-                                               String cacheKey, WebSearchContext ctx) throws Exception {
-        JsonNode root = objectMapper.readTree(body);
+                                               String cacheKey, WebSearchContext ctx) {
+        JsonNode root;
+        try {
+            root = objectMapper.readTree(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse Gemini API response", e);
+        }
 
         // Check for error
         if (root.has("error")) {
