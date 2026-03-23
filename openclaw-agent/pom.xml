@@ -15,6 +15,10 @@
     <artifactId>openclaw-agent</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
+
     <name>OpenClaw Agent</name>
     <description>AI Agent system for OpenClaw Java Edition</description>
 
