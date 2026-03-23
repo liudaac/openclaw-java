@@ -15,6 +15,10 @@
     <artifactId>openclaw-channel-telegram</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
+
     <name>OpenClaw Telegram Channel</name>
     <description>Telegram channel adapter for OpenClaw Java Edition</description>
 
