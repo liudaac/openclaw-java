@@ -7,6 +7,7 @@ import openclaw.sdk.channel.ConfigUiHint;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -63,5 +64,25 @@ public class DiscordConfigAdapter implements ChannelConfigAdapter<DiscordChannel
     @Override
     public Map<String, Object> getDefaults() {
         return Map.of();
+    }
+
+    /**
+     * Checks if DM allowlist is enabled.
+     *
+     * @return true if enabled
+     */
+    public boolean isDmAllowlistEnabled() {
+        // TODO: Implement based on configuration
+        return false;
+    }
+
+    /**
+     * Gets the DM allowlist user IDs.
+     *
+     * @return set of allowed user IDs
+     */
+    public Set<String> getDmAllowlist() {
+        // TODO: Implement based on configuration
+        return Set.of();
     }
 }

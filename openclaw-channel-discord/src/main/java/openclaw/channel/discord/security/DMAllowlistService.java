@@ -43,15 +43,14 @@ public class DMAllowlistService {
             logger.debug("DM allowlist not enabled, allowing user: {}", user.getId());
             return true;
         }
-        
+
         Set<String> allowedUsers = getDMAllowlist();
         boolean allowed = allowedUsers.contains(user.getId());
-        
+
         if (!allowed) {
-            logger.warn("User {} not in DM allowlist for component: {}", 
-                    user.getId(), component.getId());
+            logger.warn("User {} not in DM allowlist for component interaction", user.getId());
         }
-        
+
         return allowed;
     }
     
