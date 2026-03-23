@@ -167,8 +167,13 @@ public class BraveWebSearchProvider implements WebSearchProvider {
     }
 
     private Map<String, Object> parseResponse(String body, String query, long startTime,
-                                               String cacheKey, WebSearchContext ctx) throws Exception {
-        JsonNode root = objectMapper.readTree(body);
+                                               String cacheKey, WebSearchContext ctx) {
+        JsonNode root;
+        try {
+            root = objectMapper.readTree(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse Brave API response", e);
+        }
         JsonNode results = root.path("web").path("results");
 
         List<Map<String, Object>> resultList = new ArrayList<>();
