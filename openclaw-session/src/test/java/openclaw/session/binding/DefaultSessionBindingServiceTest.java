@@ -443,21 +443,18 @@ class DefaultSessionBindingServiceTest {
         assertNull(service.resolveByConversation(null));
 
         // Empty channel
-        assertNull(service.resolve
-                .conversation(ConversationRef.builder()
-                        .channel("telegram")
-                        .accountId("default")
-                        .conversationId("chat-1")
-                        .build())
-                .metadata(metadata)
-                .build();
+        assertNull(service.resolveByConversation(ConversationRef.builder()
+                .channel("")
+                .accountId("default")
+                .conversationId("chat-1")
+                .build()));
 
-        StepVerifier.create(service.bind(input))
-                .assertNext(record -> {
-                    assertEquals("value1", record.getMetadata().get("key1"));
-                    assertEquals(123, record.getMetadata().get("key2"));
-                })
-                .verifyComplete();
+        // Empty conversation ID
+        assertNull(service.resolveByConversation(ConversationRef.builder()
+                .channel("telegram")
+                .accountId("default")
+                .conversationId("")
+                .build()));
     }
 
     private SessionBindingRecord createBinding(String sessionKey, String conversationId) {
