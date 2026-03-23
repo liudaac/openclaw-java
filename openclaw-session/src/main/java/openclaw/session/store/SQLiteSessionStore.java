@@ -272,6 +272,31 @@ public class SQLiteSessionStore implements SessionStore {
     }
 
     @Override
+    public CompletableFuture<Integer> deleteSessions(List<String> sessionIds) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (sessionIds == null || sessionIds.isEmpty()) {
+                return 0;
+            }
+            
+            String sql = "DELETE FROM sessions WHERE id IN (" + 
+                        String.join(",", sessionIds.stream().map(id -> "?").toList()) + ")";
+            
+            try (Connection conn = dataSource.getConnection(); 
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                for (int i = 0; i < sessionIds.size(); i++) {
+                    stmt.setString(i + 1, sessionIds.get(i));
+                }
+                int rows = stmt.executeUpdate();
+                logger.debug("Deleted {} sessions", rows);
+                return rows;
+            } catch (SQLException e) {
+                logger.error("Failed to delete sessions: {}", sessionIds, e);
+                throw new RuntimeException("Failed to delete sessions", e);
+            }
+        });
+    }
+
+    @Override
     public CompletableFuture<Void> updateSessionStatus(String sessionId, SessionStatus status) {
         return CompletableFuture.runAsync(() -> {
             String sql = "UPDATE sessions SET status = ?, updated_at = ? WHERE id = ?";

@@ -27,6 +27,7 @@ public interface SessionStore {
     CompletableFuture<List<Session>> findSessionsByStatus(SessionStatus status);
     CompletableFuture<List<Session>> findActiveSessions();
     CompletableFuture<Boolean> deleteSession(String sessionId);
+    CompletableFuture<Integer> deleteSessions(List<String> sessionIds);
     CompletableFuture<Void> updateSessionStatus(String sessionId, SessionStatus status);
     CompletableFuture<Void> updateSessionActivity(String sessionId);
     
