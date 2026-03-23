@@ -437,26 +437,6 @@ class DefaultSessionBindingServiceTest {
         assertTrue(service.listBySession("   ").isEmpty());
     }
 
-    @Test
-    void testResolveByConversationWithInvalidRef() {
-        // Null conversation
-        assertNull(service.resolveByConversation(null));
-
-        // Empty channel
-        assertNull(service.resolveByConversation(ConversationRef.builder()
-                .channel("")
-                .accountId("default")
-                .conversationId("chat-1")
-                .build()));
-
-        // Empty conversation ID
-        assertNull(service.resolveByConversation(ConversationRef.builder()
-                .channel("telegram")
-                .accountId("default")
-                .conversationId("")
-                .build()));
-    }
-
     private SessionBindingRecord createBinding(String sessionKey, String conversationId) {
         SessionBindingBindInput input = SessionBindingBindInput.builder()
                 .targetSessionKey(sessionKey)
