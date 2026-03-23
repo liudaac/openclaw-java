@@ -173,7 +173,7 @@ public interface WebSearchProvider {
     @PublicApi(since = "2026.3.0")
     default boolean isConfigured(WebSearchContext ctx) {
         return getCredentialValue(ctx.getSearchConfig()) != null ||
-               getConfiguredCredentialValue(ctx.getConfig()).isPresent();
+               ctx.getConfig().flatMap(this::getConfiguredCredentialValue).isPresent();
     }
 
     /**
