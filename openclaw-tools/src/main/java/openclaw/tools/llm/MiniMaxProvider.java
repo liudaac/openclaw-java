@@ -75,7 +75,11 @@ public class MiniMaxProvider extends OpenAICompatibleProvider {
         );
     }
 
-    @Override
+    /**
+     * Gets the default model for this provider.
+     *
+     * @return the default model ID
+     */
     public String getDefaultModel() {
         // Updated default to M2.7 as per original update
         return "minimax-m2.7";

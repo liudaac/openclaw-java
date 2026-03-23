@@ -413,5 +413,58 @@ public class AuditLogger {
             }
             return true;
         }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public static class Builder {
+            private Instant startTime;
+            private Instant endTime;
+            private List<AuditEvent.EventType> types;
+            private List<AuditEvent.EventSeverity> severities;
+            private List<AuditEvent.EventStatus> statuses;
+            private String actor;
+            private String toolName;
+
+            public Builder startTime(Instant startTime) {
+                this.startTime = startTime;
+                return this;
+            }
+
+            public Builder endTime(Instant endTime) {
+                this.endTime = endTime;
+                return this;
+            }
+
+            public Builder types(List<AuditEvent.EventType> types) {
+                this.types = types;
+                return this;
+            }
+
+            public Builder severities(List<AuditEvent.EventSeverity> severities) {
+                this.severities = severities;
+                return this;
+            }
+
+            public Builder statuses(List<AuditEvent.EventStatus> statuses) {
+                this.statuses = statuses;
+                return this;
+            }
+
+            public Builder actor(String actor) {
+                this.actor = actor;
+                return this;
+            }
+
+            public Builder toolName(String toolName) {
+                this.toolName = toolName;
+                return this;
+            }
+
+            public AuditQuery build() {
+                return new AuditQuery(startTime, endTime, types, severities, statuses, actor, toolName);
+            }
+        }
     }
 }

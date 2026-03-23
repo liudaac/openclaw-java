@@ -72,7 +72,7 @@ public class ProviderBasedWebSearchTool implements AgentTool {
 
         // Count
         properties.put("count", AgentTool.PropertySchema.integer(
-                "Number of results to return (1-10).", 1, 10));
+                "Number of results to return (1-10)."));
 
         // Country
         properties.put("country", AgentTool.PropertySchema.string(
