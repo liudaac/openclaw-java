@@ -23,6 +23,12 @@
             <artifactId>openclaw-plugin-sdk</artifactId>
         </dependency>
 
+        <!-- OpenClaw Agent -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-agent</artifactId>
+        </dependency>
+
         <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
