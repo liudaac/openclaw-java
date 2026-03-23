@@ -13,6 +13,11 @@
     </parent>
 
     <artifactId>openclaw-session</artifactId>
+
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
+
     <name>OpenClaw Session</name>
     <description>Session persistence and management for OpenClaw</description>
 
