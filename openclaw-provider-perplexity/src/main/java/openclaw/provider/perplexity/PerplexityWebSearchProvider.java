@@ -224,8 +224,13 @@ public class PerplexityWebSearchProvider implements WebSearchProvider {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> parseSearchApiResponse(String body, String query, long startTime,
-                                                        String cacheKey, WebSearchContext ctx) throws Exception {
-        JsonNode root = objectMapper.readTree(body);
+                                                        String cacheKey, WebSearchContext ctx) {
+        JsonNode root;
+        try {
+            root = objectMapper.readTree(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse Perplexity API response", e);
+        }
         JsonNode results = root.path("results");
 
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -257,8 +262,13 @@ public class PerplexityWebSearchProvider implements WebSearchProvider {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> parseChatResponse(String body, String query, long startTime,
-                                                   String cacheKey, WebSearchContext ctx) throws Exception {
-        JsonNode root = objectMapper.readTree(body);
+                                                   String cacheKey, WebSearchContext ctx) {
+        JsonNode root;
+        try {
+            root = objectMapper.readTree(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse Perplexity chat response", e);
+        }
         JsonNode choices = root.path("choices");
 
         String content = "";
