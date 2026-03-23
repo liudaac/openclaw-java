@@ -212,16 +212,16 @@ public class FollowupQueue {
                 queue.offer(run);
                 dedupeSet.add(generateDedupeKey(run));
                 depth.incrementAndGet();
-                true;
+                yield true;
             }
             case NEW -> {
                 // Drop the new run
-                false;
+                yield false;
             }
             case SUMMARIZE -> {
                 // Would summarize older runs - for now just drop
                 logger.warn("Summarize drop policy not yet implemented");
-                false;
+                yield false;
             }
         };
     }
