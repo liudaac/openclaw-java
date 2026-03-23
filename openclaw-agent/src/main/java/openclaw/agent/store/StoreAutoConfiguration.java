@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -33,14 +32,14 @@ public class StoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public SessionStore sessionStore(StoreConfig config, 
-                                     @Autowired(required = false) StringRedisTemplate redisTemplate) {
+    public SessionStore sessionStore(StoreConfig config,
+                                     @Autowired(required = false) Object redisTemplate) {
         SessionStoreFactory factory = new SessionStoreFactory(config, redisTemplate);
         SessionStore store = factory.createStore();
-        
+
         // Initialize store
         store.initialize().join();
-        
+
         logger.info("Session store initialized: {}", store.getStoreType());
         return store;
     }
@@ -48,7 +47,7 @@ public class StoreAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SessionStoreFactory sessionStoreFactory(StoreConfig config,
-                                                   @Autowired(required = false) StringRedisTemplate redisTemplate) {
+                                                   @Autowired(required = false) Object redisTemplate) {
         return new SessionStoreFactory(config, redisTemplate);
     }
 

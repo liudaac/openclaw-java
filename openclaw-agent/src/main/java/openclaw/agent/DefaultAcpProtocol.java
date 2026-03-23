@@ -1,5 +1,6 @@
 package openclaw.agent;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -35,7 +36,7 @@ public class DefaultAcpProtocol implements AcpProtocol {
 
             // Check concurrent limit
             long runningCount = sessions.values().stream()
-                    .filter(s -> s.status == AgentStatus.RUNNING)
+                    .filter(s -> s.status() == AgentSession.AgentStatus.RUNNING)
                     .count();
             if (runningCount >= config.maxConcurrentAgents()) {
                 return SpawnResult.failure("Max concurrent agents reached");
@@ -48,9 +49,12 @@ public class DefaultAcpProtocol implements AcpProtocol {
             AgentSession session = new AgentSession(
                     sessionKey,
                     agentId,
-                    AgentStatus.PENDING,
+                    AgentSession.AgentStatus.PENDING,
                     System.currentTimeMillis(),
-                    request
+                    request,
+                    new ArrayList<>(),
+                    null,
+                    null
             );
             sessions.put(sessionKey, session);
 
@@ -71,11 +75,11 @@ public class DefaultAcpProtocol implements AcpProtocol {
 
             long deadline = System.currentTimeMillis() + timeoutMs;
             while (System.currentTimeMillis() < deadline) {
-                if (session.status == AgentStatus.COMPLETED) {
-                    return WaitResult.ok(session.result);
+                if (session.status() == AgentSession.AgentStatus.COMPLETED) {
+                    return WaitResult.ok(session.result());
                 }
-                if (session.status == AgentStatus.FAILED) {
-                    return WaitResult.error(session.error);
+                if (session.status() == AgentSession.AgentStatus.FAILED) {
+                    return WaitResult.error(session.error());
                 }
                 try {
                     Thread.sleep(100);
@@ -95,10 +99,10 @@ public class DefaultAcpProtocol implements AcpProtocol {
                 return new AgentMessages(java.util.List.of(), false);
             }
 
-            java.util.List<AgentMessage> messages = session.messages.stream()
+            java.util.List<AgentMessage> messages = session.messages().stream()
                     .limit(limit)
                     .toList();
-            boolean hasMore = session.messages.size() > limit;
+            boolean hasMore = session.messages().size() > limit;
 
             return new AgentMessages(messages, hasMore);
         });
@@ -108,8 +112,17 @@ public class DefaultAcpProtocol implements AcpProtocol {
     public CompletableFuture<Void> deleteSession(String sessionKey) {
         return CompletableFuture.runAsync(() -> {
             AgentSession session = sessions.remove(sessionKey);
-            if (session != null && session.status == AgentStatus.RUNNING) {
-                session.status = AgentStatus.CANCELLED;
+            if (session != null && session.status() == AgentSession.AgentStatus.RUNNING) {
+                sessions.put(sessionKey, new AgentSession(
+                        session.sessionKey(),
+                        session.agentId(),
+                        AgentSession.AgentStatus.CANCELLED,
+                        session.startTime(),
+                        session.request(),
+                        session.messages(),
+                        session.result(),
+                        session.error()
+                ));
             }
         });
     }
@@ -119,35 +132,64 @@ public class DefaultAcpProtocol implements AcpProtocol {
         return CompletableFuture.runAsync(() -> {
             AgentSession session = sessions.get(sessionKey);
             if (session != null) {
-                session.messages.add(message);
+                java.util.List<AgentMessage> newMessages = new ArrayList<>(session.messages());
+                newMessages.add(message);
+                sessions.put(sessionKey, new AgentSession(
+                        session.sessionKey(),
+                        session.agentId(),
+                        session.status(),
+                        session.startTime(),
+                        session.request(),
+                        newMessages,
+                        session.result(),
+                        session.error()
+                ));
             }
         });
     }
 
     private void runAgent(AgentSession session) {
         try {
-            session.status = AgentStatus.RUNNING;
+            java.util.List<AgentMessage> messages = new ArrayList<>(session.messages());
+            AgentSession.AgentStatus status = AgentSession.AgentStatus.RUNNING;
 
             // Add system message
-            session.request.systemPrompt().ifPresent(prompt ->
-                    session.messages.add(AgentMessage.system(prompt))
+            session.request().systemPrompt().ifPresent(prompt ->
+                    messages.add(AgentMessage.system(prompt))
             );
 
             // Add user message
-            session.messages.add(AgentMessage.user(session.request.userMessage()));
+            messages.add(AgentMessage.user(session.request().userMessage()));
 
             // Simulate agent processing (in production, call LLM API)
             Thread.sleep(1000);
 
             // Add assistant response
-            String response = "Agent response for: " + session.request.userMessage();
-            session.messages.add(AgentMessage.assistant(response));
-            session.result = response;
-            session.status = AgentStatus.COMPLETED;
+            String response = "Agent response for: " + session.request().userMessage();
+            messages.add(AgentMessage.assistant(response));
+
+            sessions.put(session.sessionKey(), new AgentSession(
+                    session.sessionKey(),
+                    session.agentId(),
+                    AgentSession.AgentStatus.COMPLETED,
+                    session.startTime(),
+                    session.request(),
+                    messages,
+                    response,
+                    null
+            ));
 
         } catch (Exception e) {
-            session.status = AgentStatus.FAILED;
-            session.error = e.getMessage();
+            sessions.put(session.sessionKey(), new AgentSession(
+                    session.sessionKey(),
+                    session.agentId(),
+                    AgentSession.AgentStatus.FAILED,
+                    session.startTime(),
+                    session.request(),
+                    session.messages(),
+                    null,
+                    e.getMessage()
+            ));
         }
     }
 
@@ -163,29 +205,5 @@ public class DefaultAcpProtocol implements AcpProtocol {
 
     private String generateAgentId() {
         return "agent-" + java.util.UUID.randomUUID().toString().substring(0, 8);
-    }
-
-    private enum AgentStatus {
-        PENDING, RUNNING, COMPLETED, FAILED, CANCELLED
-    }
-
-    private static class AgentSession {
-        final String sessionKey;
-        final String agentId;
-        volatile AgentStatus status;
-        final long startTime;
-        final SpawnRequest request;
-        final java.util.List<AgentMessage> messages = new java.util.ArrayList<>();
-        volatile String result;
-        volatile String error;
-
-        AgentSession(String sessionKey, String agentId, AgentStatus status,
-                     long startTime, SpawnRequest request) {
-            this.sessionKey = sessionKey;
-            this.agentId = agentId;
-            this.status = status;
-            this.startTime = startTime;
-            this.request = request;
-        }
     }
 }

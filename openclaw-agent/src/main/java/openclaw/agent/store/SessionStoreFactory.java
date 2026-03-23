@@ -2,7 +2,6 @@ package openclaw.agent.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * Factory for creating session store instances.
@@ -15,13 +14,13 @@ public class SessionStoreFactory {
     private static final Logger logger = LoggerFactory.getLogger(SessionStoreFactory.class);
 
     private final StoreConfig config;
-    private StringRedisTemplate redisTemplate;
+    private Object redisTemplate;
 
     public SessionStoreFactory(StoreConfig config) {
         this.config = config;
     }
 
-    public SessionStoreFactory(StoreConfig config, StringRedisTemplate redisTemplate) {
+    public SessionStoreFactory(StoreConfig config, Object redisTemplate) {
         this.config = config;
         this.redisTemplate = redisTemplate;
     }
@@ -44,12 +43,9 @@ public class SessionStoreFactory {
                 return new FileSessionStore(config.getFile(), config.getSession());
                 
             case REDIS:
-                if (redisTemplate == null) {
-                    throw new IllegalStateException(
-                        "RedisTemplate is required for REDIS store type. " +
-                        "Please configure Redis or switch to MEMORY/FILE store type.");
-                }
-                return new RedisSessionStore(redisTemplate, config.getRedis(), config.getSession());
+                throw new IllegalStateException(
+                    "Redis store type requires spring-data-redis dependency. " +
+                    "Please add the dependency or switch to MEMORY/FILE store type.");
                 
             default:
                 throw new IllegalArgumentException("Unknown store type: " + type);
@@ -73,10 +69,9 @@ public class SessionStoreFactory {
                 return new FileSessionStore(config.getFile(), config.getSession());
                 
             case REDIS:
-                if (redisTemplate == null) {
-                    throw new IllegalStateException("RedisTemplate is required for REDIS store type");
-                }
-                return new RedisSessionStore(redisTemplate, config.getRedis(), config.getSession());
+                throw new IllegalStateException(
+                    "Redis store type requires spring-data-redis dependency. " +
+                    "Please add the dependency or switch to MEMORY/FILE store type.");
                 
             default:
                 throw new IllegalArgumentException("Unknown store type: " + type);

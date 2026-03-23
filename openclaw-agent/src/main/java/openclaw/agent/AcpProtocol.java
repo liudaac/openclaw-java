@@ -260,4 +260,31 @@ public interface AcpProtocol {
             return new AgentMessage("system", content, System.currentTimeMillis(), Map.of());
         }
     }
+
+    /**
+     * Agent session.
+     *
+     * @param sessionKey the session key
+     * @param agentId the agent ID
+     * @param status the session status
+     * @param startTime the start time
+     * @param request the spawn request
+     * @param messages the messages
+     * @param result the result
+     * @param error the error
+     */
+    record AgentSession(
+            String sessionKey,
+            String agentId,
+            AgentStatus status,
+            long startTime,
+            SpawnRequest request,
+            java.util.List<AgentMessage> messages,
+            String result,
+            String error
+    ) {
+        public enum AgentStatus {
+            PENDING, RUNNING, COMPLETED, FAILED, CANCELLED
+        }
+    }
 }

@@ -196,7 +196,7 @@ public class FollowupRunner {
         payloads = applyReplyThreading(payloads, queued);
 
         // Filter duplicates
-        payloads = filterDuplicates(payloads, result);
+        payloads = filterDuplicates(result, result);
 
         // Add compaction completion notice
         if (compactionCount > 0) {
