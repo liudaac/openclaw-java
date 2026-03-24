@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane fx:id="agentContainer" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="openclaw.desktop.controller.AgentController"
+            styleClass="agent-container">
+
+    <!-- Header -->
+    <top>
+        <HBox styleClass="agent-header" spacing="12" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="12" right="16" bottom="12" left="16" />
+            </padding>
+
+            <Label text="Agents" styleClass="agent-title" />
+
+            <HBox HBox.hgrow="ALWAYS" />
+
+            <TextField fx:id="searchField" promptText="Search agents..." styleClass="search-field" prefWidth="250" />
+        </HBox>
+    </top>
+
+    <!-- Content -->
+    <center>
+        <SplitPane dividerPositions="0.4" styleClass="agent-split">
+            <!-- Agent List -->
+            <VBox spacing="8">
+                <padding>
+                    <Insets top="8" right="8" bottom="8" left="8" />
+                </padding>
+
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Button fx:id="createButton" text="New Agent" styleClass="action-button">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi2p-plus" iconSize="16" />
+                        </graphic>
+                    </Button>
+
+                    <Button fx:id="refreshButton" styleClass="secondary-button">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi2r-refresh" iconSize="16" />
+                        </graphic>
+                    </Button>
+                </HBox>
+
+                <ListView fx:id="agentList" VBox.vgrow="ALWAYS" styleClass="agent-list" />
+            </VBox>
+
+            <!-- Agent Details -->
+            <VBox spacing="16" styleClass="agent-details">
+                <padding>
+                    <Insets top="16" right="16" bottom="16" left="16" />
+                </padding>
+
+                <Label fx:id="selectedAgentLabel" text="No agent selected" styleClass="selected-agent-title" />
+
+                <VBox spacing="8" VBox.vgrow="ALWAYS">
+                    <Label text="Description" styleClass="section-label" />
+                    <TextArea fx:id="agentDescription" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
+                </VBox>
+
+                <VBox spacing="8">
+                    <Label text="Skills" styleClass="section-label" />
+                    <ListView fx:id="skillsList" prefHeight="120" />
+                </VBox>
+
+                <HBox spacing="12" alignment="CENTER_RIGHT">
+                    <Button fx:id="editButton" text="Edit" styleClass="secondary-button" disable="true">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi2p-pencil" iconSize="16" />
+                        </graphic>
+                    </Button>
+
+                    <Button fx:id="deleteButton" text="Delete" styleClass="danger-button" disable="true">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi2d-delete" iconSize="16" />
+                        </graphic>
+                    </Button>
+                </HBox>
+            </VBox>
+        </SplitPane>
+    </center>
+
+</BorderPane>
