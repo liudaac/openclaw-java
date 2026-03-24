@@ -58,6 +58,9 @@ public class SidebarController implements Initializable {
     private Button chatNavButton;
 
     @FXML
+    private Button gatewayNavButton;
+
+    @FXML
     private Button toolsNavButton;
 
     @FXML
@@ -163,6 +166,17 @@ public class SidebarController implements Initializable {
             }
         });
 
+        // Gateway button
+        FontIcon gatewayIcon = new FontIcon(MaterialDesignS.SERVER_NETWORK);
+        gatewayIcon.setIconSize(20);
+        gatewayNavButton.setGraphic(gatewayIcon);
+        gatewayNavButton.setOnAction(e -> {
+            setActiveTab("gateway");
+            if (mainController != null) {
+                mainController.showGatewayView();
+            }
+        });
+
         // Tools button
         FontIcon toolsIcon = new FontIcon(MaterialDesignT.TOOLS);
         toolsIcon.setIconSize(20);
@@ -244,12 +258,14 @@ public class SidebarController implements Initializable {
     private void updateNavStyles() {
         // Reset all
         chatNavButton.getStyleClass().remove("nav-button-active");
+        gatewayNavButton.getStyleClass().remove("nav-button-active");
         toolsNavButton.getStyleClass().remove("nav-button-active");
         settingsNavButton.getStyleClass().remove("nav-button-active");
 
         // Set active
         switch (activeTab) {
             case "chat" -> chatNavButton.getStyleClass().add("nav-button-active");
+            case "gateway" -> gatewayNavButton.getStyleClass().add("nav-button-active");
             case "tools" -> toolsNavButton.getStyleClass().add("nav-button-active");
             case "settings" -> settingsNavButton.getStyleClass().add("nav-button-active");
         }

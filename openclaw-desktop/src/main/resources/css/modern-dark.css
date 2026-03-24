@@ -217,6 +217,51 @@
     -fx-text-fill: var(--text-primary);
 }
 
+/* ========== Gateway ========== */
+.gateway-container {
+    -fx-background-color: var(--bg-primary);
+}
+
+.gateway-header {
+    -fx-background-color: var(--bg-secondary);
+    -fx-border-color: var(--border);
+    -fx-border-width: 0 0 1px 0;
+}
+
+.gateway-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: var(--text-primary);
+}
+
+.status-connected {
+    -fx-text-fill: var(--success);
+    -fx-font-weight: bold;
+}
+
+.status-disconnected {
+    -fx-text-fill: var(--error);
+}
+
+.node-list .list-cell {
+    -fx-padding: 8px 12px;
+}
+
+.node-item {
+    -fx-background-color: var(--bg-secondary);
+    -fx-background-radius: 8px;
+}
+
+.node-name {
+    -fx-font-weight: bold;
+    -fx-text-fill: var(--text-primary);
+}
+
+.node-status {
+    -fx-font-size: 12px;
+    -fx-text-fill: var(--text-muted);
+}
+
 /* ========== ComboBox ========== */
 .combo-box {
     -fx-background-color: var(--bg-tertiary);

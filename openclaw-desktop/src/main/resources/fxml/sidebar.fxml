@@ -59,6 +59,12 @@
             </graphic>
         </Button>
 
+        <Button fx:id="gatewayNavButton" text="Gateway" styleClass="nav-button">
+            <graphic>
+                <FontIcon iconLiteral="mdi2s-server-network" iconSize="20" />
+            </graphic>
+        </Button>
+
         <Button fx:id="toolsNavButton" text="Tools" styleClass="nav-button">
             <graphic>
                 <FontIcon iconLiteral="mdi2t-tools" iconSize="20" />

@@ -47,6 +47,7 @@ public class MainController implements Initializable {
     private Stage stage;
     private SidebarController sidebarController;
     private ChatController chatController;
+    private GatewayController gatewayController;
     private ToolsController toolsController;
     private SettingsController settingsController;
 
@@ -124,6 +125,28 @@ public class MainController implements Initializable {
             logger.debug("Chat view loaded");
         } catch (IOException e) {
             logger.error("Failed to load chat view", e);
+        }
+    }
+
+    /**
+     * Load Gateway view.
+     */
+    @FXML
+    public void showGatewayView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/gateway.fxml"));
+            Parent gatewayView = loader.load();
+            gatewayController = loader.getController();
+
+            contentContainer.getChildren().clear();
+            contentContainer.getChildren().add(gatewayView);
+            logger.debug("Gateway view loaded");
+        } catch (IOException e) {
+            logger.error("Failed to load gateway view", e);
+        }
+
+        if (sidebarController != null) {
+            sidebarController.setActiveTab("gateway");
         }
     }
 
