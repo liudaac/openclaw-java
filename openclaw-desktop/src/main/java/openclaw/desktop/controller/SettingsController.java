@@ -86,18 +86,23 @@ public class SettingsController implements Initializable {
     }
 
     private void setupApiKeySection() {
-        providerSelector.getItems().addAll("openai", "anthropic", "google", "azure");
-        providerSelector.getSelectionModel().selectFirst();
-
-        providerSelector.setOnAction(e -> updateApiKeyStatus());
-
-        saveApiKeyButton.setOnAction(e -> saveApiKey());
-        deleteApiKeyButton.setOnAction(e -> deleteApiKey());
-
+        if (providerSelector != null) {
+            providerSelector.getItems().addAll("openai", "anthropic", "google", "azure");
+            providerSelector.getSelectionModel().selectFirst();
+            providerSelector.setOnAction(e -> updateApiKeyStatus());
+        }
+        if (saveApiKeyButton != null) {
+            saveApiKeyButton.setOnAction(e -> saveApiKey());
+        }
+        if (deleteApiKeyButton != null) {
+            deleteApiKeyButton.setOnAction(e -> deleteApiKey());
+        }
         updateApiKeyStatus();
     }
 
     private void updateApiKeyStatus() {
+        if (providerSelector == null || apiKeyStatusLabel == null || deleteApiKeyButton == null) return;
+        
         String provider = providerSelector.getValue();
         if (provider == null) return;
 
@@ -109,6 +114,8 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void saveApiKey() {
+        if (providerSelector == null || apiKeyField == null || masterPasswordField == null) return;
+        
         String provider = providerSelector.getValue();
         String apiKey = apiKeyField.getText().trim();
         String password = masterPasswordField.getText();
@@ -134,6 +141,8 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void deleteApiKey() {
+        if (providerSelector == null) return;
+        
         String provider = providerSelector.getValue();
         if (provider == null) return;
 
