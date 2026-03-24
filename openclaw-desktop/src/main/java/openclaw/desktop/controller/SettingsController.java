@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import openclaw.desktop.config.DesktopConfig;
+import openclaw.desktop.service.SecureStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,74 @@ public class SettingsController implements Initializable {
         browseExportPathButton.setOnAction(e -> browseExportPath());
         saveButton.setOnAction(e -> saveSettings());
         resetButton.setOnAction(e -> resetSettings());
+
+        // API Key setup
+        setupApiKeySection();
+    }
+
+    private void setupApiKeySection() {
+        providerSelector.getItems().addAll("openai", "anthropic", "google", "azure");
+        providerSelector.getSelectionModel().selectFirst();
+
+        providerSelector.setOnAction(e -> updateApiKeyStatus());
+
+        saveApiKeyButton.setOnAction(e -> saveApiKey());
+        deleteApiKeyButton.setOnAction(e -> deleteApiKey());
+
+        updateApiKeyStatus();
+    }
+
+    private void updateApiKeyStatus() {
+        String provider = providerSelector.getValue();
+        if (provider == null) return;
+
+        boolean hasKey = secureStorage.hasApiKey(provider);
+        apiKeyStatusLabel.setText(hasKey ? "API Key stored" : "No API Key");
+        apiKeyStatusLabel.getStyleClass().setAll(hasKey ? "status-stored" : "status-missing");
+        deleteApiKeyButton.setDisable(!hasKey);
+    }
+
+    @FXML
+    private void saveApiKey() {
+        String provider = providerSelector.getValue();
+        String apiKey = apiKeyField.getText().trim();
+        String password = masterPasswordField.getText();
+
+        if (provider == null || apiKey.isEmpty() || password.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Missing Information", 
+                "Please fill in all fields");
+            return;
+        }
+
+        try {
+            secureStorage.storeApiKey(provider, apiKey, password);
+            apiKeyField.clear();
+            masterPasswordField.clear();
+            updateApiKeyStatus();
+            showAlert(Alert.AlertType.INFORMATION, "Success", 
+                "API Key stored securely");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", 
+                "Failed to store API key: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void deleteApiKey() {
+        String provider = providerSelector.getValue();
+        if (provider == null) return;
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete API Key");
+        alert.setHeaderText("Delete API Key for " + provider + "?");
+        alert.setContentText("This action cannot be undone.");
+
+        alert.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                secureStorage.deleteApiKey(provider);
+                updateApiKeyStatus();
+            }
+        });
     }
 
     @FXML

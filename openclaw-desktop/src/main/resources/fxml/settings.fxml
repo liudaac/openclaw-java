@@ -100,6 +100,36 @@
 
                 <Separator />
 
+                <!-- API Keys Section -->
+                <VBox spacing="12">
+                    <Label text="API Keys" styleClass="section-title" />
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label text="Provider:" prefWidth="120" />
+                        <ComboBox fx:id="providerSelector" styleClass="setting-control" prefWidth="200" />
+                        <Label fx:id="apiKeyStatusLabel" text="No API Key" />
+                    </HBox>
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label text="API Key:" prefWidth="120" />
+                        <TextField fx:id="apiKeyField" promptText="Enter API Key"
+                                   styleClass="setting-control" HBox.hgrow="ALWAYS" />
+                    </HBox>
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label text="Master Password:" prefWidth="120" />
+                        <PasswordField fx:id="masterPasswordField" promptText="Encryption password"
+                                       styleClass="setting-control" HBox.hgrow="ALWAYS" />
+                    </HBox>
+
+                    <HBox spacing="12" alignment="CENTER_RIGHT">
+                        <Button fx:id="deleteApiKeyButton" text="Delete" styleClass="secondary-button" disable="true" />
+                        <Button fx:id="saveApiKeyButton" text="Save API Key" styleClass="primary-button" />
+                    </HBox>
+                </VBox>
+
+                <Separator />
+
                 <!-- Actions -->
                 <HBox spacing="12" alignment="CENTER_RIGHT">
                     <Button fx:id="resetButton" text="Reset to Default" styleClass="secondary-button">

@@ -429,6 +429,16 @@
     -fx-font-style: italic;
 }
 
+/* ========== API Key Status ========== */
+.status-stored {
+    -fx-text-fill: var(--success);
+    -fx-font-weight: bold;
+}
+
+.status-missing {
+    -fx-text-fill: var(--text-muted);
+}
+
 /* ========== ComboBox ========== */
 .combo-box {
     -fx-background-color: var(--bg-tertiary);
