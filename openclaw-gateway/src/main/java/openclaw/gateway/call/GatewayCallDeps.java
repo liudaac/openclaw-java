@@ -1,9 +1,6 @@
 package openclaw.gateway.call;
 
-import openclaw.config.ConfigLoader;
 import openclaw.gateway.client.GatewayClient;
-import openclaw.gateway.client.GatewayClientOptions;
-import openclaw.gateway.tls.GatewayTlsRuntime;
 
 import java.util.function.Function;
 
@@ -14,7 +11,7 @@ import java.util.function.Function;
  * enabling test isolation and dependency mocking.</p>
  *
  * @author OpenClaw Team
- * @version 2026.3.23
+ * @version 2026.3.24
  */
 public class GatewayCallDeps {
 
@@ -23,18 +20,16 @@ public class GatewayCallDeps {
     private GatewayPortResolver portResolver;
     private ConfigPathResolver configPathResolver;
     private StateDirResolver stateDirResolver;
-    private TlsRuntimeLoader tlsRuntimeLoader;
 
     /**
      * Creates default dependencies.
      */
     public GatewayCallDeps() {
         this.createGatewayClient = opts -> new GatewayClient(opts.url(), opts.authRequest());
-        this.configLoader = new ConfigLoader();
-        this.portResolver = new GatewayPortResolver();
-        this.configPathResolver = new ConfigPathResolver();
-        this.stateDirResolver = new StateDirResolver();
-        this.tlsRuntimeLoader = new TlsRuntimeLoader();
+        this.configLoader = () -> new OpenClawConfig() {};
+        this.portResolver = config -> 8080;
+        this.configPathResolver = () -> System.getProperty("user.home") + "/.openclaw/config.json";
+        this.stateDirResolver = config -> System.getProperty("user.home") + "/.openclaw/state";
     }
 
     // Getters
@@ -58,10 +53,6 @@ public class GatewayCallDeps {
         return stateDirResolver;
     }
 
-    public TlsRuntimeLoader getTlsRuntimeLoader() {
-        return tlsRuntimeLoader;
-    }
-
     // Setters for testing
     public void setCreateGatewayClient(Function<GatewayClientOptions, GatewayClient> createGatewayClient) {
         this.createGatewayClient = createGatewayClient;
@@ -83,20 +74,15 @@ public class GatewayCallDeps {
         this.stateDirResolver = stateDirResolver;
     }
 
-    public void setTlsRuntimeLoader(TlsRuntimeLoader tlsRuntimeLoader) {
-        this.tlsRuntimeLoader = tlsRuntimeLoader;
-    }
-
     /**
      * Resets all dependencies to default implementations.
      */
     public void resetToDefaults() {
         this.createGatewayClient = opts -> new GatewayClient(opts.url(), opts.authRequest());
-        this.configLoader = new ConfigLoader();
-        this.portResolver = new GatewayPortResolver();
-        this.configPathResolver = new ConfigPathResolver();
-        this.stateDirResolver = new StateDirResolver();
-        this.tlsRuntimeLoader = new TlsRuntimeLoader();
+        this.configLoader = () -> new OpenClawConfig() {};
+        this.portResolver = config -> 8080;
+        this.configPathResolver = () -> System.getProperty("user.home") + "/.openclaw/config.json";
+        this.stateDirResolver = config -> System.getProperty("user.home") + "/.openclaw/state";
     }
 
     // Inner classes for dependency interfaces
@@ -142,24 +128,9 @@ public class GatewayCallDeps {
     }
 
     /**
-     * TLS runtime loader.
-     */
-    @FunctionalInterface
-    public interface TlsRuntimeLoader {
-        GatewayTlsRuntime load();
-    }
-
-    /**
      * OpenClaw config placeholder.
      */
     public interface OpenClawConfig {
         // Config methods
-    }
-
-    /**
-     * Gateway TLS runtime placeholder.
-     */
-    public interface GatewayTlsRuntime {
-        // TLS runtime methods
     }
 }
