@@ -7,6 +7,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import openclaw.desktop.component.ToolCard;
+import openclaw.desktop.component.ToolResultView;
+import openclaw.desktop.model.ToolExecutionResult;
 import openclaw.desktop.service.ToolExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,18 +118,34 @@ public class ToolsController implements Initializable {
     }
 
     private void executeTool(String toolName, Map<String, Object> args) {
-        toolOutput.appendText("Executing " + toolName + "...\n");
+        resultContainer.getChildren().clear();
+        
+        Label loadingLabel = new Label("Executing " + toolName + "...");
+        loadingLabel.getStyleClass().add("tool-loading");
+        resultContainer.getChildren().add(loadingLabel);
+
         toolService.executeTool(toolName, args)
             .thenAccept(result -> Platform.runLater(() -> {
-                if (result.success()) {
-                    toolOutput.appendText("Success: " + result.output() + "\n");
-                } else {
-                    toolOutput.appendText("Error: " + result.error() + "\n");
-                }
-                toolOutput.appendText("---\n");
+                resultContainer.getChildren().clear();
+                ToolResultView resultView = new ToolResultView(new ToolExecutionResult(
+                    result.success(),
+                    result.output(),
+                    result.error(),
+                    result.metadata()
+                ));
+                resultContainer.getChildren().add(resultView);
             }))
             .exceptionally(ex -> {
-                Platform.runLater(() -> toolOutput.appendText("Exception: " + ex.getMessage() + "\n---\n"));
+                Platform.runLater(() -> {
+                    resultContainer.getChildren().clear();
+                    ToolResultView errorView = new ToolResultView(new ToolExecutionResult(
+                        false,
+                        null,
+                        ex.getMessage(),
+                        Map.of()
+                    ));
+                    resultContainer.getChildren().add(errorView);
+                });
                 return null;
             });
     }

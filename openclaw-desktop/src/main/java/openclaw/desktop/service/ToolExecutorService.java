@@ -301,7 +301,7 @@ public class ToolExecutorService {
 
     public record ToolExecutionResult(boolean success, String output, String error, 
                                        Map<String, Object> metadata) {
-        public static ToolExecutionResult from(ToolResult result) {
+        public static ToolExecutionResult from(openclaw.sdk.tool.ToolResult result) {
             return new ToolExecutionResult(
                 result.success(),
                 result.content().orElse(null),
