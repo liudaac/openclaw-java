@@ -53,6 +53,7 @@
         <module>openclaw-provider-perplexity</module>
         <module>openclaw-provider-google</module>
         <module>openclaw-lsp</module>
+        <module>openclaw-desktop</module>
     </modules>
 
     <dependencyManagement>

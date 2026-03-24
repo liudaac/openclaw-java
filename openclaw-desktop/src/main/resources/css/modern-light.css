@@ -1,0 +1,86 @@
+/*
+ * Modern Light Theme for OpenClaw Desktop
+ */
+
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f6f8fa;
+    --bg-tertiary: #eaeef2;
+    --bg-hover: #f3f4f6;
+    
+    --text-primary: #1f2328;
+    --text-secondary: #656d76;
+    --text-muted: #8c959f;
+    
+    --accent: #0969da;
+    --accent-hover: #0550ae;
+    --accent-light: #ddf4ff;
+    
+    --border: #d0d7de;
+    --border-light: #eaeef2;
+    
+    --user-bubble: #ddf4ff;
+    --assistant-bubble: #f6f8fa;
+}
+
+.root {
+    -fx-background-color: var(--bg-primary);
+    -fx-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -fx-font-size: 14px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: var(--border);
+}
+
+.sidebar {
+    -fx-background-color: var(--bg-secondary);
+    -fx-border-color: var(--border);
+    -fx-border-width: 0 1px 0 0;
+}
+
+.button {
+    -fx-background-color: var(--bg-tertiary);
+    -fx-text-fill: var(--text-primary);
+    -fx-border-color: var(--border);
+}
+
+.primary-button {
+    -fx-background-color: var(--accent);
+    -fx-text-fill: white;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: var(--text-secondary);
+}
+
+.nav-button-active {
+    -fx-background-color: var(--accent-light);
+    -fx-text-fill: var(--accent);
+}
+
+.text-field, .text-area {
+    -fx-background-color: var(--bg-primary);
+    -fx-text-fill: var(--text-primary);
+    -fx-border-color: var(--border);
+}
+
+.chat-container, .tools-container, .settings-container {
+    -fx-background-color: var(--bg-primary);
+}
+
+.user-bubble {
+    -fx-background-color: var(--user-bubble);
+    -fx-border-color: var(--accent);
+}
+
+.assistant-bubble {
+    -fx-background-color: var(--assistant-bubble);
+    -fx-border-color: var(--border);
+}
+
+.tool-card {
+    -fx-background-color: var(--bg-secondary);
+    -fx-border-color: var(--border);
+}

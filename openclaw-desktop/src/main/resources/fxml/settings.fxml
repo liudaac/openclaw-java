@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane fx:id="settingsContainer" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="openclaw.desktop.controller.SettingsController"
+            styleClass="settings-container">
+
+    <!-- Header -->
+    <top>
+        <HBox styleClass="settings-header" spacing="12" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="12" right="16" bottom="12" left="16" />
+            </padding>
+
+            <Label text="Settings" styleClass="settings-title" />
+        </HBox>
+    </top>
+
+    <!-- Content -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="settings-scroll">
+            <VBox spacing="24" styleClass="settings-content">
+                <padding>
+                    <Insets top="16" right="16" bottom="16" left="16" />
+                </padding>
+
+                <!-- Appearance Section -->
+                <VBox spacing="12">
+                    <Label text="Appearance" styleClass="section-title" />
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label text="Theme:" prefWidth="120" />
+                        <ComboBox fx:id="themeSelector" styleClass="setting-control" />
+                    </HBox>
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label text="Font Scale:" prefWidth="120" />
+                        <Slider fx:id="fontScaleSlider" min="0.8" max="1.5" step="0.1" prefWidth="200" />
+                        <Label fx:id="fontScaleLabel" text="1.0x" />
+                    </HBox>
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="animationsCheck" text="Enable animations" />
+                    </HBox>
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="transparencyCheck" text="Enable transparency effects" />
+                    </HBox>
+                </VBox>
+
+                <Separator />
+
+                <!-- Chat Section -->
+                <VBox spacing="12">
+                    <Label text="Chat" styleClass="section-title" />
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="autoSaveCheck" text="Auto-save conversations" />
+                    </HBox>
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="streamingCheck" text="Enable streaming responses" />
+                    </HBox>
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="tokenUsageCheck" text="Show token usage" />
+                    </HBox>
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label text="Default Model:" prefWidth="120" />
+                        <TextField fx:id="defaultModelField" styleClass="setting-control" prefWidth="250" />
+                    </HBox>
+                </VBox>
+
+                <Separator />
+
+                <!-- Export Section -->
+                <VBox spacing="12">
+                    <Label text="Export" styleClass="section-title" />
+
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label text="Export Path:" prefWidth="120" />
+                        <TextField fx:id="exportPathField" styleClass="setting-control" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="browseExportPathButton" text="Browse" styleClass="secondary-button" />
+                    </HBox>
+                </VBox>
+
+                <Separator />
+
+                <!-- Actions -->
+                <HBox spacing="12" alignment="CENTER_RIGHT">
+                    <Button fx:id="resetButton" text="Reset to Default" styleClass="secondary-button">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi2r-refresh" iconSize="16" />
+                        </graphic>
+                    </Button>
+
+                    <Button fx:id="saveButton" text="Save Settings" styleClass="primary-button" defaultButton="true">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi2c-check" iconSize="16" />
+                        </graphic>
+                    </Button>
+                </HBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

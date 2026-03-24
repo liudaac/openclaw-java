@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<BorderPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="openclaw.desktop.controller.MainController"
+            stylesheets="@/css/modern-dark.css">
+
+    <center>
+        <SplitPane fx:id="splitPane" dividerPositions="0.22">
+            <!-- Sidebar -->
+            <StackPane fx:id="sidebarContainer" minWidth="250" maxWidth="350" />
+
+            <!-- Main Content -->
+            <StackPane fx:id="contentContainer" />
+        </SplitPane>
+    </center>
+
+</BorderPane>

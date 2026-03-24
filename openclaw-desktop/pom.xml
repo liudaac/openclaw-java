@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>ai.openclaw</groupId>
+        <artifactId>openclaw</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>openclaw-desktop</artifactId>
+    <packaging>jar</packaging>
+
+    <name>OpenClaw Desktop</name>
+    <description>Modern JavaFX desktop application for OpenClaw</description>
+
+    <properties>
+        <javafx.version>21</javafx.version>
+        <ikonli.version>12.3.1</ikonli.version>
+    </properties>
+
+    <dependencies>
+        <!-- OpenClaw Core Modules -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-cron</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-browser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-session</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-tools</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-memory</artifactId>
+        </dependency>
+
+        <!-- JavaFX -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <!-- Icons -->
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+            <version>${ikonli.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-materialdesign2-pack</artifactId>
+            <version>${ikonli.version}</version>
+        </dependency>
+
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>openclaw.desktop.OpenClawApp</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
