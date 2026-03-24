@@ -45,12 +45,19 @@
                 <Insets top="12" right="16" bottom="16" left="16" />
             </padding>
 
+            <!-- Attachments Container -->
+            <VBox fx:id="attachmentsContainer" spacing="8" visible="false">
+                <padding>
+                    <Insets bottom="8" />
+                </padding>
+            </VBox>
+
             <!-- Progress Bar (hidden by default) -->
             <ProgressBar fx:id="streamingProgress" styleClass="streaming-progress" visible="false" maxWidth="Infinity" />
 
             <!-- Input Toolbar -->
             <HBox fx:id="inputToolbar" spacing="8" alignment="CENTER_LEFT">
-                <Button styleClass="toolbar-button">
+                <Button fx:id="attachButton" styleClass="toolbar-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2p-paperclip" iconSize="18" />
                     </graphic>

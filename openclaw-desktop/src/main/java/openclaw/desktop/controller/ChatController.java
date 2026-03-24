@@ -10,11 +10,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import openclaw.desktop.component.MessageCell;
+import openclaw.desktop.component.AttachmentView;
 import openclaw.desktop.model.UIMessage;
 import openclaw.desktop.service.ChatService;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignD;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignS;
@@ -24,7 +26,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -66,11 +72,18 @@ public class ChatController implements Initializable {
     private HBox inputToolbar;
 
     @FXML
+    private Button attachButton;
+
+    @FXML
+    private VBox attachmentsContainer;
+
+    @FXML
     private ProgressBar streamingProgress;
 
     private ObservableList<UIMessage> messages;
     private String currentSessionKey;
     private boolean isStreaming = false;
+    private List<File> pendingAttachments = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -89,6 +102,7 @@ public class ChatController implements Initializable {
 
         // Setup buttons
         setupButtons();
+        setupAttachmentButton();
 
         // Create initial conversation
         createNewConversation();
@@ -134,6 +148,73 @@ public class ChatController implements Initializable {
         abortButton.setGraphic(abortIcon);
         abortButton.setOnAction(e -> abortGeneration());
         abortButton.setVisible(false);
+    }
+
+    /**
+     * Setup attachment button.
+     */
+    private void setupAttachmentButton() {
+        FontIcon attachIcon = new FontIcon(MaterialDesignP.PAPERCLIP);
+        attachIcon.setIconSize(18);
+        attachButton.setGraphic(attachIcon);
+        attachButton.setOnAction(e -> handleAttachment());
+    }
+
+    /**
+     * Handle file attachment.
+     */
+    private void handleAttachment() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Files");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("All Files", "*.*"),
+            new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif"),
+            new FileChooser.ExtensionFilter("Documents", "*.pdf", "*.doc", "*.docx", "*.txt")
+        );
+
+        List<File> files = fileChooser.showOpenMultipleDialog(inputArea.getScene().getWindow());
+        if (files != null) {
+            for (File file : files) {
+                if (pendingAttachments.size() < 5) { // Limit to 5 attachments
+                    pendingAttachments.add(file);
+                    addAttachmentView(file);
+                }
+            }
+        }
+    }
+
+    /**
+     * Add attachment view to UI.
+     */
+    private void addAttachmentView(File file) {
+        AttachmentView view = new AttachmentView(file);
+        view.setOnMouseClicked(e -> {
+            if (e.getClickCount() == 2) {
+                removeAttachment(file, view);
+            }
+        });
+        attachmentsContainer.getChildren().add(view);
+        attachmentsContainer.setVisible(true);
+    }
+
+    /**
+     * Remove attachment.
+     */
+    private void removeAttachment(File file, AttachmentView view) {
+        pendingAttachments.remove(file);
+        attachmentsContainer.getChildren().remove(view);
+        if (pendingAttachments.isEmpty()) {
+            attachmentsContainer.setVisible(false);
+        }
+    }
+
+    /**
+     * Clear all attachments.
+     */
+    private void clearAttachments() {
+        pendingAttachments.clear();
+        attachmentsContainer.getChildren().clear();
+        attachmentsContainer.setVisible(false);
     }
 
     /**
