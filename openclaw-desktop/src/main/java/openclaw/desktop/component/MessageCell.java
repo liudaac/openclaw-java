@@ -15,60 +15,50 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignR;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignT;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- * Custom ListCell for displaying chat messages.
- *
- * <p>Modern bubble-style message display with role-based styling.</p>
+ * Custom ListCell for displaying chat messages with Markdown support.
  */
 public class MessageCell extends ListCell<UIMessage> {
 
     private final HBox container;
     private final VBox bubble;
-    private final TextFlow contentFlow;
-    private final Text contentText;
+    private final VBox contentContainer;
     private final Label headerLabel;
     private final Label footerLabel;
     private final HBox statusBox;
     private final FontIcon statusIcon;
 
+    private static final Pattern CODE_BLOCK_PATTERN = Pattern.compile("```(\\w*)\\n?(.*?)\\n?```", Pattern.DOTALL);
+
     public MessageCell() {
-        // Container
         container = new HBox();
         container.setPadding(new Insets(8, 16, 8, 16));
 
-        // Bubble
         bubble = new VBox(4);
         bubble.setPadding(new Insets(12, 16, 12, 16));
         bubble.getStyleClass().add("message-bubble");
 
-        // Header (role + timestamp)
         headerLabel = new Label();
         headerLabel.getStyleClass().add("message-header");
 
-        // Content
-        contentText = new Text();
-        contentText.getStyleClass().add("message-content");
-        contentFlow = new TextFlow(contentText);
-        contentFlow.getStyleClass().add("message-content-flow");
+        contentContainer = new VBox(4);
+        contentContainer.getStyleClass().add("message-content");
 
-        // Status indicator
         statusIcon = new FontIcon();
         statusIcon.setIconSize(14);
-        
+
         statusBox = new HBox(4, statusIcon);
         statusBox.setAlignment(Pos.CENTER_RIGHT);
         statusBox.getStyleClass().add("message-status");
 
-        // Footer (model + tokens)
         footerLabel = new Label();
         footerLabel.getStyleClass().add("message-footer");
 
-        // Assemble bubble
-        bubble.getChildren().addAll(headerLabel, contentFlow, footerLabel, statusBox);
+        bubble.getChildren().addAll(headerLabel, contentContainer, footerLabel, statusBox);
         container.getChildren().add(bubble);
-
-        // Bind width for text wrapping
-        contentFlow.maxWidthProperty().bind(widthProperty().subtract(120));
     }
 
     @Override
@@ -77,128 +67,98 @@ public class MessageCell extends ListCell<UIMessage> {
 
         if (empty || message == null) {
             setGraphic(null);
-            setText(null);
             return;
         }
 
-        // Update content
-        contentText.setText(message.getContent());
+        headerLabel.setText(getRoleDisplayText(message) + "  ·  " + message.getFormattedTimestamp());
+        renderContent(message.getContent());
 
-        // Update header based on role
-        String roleText = getRoleDisplayText(message);
-        String timestamp = message.getFormattedTimestamp();
-        headerLabel.setText(roleText + "  ·  " + timestamp);
-
-        // Update footer
-        String footer = buildFooter(message);
+        String footer = message.isAssistant() && message.getTokenCount() > 0 
+            ? message.getTokenCount() + " tokens" : "";
         footerLabel.setText(footer);
         footerLabel.setVisible(!footer.isEmpty());
 
-        // Update status
         updateStatus(message);
-
-        // Apply role-based styling
         applyRoleStyle(message);
-
-        // Position bubble based on role
         positionBubble(message);
 
         setGraphic(container);
     }
 
-    private String getRoleDisplayText(UIMessage message) {
-        if (message.isUser()) {
-            return "You";
-        } else if (message.isAssistant()) {
-            return message.getModel() != null && !message.getModel().isEmpty() 
-                ? message.getModel() 
-                : "Assistant";
-        } else if (message.isSystem()) {
-            return "System";
-        } else if (message.isTool()) {
-            return "Tool";
-        }
-        return message.getRole();
-    }
+    private void renderContent(String content) {
+        contentContainer.getChildren().clear();
+        if (content == null || content.isEmpty()) return;
 
-    private String buildFooter(UIMessage message) {
-        if (!message.isAssistant()) {
-            return "";
-        }
-
-        StringBuilder footer = new StringBuilder();
-        if (message.getTokenCount() > 0) {
-            footer.append(message.getTokenCount()).append(" tokens");
-        }
-        return footer.toString();
-    }
-
-    private void updateStatus(UIMessage message) {
-        statusBox.setVisible(true);
-
-        switch (message.getStatus()) {
-            case PENDING -> {
-                statusIcon.setIconCode(MaterialDesignC.CLOCK_OUTLINE);
-                statusBox.getStyleClass().setAll("message-status", "status-pending");
-            }
-            case SENDING -> {
-                statusIcon.setIconCode(MaterialDesignT.TELEGRAM);
-                statusBox.getStyleClass().setAll("message-status", "status-sending");
-            }
-            case STREAMING -> {
-                statusIcon.setIconCode(MaterialDesignR.RADIO_TOWER);
-                statusBox.getStyleClass().setAll("message-status", "status-streaming");
-            }
-            case COMPLETED -> {
-                if (message.isUser()) {
-                    statusBox.setVisible(false);
-                } else {
-                    statusIcon.setIconCode(MaterialDesignC.CHECK_CIRCLE);
-                    statusBox.getStyleClass().setAll("message-status", "status-completed");
+        String[] parts = content.split("(?=```)");
+        for (String part : parts) {
+            if (part.startsWith("```")) {
+                Matcher m = CODE_BLOCK_PATTERN.matcher(part);
+                if (m.find()) {
+                    contentContainer.getChildren().add(new CodeBlockView(m.group(1), m.group(2)));
                 }
-            }
-            case FAILED -> {
-                statusIcon.setIconCode(MaterialDesignA.ALERT_CIRCLE);
-                statusBox.getStyleClass().setAll("message-status", "status-failed");
-            }
-            case ABORTED -> {
-                statusIcon.setIconCode(MaterialDesignC.CLOSE_CIRCLE);
-                statusBox.getStyleClass().setAll("message-status", "status-aborted");
+            } else {
+                renderTextBlock(part);
             }
         }
     }
 
-    private void applyRoleStyle(UIMessage message) {
-        bubble.getStyleClass().removeAll(
-            "user-bubble", "assistant-bubble", "system-bubble", "tool-bubble"
-        );
-
-        if (message.isUser()) {
-            bubble.getStyleClass().add("user-bubble");
-        } else if (message.isAssistant()) {
-            bubble.getStyleClass().add("assistant-bubble");
-        } else if (message.isSystem()) {
-            bubble.getStyleClass().add("system-bubble");
-        } else if (message.isTool()) {
-            bubble.getStyleClass().add("tool-bubble");
+    private void renderTextBlock(String text) {
+        for (String para : text.split("\\n\\n")) {
+            if (para.trim().isEmpty()) continue;
+            
+            if (para.startsWith("# ")) {
+                Label h = new Label(para.substring(2)); h.getStyleClass().add("markdown-h1");
+                contentContainer.getChildren().add(h);
+            } else if (para.startsWith("## ")) {
+                Label h = new Label(para.substring(3)); h.getStyleClass().add("markdown-h2");
+                contentContainer.getChildren().add(h);
+            } else if (para.startsWith("### ")) {
+                Label h = new Label(para.substring(4)); h.getStyleClass().add("markdown-h3");
+                contentContainer.getChildren().add(h);
+            } else if (para.startsWith("- ") || para.startsWith("* ")) {
+                HBox item = new HBox(8, new Label("•") {{ getStyleClass().add("markdown-bullet"); }}, 
+                    new TextFlow(new Text(para.substring(2))));
+                item.getStyleClass().add("markdown-list-item");
+                contentContainer.getChildren().add(item);
+            } else {
+                TextFlow flow = new TextFlow(new Text(para));
+                flow.getStyleClass().add("markdown-paragraph");
+                contentContainer.getChildren().add(flow);
+            }
         }
     }
 
-    private void positionBubble(UIMessage message) {
+    private String getRoleDisplayText(UIMessage m) {
+        return m.isUser() ? "You" : m.isAssistant() ? (m.getModel() != null ? m.getModel() : "Assistant")
+            : m.isSystem() ? "System" : m.isTool() ? "Tool" : m.getRole();
+    }
+
+    private void updateStatus(UIMessage m) {
+        statusBox.setVisible(true);
+        switch (m.getStatus()) {
+            case PENDING -> { statusIcon.setIconCode(MaterialDesignC.CLOCK_OUTLINE); }
+            case SENDING -> { statusIcon.setIconCode(MaterialDesignT.TELEGRAM); }
+            case STREAMING -> { statusIcon.setIconCode(MaterialDesignR.RADIO_TOWER); }
+            case COMPLETED -> { 
+                if (m.isUser()) { statusBox.setVisible(false); return; }
+                statusIcon.setIconCode(MaterialDesignC.CHECK_CIRCLE); 
+            }
+            case FAILED -> { statusIcon.setIconCode(MaterialDesignA.ALERT_CIRCLE); }
+            case ABORTED -> { statusIcon.setIconCode(MaterialDesignC.CLOSE_CIRCLE); }
+        }
+    }
+
+    private void applyRoleStyle(UIMessage m) {
+        bubble.getStyleClass().removeAll("user-bubble", "assistant-bubble", "system-bubble", "tool-bubble");
+        if (m.isUser()) bubble.getStyleClass().add("user-bubble");
+        else if (m.isAssistant()) bubble.getStyleClass().add("assistant-bubble");
+        else if (m.isSystem()) bubble.getStyleClass().add("system-bubble");
+        else if (m.isTool()) bubble.getStyleClass().add("tool-bubble");
+    }
+
+    private void positionBubble(UIMessage m) {
         container.getChildren().clear();
-
-        if (message.isUser()) {
-            // User messages on right
-            container.setAlignment(Pos.CENTER_RIGHT);
-            container.getChildren().add(bubble);
-        } else if (message.isAssistant()) {
-            // Assistant messages on left
-            container.setAlignment(Pos.CENTER_LEFT);
-            container.getChildren().add(bubble);
-        } else {
-            // System/tool messages centered
-            container.setAlignment(Pos.CENTER);
-            container.getChildren().add(bubble);
-        }
+        container.setAlignment(m.isUser() ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+        container.getChildren().add(bubble);
     }
 }

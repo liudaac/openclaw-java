@@ -262,6 +262,72 @@
     -fx-text-fill: var(--text-muted);
 }
 
+/* ========== Markdown ========== */
+.markdown-h1 {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: var(--text-primary);
+}
+
+.markdown-h2 {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: var(--text-primary);
+}
+
+.markdown-h3 {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: var(--text-primary);
+}
+
+.markdown-paragraph {
+    -fx-text-fill: var(--text-primary);
+}
+
+.markdown-list-item {
+    -fx-padding: 2px 0;
+}
+
+.markdown-bullet {
+    -fx-text-fill: var(--accent);
+    -fx-font-weight: bold;
+}
+
+/* ========== Code Block ========== */
+.code-block {
+    -fx-background-color: #161b22;
+    -fx-background-radius: 8px;
+    -fx-border-color: var(--border);
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+}
+
+.code-block-header {
+    -fx-background-color: var(--bg-tertiary);
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-border-color: var(--border);
+    -fx-border-radius: 8px 8px 0 0;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.code-language {
+    -fx-text-fill: var(--text-secondary);
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.code-content {
+    -fx-background-color: #0d1117;
+    -fx-background-radius: 0 0 8px 8px;
+    -fx-font-family: "JetBrains Mono", "Fira Code", monospace;
+    -fx-font-size: 13px;
+}
+
+.code-line {
+    -fx-padding: 1px 0;
+}
+
 /* ========== ComboBox ========== */
 .combo-box {
     -fx-background-color: var(--bg-tertiary);
