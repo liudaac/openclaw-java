@@ -80,6 +80,46 @@ All notable changes to OpenClaw Java Edition.
 - JUnit 5.10 (Testing)
 - AssertJ 3.24 (Assertions)
 
+## [2026.3.25] - 2026-03-25
+
+### Synced from Original OpenClaw
+
+Based on analysis report: `openclaw-nightly-sync-2026-03-25.md`
+
+#### Feishu Channel - Mention Policy Enhancement
+
+**New Files:**
+- `FeishuGroupPolicy.java` - Group policy enumeration (OPEN, ALLOWLIST, DISABLED, ALLOWALL)
+- `FeishuGroupConfig.java` - Per-group configuration with requireMention, tools, skills
+- `FeishuPolicyResolver.java` - Policy resolution logic matching TypeScript implementation
+
+**Modified Files:**
+- `FeishuConfigAdapter.java` - Added groupPolicy, groups, requireMention configuration support
+- `FeishuInboundAdapter.java` - Integrated policy-based mention handling
+
+**New Test Files:**
+- `FeishuPolicyResolverTest.java` - Comprehensive tests for policy resolution
+- `FeishuMentionAdapterTest.java` - Tests for mention parsing and formatting
+
+**Key Features:**
+- When `groupPolicy` is `"open"`, `requireMention` defaults to `false`
+  - Allows non-text messages (images, etc.) to be processed without @-mentions
+  - Improves user experience in open group chats
+- Support for per-group configuration via `groups` map
+- Allowlist matching with wildcard support (`*`)
+- Case-insensitive group ID matching
+
+**Implementation Details:**
+- Ported from: `extensions/feishu/src/policy.ts`
+- Maintains backward compatibility (defaults to ALLOWLIST policy)
+- All new configuration fields are optional
+
+### Skipped (Java Edition Does Not Have These Modules)
+
+- **WhatsApp Reply Detection Fixes** - No WhatsApp channel module
+- **WhatsApp Identity Handling Refactor** - No WhatsApp channel module
+- **OpenAI Codex Auth Refactor** - No dedicated Codex integration
+
 ## [Unreleased]
 
 ### Planned
