@@ -4,6 +4,7 @@ import openclaw.sdk.tool.AgentTool;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -93,6 +94,7 @@ public interface SkillManager {
      * @param author the author
      * @param tools list of tools
      * @param loaded whether loaded
+     * @param source the skill source (e.g., "openclaw-bundled", "github", "local")
      */
     record Skill(
             String id,
@@ -101,7 +103,31 @@ public interface SkillManager {
             String description,
             String author,
             List<String> tools,
-            boolean loaded
+            boolean loaded,
+            String source
     ) {
+        /**
+         * Creates a Skill with default source.
+         */
+        public Skill {
+            if (source == null) {
+                source = "unknown";
+            }
+        }
+    }
+
+    /**
+     * Bundled skill sources.
+     */
+    Set<String> BUNDLED_SOURCES = Set.of("openclaw-bundled", "openclaw-bundled-core");
+
+    /**
+     * Checks if a skill is bundled.
+     *
+     * @param skill the skill to check
+     * @return true if bundled
+     */
+    default boolean isBundledSkill(Skill skill) {
+        return skill != null && skill.source() != null && BUNDLED_SOURCES.contains(skill.source());
     }
 }

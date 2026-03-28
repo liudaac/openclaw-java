@@ -3,6 +3,7 @@ package openclaw.server.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import openclaw.gateway.config.ProtectedConfigPaths;
 import openclaw.server.config.GatewayProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +102,20 @@ public class ConfigController {
                 ObjectNode errorResult = objectMapper.createObjectNode();
                 errorResult.put("success", false);
                 errorResult.put("error", validation.getError());
+                return badRequest(errorResult);
+            }
+            
+            // 检查受保护的配置路径
+            try {
+                JsonNode currentConfigNode = getCurrentConfigNode();
+                Map<String, Object> currentConfig = objectMapper.convertValue(currentConfigNode, Map.class);
+                Map<String, Object> newConfig = objectMapper.convertValue(config, Map.class);
+                
+                ProtectedConfigPaths.assertMutationAllowed("config.set", currentConfig, newConfig);
+            } catch (ProtectedConfigPaths.ProtectedConfigException e) {
+                ObjectNode errorResult = objectMapper.createObjectNode();
+                errorResult.put("success", false);
+                errorResult.put("error", e.getMessage());
                 return badRequest(errorResult);
             }
             
@@ -262,12 +277,26 @@ public class ConfigController {
             @RequestBody JsonNode config) {
         
         return Mono.fromCallable(() -> {
-            // 先保存配置
+            // 先验证配置
             ValidationResult validation = doValidateConfig(config);
             if (!validation.isValid()) {
                 ObjectNode errorResult = objectMapper.createObjectNode();
                 errorResult.put("success", false);
                 errorResult.put("error", validation.getError());
+                return badRequest(errorResult);
+            }
+            
+            // 检查受保护的配置路径
+            try {
+                JsonNode currentConfigNode = getCurrentConfigNode();
+                Map<String, Object> currentConfig = objectMapper.convertValue(currentConfigNode, Map.class);
+                Map<String, Object> newConfig = objectMapper.convertValue(config, Map.class);
+                
+                ProtectedConfigPaths.assertMutationAllowed("config.apply", currentConfig, newConfig);
+            } catch (ProtectedConfigPaths.ProtectedConfigException e) {
+                ObjectNode errorResult = objectMapper.createObjectNode();
+                errorResult.put("success", false);
+                errorResult.put("error", e.getMessage());
                 return badRequest(errorResult);
             }
             
@@ -376,6 +405,23 @@ public class ConfigController {
     
     private String generateToken() {
         return java.util.UUID.randomUUID().toString().replace("-", "");
+    }
+    
+    /**
+     * Gets the current configuration as JsonNode.
+     */
+    private JsonNode getCurrentConfigNode() {
+        try {
+            Path configPath = Paths.get(CONFIG_FILE);
+            if (!Files.exists(configPath)) {
+                return getDefaultConfig();
+            }
+            String content = Files.readString(configPath);
+            return objectMapper.readTree(content);
+        } catch (Exception e) {
+            logger.warn("Failed to read current config, using default", e);
+            return getDefaultConfig();
+        }
     }
     
     // Inner classes
