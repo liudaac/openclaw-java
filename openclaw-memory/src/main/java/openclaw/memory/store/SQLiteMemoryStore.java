@@ -43,6 +43,9 @@ public class SQLiteMemoryStore implements MemoryStore {
     public void init() {
         logger.info("Initializing SQLite memory store");
         createTables();
+        if (config.getFts().isEnabled()) {
+            initializeFtsTable();
+        }
     }
     
     private void createTables() {
@@ -54,6 +57,24 @@ public class SQLiteMemoryStore implements MemoryStore {
         } catch (SQLException e) {
             logger.error("Failed to create tables", e);
             throw new RuntimeException("Failed to initialize", e);
+        }
+    }
+
+    private void initializeFtsTable() {
+        String tokenizer = config.getFts().getTokenizer();
+        String createFtsSql = String.format(
+            "CREATE VIRTUAL TABLE IF NOT EXISTS memories_fts USING fts5(" +
+            "  content, " +
+            "  tokenize='%s'" +
+            ")",
+            tokenizer
+        );
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute(createFtsSql);
+            logger.info("SQLite FTS5 table created with tokenizer: {}", tokenizer);
+        } catch (SQLException e) {
+            logger.error("Failed to create FTS5 table", e);
+            throw new RuntimeException("Failed to initialize FTS5", e);
         }
     }
     

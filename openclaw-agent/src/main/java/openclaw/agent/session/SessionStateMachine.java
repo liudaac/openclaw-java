@@ -287,8 +287,41 @@ public class SessionStateMachine {
         String errorMessage,
         int totalInputTokens,
         int totalOutputTokens,
-        Map<String, Object> metadata
-    ) {}
+        Map<String, Object> metadata,
+        String parentSessionKey,  // Non-null for sub-agent sessions
+        SessionType sessionType   // MAIN or SUBAGENT
+    ) {
+        /**
+         * Compact constructor for backward compatibility
+         */
+        public SessionContext(
+            String sessionKey,
+            String model,
+            SessionState state,
+            Instant lastActivity,
+            String errorMessage,
+            int totalInputTokens,
+            int totalOutputTokens,
+            Map<String, Object> metadata) {
+            this(sessionKey, model, state, lastActivity, errorMessage,
+                 totalInputTokens, totalOutputTokens, metadata, null, SessionType.MAIN);
+        }
+        
+        /**
+         * Check if this is a sub-agent session.
+         */
+        public boolean isSubagentSession() {
+            return sessionType == SessionType.SUBAGENT || parentSessionKey != null;
+        }
+    }
+    
+    /**
+     * Session types
+     */
+    public enum SessionType {
+        MAIN,      // Main agent session
+        SUBAGENT   // Sub-agent session
+    }
     
     /**
      * Session state change event
