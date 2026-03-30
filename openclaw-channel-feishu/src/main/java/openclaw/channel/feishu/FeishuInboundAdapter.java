@@ -1,5 +1,6 @@
 package openclaw.channel.feishu;
 
+import openclaw.channel.feishu.config.FeishuGroupConfig;
 import openclaw.sdk.channel.ChannelInboundAdapter;
 import openclaw.sdk.channel.ChannelMessage;
 import org.slf4j.Logger;
