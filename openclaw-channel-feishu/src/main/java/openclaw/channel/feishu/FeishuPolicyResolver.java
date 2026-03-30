@@ -1,10 +1,10 @@
 package openclaw.channel.feishu;
 
+import openclaw.channel.feishu.policy.FeishuPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Feishu policy resolver.
@@ -178,9 +178,25 @@ public class FeishuPolicyResolver {
     }
 
     /**
+     * Static version of isGroupAllowed for convenience.
+     */
+    public static boolean isGroupAllowed(
+            FeishuGroupPolicy groupPolicy,
+            List<String> allowFrom,
+            String senderId,
+            String senderName) {
+
+        FeishuPolicyResolver resolver = new FeishuPolicyResolver();
+        return resolver.isGroupAllowed(groupPolicy, allowFrom, senderId, List.of(), senderName);
+    }
+
+    /**
      * Reply policy result.
      */
     public record ReplyPolicy(boolean requireMention) {
+        public boolean isRequireMention() {
+            return requireMention;
+        }
     }
 
     /**
@@ -218,6 +234,41 @@ public class FeishuPolicyResolver {
                             // even without @-mentions
                             return groupPolicy != FeishuGroupPolicy.OPEN;
                         }));
+
+        return new ReplyPolicy(requireMention);
+    }
+
+    /**
+     * Static version of resolveReplyPolicy for convenience.
+     */
+    public static ReplyPolicy resolveReplyPolicy(
+            boolean isDirectMessage,
+            FeishuPolicy policy,
+            Optional<FeishuGroupConfig> groupConfig,
+            String messageType) {
+
+        FeishuGroupPolicy groupPolicy = groupConfig
+                .map(FeishuGroupConfig::getGroupPolicy)
+                .orElse(policy.getGroupPolicy());
+
+        Optional<Boolean> globalRequireMention = Optional.of(policy.isRequireMention());
+
+        // For non-text messages in OPEN policy, don't require mention
+        if (!isDirectMessage && groupPolicy == FeishuGroupPolicy.OPEN && !"text".equals(messageType)) {
+            return new ReplyPolicy(false);
+        }
+
+        // DM always doesn't require mention
+        if (isDirectMessage) {
+            return new ReplyPolicy(false);
+        }
+
+        // Check group-specific setting
+        Optional<Boolean> groupRequireMention = groupConfig.flatMap(FeishuGroupConfig::getRequireMention);
+
+        boolean requireMention = groupRequireMention
+                .orElse(globalRequireMention
+                        .orElseGet(() -> groupPolicy != FeishuGroupPolicy.OPEN));
 
         return new ReplyPolicy(requireMention);
     }

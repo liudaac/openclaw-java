@@ -1,8 +1,6 @@
 package openclaw.channel.feishu;
 
 import openclaw.channel.feishu.config.FeishuGroupConfig;
-import openclaw.channel.feishu.policy.FeishuGroupPolicy;
-import openclaw.channel.feishu.policy.FeishuPolicy;
 import openclaw.sdk.channel.ChannelConfigAdapter;
 import openclaw.sdk.channel.ChannelConfigSchema;
 import openclaw.sdk.channel.ConfigUiHint;

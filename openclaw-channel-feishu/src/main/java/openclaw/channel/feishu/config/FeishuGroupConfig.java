@@ -1,6 +1,6 @@
 package openclaw.channel.feishu.config;
 
-import openclaw.channel.feishu.policy.FeishuGroupPolicy;
+import openclaw.channel.feishu.FeishuGroupPolicy;
 
 import java.util.List;
 import java.util.Optional;
