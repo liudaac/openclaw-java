@@ -1,35 +1,46 @@
 package openclaw.channel.wecom;
 
-import openclaw.sdk.channel.*;
+import openclaw.sdk.channel.ChannelInboundAdapter;
+import openclaw.sdk.channel.ChannelMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
- * WeCom inbound message adapter.
+ * WeCom channel inbound adapter.
  *
  * @author OpenClaw Team
- * @version 2026.3.21
- * @since 2026.3.21
+ * @version 2026.3.30
  */
 public class WecomInboundAdapter implements ChannelInboundAdapter {
 
+    private static final Logger logger = LoggerFactory.getLogger(WecomInboundAdapter.class);
+
+    private Consumer<ChannelMessage> messageHandler;
+
     @Override
-    public CompletableFuture<ChannelInboundResult> handleWebhook(ChannelWebhookPayload payload) {
-        // TODO: Implement WeCom webhook handling
-        return CompletableFuture.completedFuture(
-                ChannelInboundResult.builder()
-                        .handled(false)
-                        .build()
-        );
+    public CompletableFuture<ProcessResult> onMessage(ChannelMessage message) {
+        return CompletableFuture.supplyAsync(() -> {
+            logger.info("Received message from WeCom: {}", message.text());
+            if (messageHandler != null) {
+                messageHandler.accept(message);
+                return ProcessResult.success();
+            }
+            return ProcessResult.failure("No message handler registered");
+        });
     }
 
     @Override
-    public CompletableFuture<ChannelInboundResult> handlePoll(ChannelPollRequest request) {
-        // TODO: Implement WeCom polling
-        return CompletableFuture.completedFuture(
-                ChannelInboundResult.builder()
-                        .handled(false)
-                        .build()
-        );
+    public void onMessage(Consumer<ChannelMessage> handler) {
+        this.messageHandler = handler;
+    }
+
+    @Override
+    public void removeHandler(Consumer<ChannelMessage> handler) {
+        if (this.messageHandler == handler) {
+            this.messageHandler = null;
+        }
     }
 }

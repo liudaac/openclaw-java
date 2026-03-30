@@ -1,46 +1,45 @@
 package openclaw.channel.wecom;
 
-import openclaw.sdk.channel.*;
+import openclaw.sdk.channel.ChannelOutboundAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * WeCom outbound message adapter.
+ * WeCom channel outbound adapter.
  *
  * @author OpenClaw Team
- * @version 2026.3.21
- * @since 2026.3.21
+ * @version 2026.3.30
  */
 public class WecomOutboundAdapter implements ChannelOutboundAdapter {
 
+    private static final Logger logger = LoggerFactory.getLogger(WecomOutboundAdapter.class);
+
     @Override
-    public CompletableFuture<ChannelMessage> sendText(ChannelOutboundRequest request) {
-        // TODO: Implement WeCom API call
-        return CompletableFuture.completedFuture(
-                ChannelMessage.builder()
-                        .id("wecom-msg-" + System.currentTimeMillis())
-                        .text(request.getText())
-                        .build()
-        );
+    public CompletableFuture<SendResult> sendText(Object account, String to, String message, Optional<SendOptions> options) {
+        return CompletableFuture.supplyAsync(() -> {
+            logger.info("Sending text message to WeCom user: {}", to);
+            // TODO: Implement actual WeCom API call
+            return new SendResult(true, Optional.empty(), Optional.of("msg-" + System.currentTimeMillis()));
+        });
     }
 
     @Override
-    public CompletableFuture<ChannelMessage> sendImage(ChannelOutboundRequest request) {
-        // TODO: Implement WeCom API call
-        return CompletableFuture.completedFuture(
-                ChannelMessage.builder()
-                        .id("wecom-img-" + System.currentTimeMillis())
-                        .build()
-        );
+    public CompletableFuture<SendResult> sendMedia(Object account, String to, Optional<String> message, String mediaUrl, Optional<SendOptions> options) {
+        return CompletableFuture.supplyAsync(() -> {
+            logger.info("Sending media message to WeCom user: {}", to);
+            // TODO: Implement actual WeCom API call
+            return new SendResult(true, Optional.empty(), Optional.of("msg-" + System.currentTimeMillis()));
+        });
     }
 
     @Override
-    public CompletableFuture<ChannelMessage> sendFile(ChannelOutboundRequest request) {
-        // TODO: Implement WeCom API call
-        return CompletableFuture.completedFuture(
-                ChannelMessage.builder()
-                        .id("wecom-file-" + System.currentTimeMillis())
-                        .build()
-        );
+    public CompletableFuture<Void> sendTyping(Object account, String to) {
+        return CompletableFuture.runAsync(() -> {
+            logger.debug("Sending typing indicator to WeCom user: {}", to);
+            // TODO: Implement actual WeCom API call
+        });
     }
 }
