@@ -1,8 +1,0 @@
-/root/openclaw-java/openclaw-plugin-sdk/src/test/java/openclaw/sdk/PluginRuntimeTest.java
-/root/openclaw-java/openclaw-plugin-sdk/src/test/java/openclaw/plugin/sdk/websearch/utils/ValidationUtilsTest.java
-/root/openclaw-java/openclaw-plugin-sdk/src/test/java/openclaw/sdk/DiscoveryTest.java
-/root/openclaw-java/openclaw-plugin-sdk/src/test/java/openclaw/utils/CjkCharUtilsTest.java
-/root/openclaw-java/openclaw-plugin-sdk/src/test/java/openclaw/plugin/sdk/bundle/BundleCommandRegistryTest.java
-/root/openclaw-java/openclaw-plugin-sdk/src/test/java/openclaw/plugin/sdk/websearch/WebSearchProviderRegistryTest.java
-/root/openclaw-java/openclaw-plugin-sdk/src/test/java/openclaw/plugin/sdk/bundle/BundledWebSearchIdsTest.java
-/root/openclaw-java/openclaw-plugin-sdk/src/test/java/openclaw/sdk/ChannelPluginTest.java

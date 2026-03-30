@@ -1,8 +1,0 @@
-# OpenClaw Channel Plugin Service Provider Interface
-# Register channel plugin implementations here
-# Format: fully.qualified.ClassName
-
-# Example:
-# openclaw.channel.telegram.TelegramChannelPlugin
-# openclaw.channel.slack.SlackChannelPlugin
-# openclaw.channel.feishu.FeishuChannelPlugin
