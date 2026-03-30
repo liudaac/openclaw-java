@@ -173,6 +173,20 @@ public class Session {
     public int getTotalTokens() {
         return totalInputTokens + totalOutputTokens;
     }
+
+    /**
+     * Get session label (alias for sessionKey).
+     */
+    public String getLabel() {
+        return sessionKey;
+    }
+
+    /**
+     * Get message count.
+     */
+    public int getMessageCount() {
+        return messages != null ? messages.size() : 0;
+    }
     
     @Override
     public String toString() {
