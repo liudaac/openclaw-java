@@ -2,6 +2,7 @@ package openclaw.channel.feishu;
 
 import openclaw.channel.feishu.config.FeishuGroupConfig;
 import openclaw.channel.feishu.policy.FeishuPolicy;
+import openclaw.channel.feishu.FeishuPolicyResolver;
 import openclaw.sdk.channel.ChannelMentionAdapter;
 
 import java.util.List;

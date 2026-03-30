@@ -1,5 +1,6 @@
 package openclaw.channel.feishu;
 
+import openclaw.channel.feishu.config.FeishuGroupConfig;
 import openclaw.channel.feishu.policy.FeishuPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
