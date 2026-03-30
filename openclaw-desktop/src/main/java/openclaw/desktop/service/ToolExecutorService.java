@@ -203,7 +203,7 @@ public class ToolExecutorService {
      * Create a browser session.
      */
     public CompletableFuture<BrowserSessionInfo> createBrowserSession(String name, 
-                                                                       SessionOptions options) {
+                                                                       BrowserSession.SessionOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             BrowserSession session = browserService.createSession(name, options).join();
             return new BrowserSessionInfo(
@@ -263,7 +263,7 @@ public class ToolExecutorService {
                     s.getStatus().name(),
                     s.getCreatedAt()
                 ))
-                .collect(Collectors.toList());
+                .toList();
         });
     }
 

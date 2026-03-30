@@ -101,7 +101,7 @@ public class AttachmentView extends HBox {
     /**
      * Create icon preview.
      */
-    private Node createIconPreview(Enum<?> iconCode) {
+    private Node createIconPreview(org.kordamp.ikonli.Ikon iconCode) {
         VBox iconBox = new VBox();
         iconBox.setAlignment(Pos.CENTER);
         iconBox.setPrefSize(64, 64);

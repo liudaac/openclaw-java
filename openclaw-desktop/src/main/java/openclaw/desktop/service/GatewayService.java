@@ -82,7 +82,7 @@ public class GatewayService {
                 version,
                 lastConnectedAt,
                 reconnectAttempts,
-                autoReconnect
+                List.of()
             );
         });
     }
