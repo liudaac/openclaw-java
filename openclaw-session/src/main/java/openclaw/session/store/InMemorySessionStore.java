@@ -109,6 +109,20 @@ public class InMemorySessionStore implements SessionStore {
     }
 
     @Override
+    public CompletableFuture<Integer> deleteSessions(List<String> sessionIds) {
+        return CompletableFuture.supplyAsync(() -> {
+            int count = 0;
+            for (String sessionId : sessionIds) {
+                sessions.remove(sessionId);
+                messages.remove(sessionId);
+                count++;
+            }
+            logger.debug("Deleted {} sessions", count);
+            return count;
+        });
+    }
+
+    @Override
     public CompletableFuture<Void> updateSessionStatus(String sessionId, SessionStatus status) {
         return CompletableFuture.runAsync(() -> {
             Session session = sessions.get(sessionId);
