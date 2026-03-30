@@ -239,3 +239,33 @@ public class GatewayController implements Initializable {
             nameLabel.getStyleClass().add("node-name");
 
             HBox metaBox = new HBox(8);
+            statusLabel = new Label();
+            statusLabel.getStyleClass().add("node-status");
+            versionLabel = new Label();
+            versionLabel.getStyleClass().add("node-version");
+            metaBox.getChildren().addAll(statusLabel, versionLabel);
+
+            infoBox.getChildren().addAll(nameLabel, metaBox);
+            container.getChildren().add(infoBox);
+        }
+
+        @Override
+        protected void updateItem(NodeInfo item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+                setGraphic(null);
+            } else {
+                nameLabel.setText(item.name());
+                statusLabel.setText(item.status());
+                versionLabel.setText(item.version());
+                setGraphic(container);
+            }
+        }
+    }
+
+    /**
+     * Node info record.
+     */
+    private record NodeInfo(String name, String status, String version) {
+    }
+}
