@@ -114,7 +114,7 @@ public class ToolCard extends VBox {
         });
     }
 
-    private String getIconForTool(String toolName) {
+    private Enum<?> getIconForTool(String toolName) {
         String lower = toolName.toLowerCase();
         
         return switch (lower) {
@@ -124,15 +124,15 @@ public class ToolCard extends VBox {
             case "web_search", "websearch" -> MaterialDesignS.SEARCH_WEB;
             case "file" -> MaterialDesignF.FOLDER;
             case "email" -> MaterialDesignE.EMAIL;
-            case "exec", "shell", "command" -> MaterialDesignT.TERMINAL;
-            case "python" -> MaterialDesignL.LANGUAGE_PYTHON; // Note: Need to import MaterialDesignL
-            case "image" -> MaterialDesignI.IMAGE; // Note: Need to import MaterialDesignI
+            case "exec", "shell", "command" -> MaterialDesignC.CONSOLE;
+            case "python" -> MaterialDesignL.LANGUAGE_PYTHON;
+            case "image" -> MaterialDesignI.IMAGE;
             case "calendar" -> MaterialDesignC.CALENDAR;
             case "weather" -> MaterialDesignW.WEATHER_PARTLY_CLOUDY;
             case "translate" -> MaterialDesignT.TRANSLATE;
             case "finance" -> MaterialDesignC.CASH;
             case "audit" -> MaterialDesignS.SHIELD_CHECK;
-            case "fetch" -> MaterialDesignD.DOWNLOAD; // Note: Need to import MaterialDesignD
+            case "fetch" -> MaterialDesignD.DOWNLOAD;
             case "db", "database" -> MaterialDesignD.DATABASE;
             default -> MaterialDesignM.MENU;
         };

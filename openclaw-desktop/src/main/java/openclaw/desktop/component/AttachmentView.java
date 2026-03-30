@@ -101,7 +101,7 @@ public class AttachmentView extends HBox {
     /**
      * Create icon preview.
      */
-    private Node createIconPreview(String iconCode) {
+    private Node createIconPreview(Enum<?> iconCode) {
         VBox iconBox = new VBox();
         iconBox.setAlignment(Pos.CENTER);
         iconBox.setPrefSize(64, 64);

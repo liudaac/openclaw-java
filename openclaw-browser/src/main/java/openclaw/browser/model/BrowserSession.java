@@ -96,6 +96,14 @@ public class BrowserSession {
     public SessionOptions getOptions() {
         return options;
     }
+
+    public String getName() {
+        return profile;
+    }
+
+    public SessionStatus getStatus() {
+        return context != null ? SessionStatus.ACTIVE : SessionStatus.CLOSED;
+    }
     
     public void close() {
         pages.values().forEach(Page::close);
@@ -115,5 +123,9 @@ public class BrowserSession {
         public static SessionOptions defaults() {
             return new SessionOptions(1280, 720, null, "en-US", "UTC", true, Map.of());
         }
+    }
+
+    public enum SessionStatus {
+        ACTIVE, CLOSED, ERROR
     }
 }

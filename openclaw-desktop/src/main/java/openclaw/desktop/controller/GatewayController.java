@@ -263,9 +263,4 @@ public class GatewayController implements Initializable {
         }
     }
 
-    /**
-     * Node info record.
-     */
-    private record NodeInfo(String name, String status, String version) {
-    }
 }

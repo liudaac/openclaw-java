@@ -43,7 +43,7 @@ public class ToolResultView extends VBox {
         HBox header = new HBox(12);
         header.getStyleClass().add("tool-result-header");
 
-        FontIcon statusIcon = new FontIcon(result.success() ? MaterialDesignC.CHECK_CIRCLE : MaterialDesignE.ERROR);
+        FontIcon statusIcon = new FontIcon(result.success() ? MaterialDesignC.CHECK_CIRCLE : MaterialDesignC.CLOSE_CIRCLE);
         statusIcon.setIconSize(24);
         statusIcon.getStyleClass().add(result.success() ? "status-success" : "status-error");
 

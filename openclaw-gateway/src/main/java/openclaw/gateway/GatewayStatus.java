@@ -11,19 +11,45 @@ import java.util.List;
  */
 public record GatewayStatus(
         boolean connected,
+        String url,
         String version,
-        Instant connectedAt,
+        Instant lastConnectedAt,
+        int reconnectAttempts,
         List<NodeInfo> nodes
 ) {
     public GatewayStatus {
         nodes = nodes != null ? List.copyOf(nodes) : List.of();
     }
 
-    public GatewayStatus(boolean connected, String version) {
-        this(connected, version, null, List.of());
+    public GatewayStatus(boolean connected, String url, String version) {
+        this(connected, url, version, null, 0, List.of());
     }
 
-    public GatewayStatus(boolean connected, String version, Instant connectedAt) {
-        this(connected, version, connectedAt, List.of());
+    public GatewayStatus(boolean connected, String url, String version, Instant lastConnectedAt) {
+        this(connected, url, version, lastConnectedAt, 0, List.of());
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public Instant getLastConnectedAt() {
+        return lastConnectedAt;
+    }
+
+    public int getReconnectAttempts() {
+        return reconnectAttempts;
+    }
+
+    public List<NodeInfo> getNodes() {
+        return nodes;
     }
 }

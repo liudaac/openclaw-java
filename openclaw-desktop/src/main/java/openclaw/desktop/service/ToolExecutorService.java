@@ -256,7 +256,7 @@ public class ToolExecutorService {
      */
     public CompletableFuture<List<BrowserSessionInfo>> listBrowserSessions() {
         return CompletableFuture.supplyAsync(() -> {
-            return browserService.listSessions().join().stream()
+            return browserService.listSessions().join().values().stream()
                 .map(s -> new BrowserSessionInfo(
                     s.getId(),
                     s.getName(),
