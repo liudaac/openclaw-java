@@ -1,5 +1,6 @@
 package openclaw.channel.feishu;
 
+import openclaw.channel.feishu.config.FeishuGroupConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
