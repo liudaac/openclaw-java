@@ -23,7 +23,7 @@ public final class JsonRpcProtocol {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonRpcProtocol.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Pattern CONTENT_LENGTH_PATTERN = Pattern.compile("Content-Length:\s*(\d+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CONTENT_LENGTH_PATTERN = Pattern.compile("Content-Length:\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
 
     private JsonRpcProtocol() {
         // Utility class
