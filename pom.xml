@@ -42,7 +42,7 @@
         <module>openclaw-channel-discord</module>
         <module>openclaw-channel-slack</module>
         <module>openclaw-channel-matrix</module>
-        <module>openclaw-channel-wecom</module>
+        <!-- <module>openclaw-channel-wecom</module> -->
         <module>openclaw-tools</module>
         <module>openclaw-memory</module>
         <module>openclaw-security</module>
