@@ -28,12 +28,22 @@ public class WecomChannelPlugin implements ChannelPlugin<WecomChannelPlugin.Weco
 
     @Override
     public ChannelMeta getMeta() {
-        return new ChannelMeta("WeCom", "WeChat Work (WeCom) channel adapter", "2026.3.30");
+        return ChannelMeta.builder()
+                .name("WeCom")
+                .description("WeChat Work (WeCom) channel adapter")
+                .build();
     }
 
     @Override
     public ChannelCapabilities getCapabilities() {
-        return new ChannelCapabilities(true, true, true, true, true, true, true, true, true);
+        return ChannelCapabilities.builder()
+                .supportsText(true)
+                .supportsImages(true)
+                .supportsFiles(true)
+                .supportsTyping(true)
+                .supportsGroups(true)
+                .supportsDMs(true)
+                .build();
     }
 
     @Override
