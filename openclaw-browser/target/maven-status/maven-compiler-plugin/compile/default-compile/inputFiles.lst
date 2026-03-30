@@ -1,0 +1,9 @@
+/root/openclaw-java/openclaw-browser/src/main/java/openclaw/browser/action/BrowserActions.java
+/root/openclaw-java/openclaw-browser/src/main/java/openclaw/browser/snapshot/PageSnapshot.java
+/root/openclaw-java/openclaw-browser/src/main/java/openclaw/browser/batch/BatchExecutor.java
+/root/openclaw-java/openclaw-browser/src/main/java/openclaw/browser/session/SessionManager.java
+/root/openclaw-java/openclaw-browser/src/main/java/openclaw/browser/BrowserService.java
+/root/openclaw-java/openclaw-browser/src/main/java/openclaw/browser/model/BrowserSession.java
+/root/openclaw-java/openclaw-browser/src/main/java/openclaw/browser/batch/BatchAction.java
+/root/openclaw-java/openclaw-browser/src/main/java/openclaw/browser/batch/BatchResult.java
+/root/openclaw-java/openclaw-browser/src/main/java/openclaw/browser/batch/ActionResult.java

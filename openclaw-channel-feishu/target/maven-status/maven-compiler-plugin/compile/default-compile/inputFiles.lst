@@ -1,0 +1,16 @@
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuInboundAdapter.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuDirectoryAdapter.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuOutboundAdapter.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/config/FeishuGroupConfig.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuChannelPlugin.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuConfigAdapter.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuMentionAdapter.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuGroupPolicy.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuPolicyResolver.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuStreamingAdapter.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuToolAccountResolver.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuGroupAdapter.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuCardBuilder.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/webhook/FeishuWebhookController.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuGroupConfig.java
+/root/openclaw-java/openclaw-channel-feishu/src/main/java/openclaw/channel/feishu/FeishuSecurityAdapter.java

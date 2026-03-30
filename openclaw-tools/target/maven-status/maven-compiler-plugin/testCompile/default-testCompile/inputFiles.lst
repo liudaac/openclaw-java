@@ -1,0 +1,4 @@
+/root/openclaw-java/openclaw-tools/src/test/java/openclaw/tools/exec/SandboxDetectorTest.java
+/root/openclaw-java/openclaw-tools/src/test/java/openclaw/tools/image/ImageToolTest.java
+/root/openclaw-java/openclaw-tools/src/test/java/openclaw/tools/llm/GeminiSchemaCleanerTest.java
+/root/openclaw-java/openclaw-tools/src/test/java/openclaw/tools/browser/BrowserToolTest.java

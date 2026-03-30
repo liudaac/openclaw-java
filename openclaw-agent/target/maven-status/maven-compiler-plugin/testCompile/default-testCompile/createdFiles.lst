@@ -1,0 +1,9 @@
+openclaw/agent/workspace/WorkspaceFileServiceTest.class
+openclaw/agent/event/AgentEventEmitterTest.class
+openclaw/agent/context/ContextCompactionNotifierTest.class
+openclaw/agent/event/HeartbeatEventEmitterTest.class
+openclaw/agent/security/ToolPolicyEnforcerTest.class
+openclaw/agent/event/SystemEventQueueTest.class
+openclaw/agent/heartbeat/HeartbeatProcessorTest.class
+openclaw/agent/autoreply/FollowupQueueTest$1.class
+openclaw/agent/autoreply/FollowupQueueTest.class

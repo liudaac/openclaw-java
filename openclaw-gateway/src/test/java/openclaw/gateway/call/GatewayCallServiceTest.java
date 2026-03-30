@@ -61,7 +61,15 @@ class GatewayCallServiceTest {
         GatewayCallService service = GatewayCallService.getInstance();
         GatewayCallService.GatewayCallOptions options = new GatewayCallService.GatewayCallOptions(
                 "ws://localhost:8080",
-                new DeviceAuthV3.AuthRequest("test-device", "test-token"),
+                new DeviceAuthV3.AuthRequest(
+                    "test-device",
+                    "test-client",
+                    new String[]{"read", "write"},
+                    "nonce-1234567890",
+                    System.currentTimeMillis(),
+                    "test-token",
+                    "signature-abc123"
+                ),
                 "testMethod",
                 Map.of("key", "value")
         );
@@ -84,7 +92,15 @@ class GatewayCallServiceTest {
         GatewayCallService service = GatewayCallService.getInstance();
         GatewayCallService.GatewayCallOptions options = new GatewayCallService.GatewayCallOptions(
                 "ws://localhost:8080",
-                new DeviceAuthV3.AuthRequest("test-device", "test-token"),
+                new DeviceAuthV3.AuthRequest(
+                    "test-device",
+                    "test-client",
+                    new String[]{"read"},
+                    "nonce-0987654321",
+                    System.currentTimeMillis(),
+                    "test-token",
+                    "signature-xyz789"
+                ),
                 "testMethod",
                 Map.of()
         );
@@ -155,7 +171,15 @@ class GatewayCallServiceTest {
         private Throwable nextError;
 
         public MockGatewayClient() {
-            super("ws://localhost:8080", new DeviceAuthV3.AuthRequest("test", "token"));
+            super("ws://localhost:8080", new DeviceAuthV3.AuthRequest(
+                "test",
+                "test-client",
+                new String[]{"read"},
+                "nonce-mock",
+                System.currentTimeMillis(),
+                "token",
+                "signature-mock"
+            ));
         }
 
         @Override

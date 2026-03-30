@@ -1,0 +1,8 @@
+/root/openclaw-java/openclaw-agent/src/test/java/openclaw/agent/workspace/WorkspaceFileServiceTest.java
+/root/openclaw-java/openclaw-agent/src/test/java/openclaw/agent/event/HeartbeatEventEmitterTest.java
+/root/openclaw-java/openclaw-agent/src/test/java/openclaw/agent/event/SystemEventQueueTest.java
+/root/openclaw-java/openclaw-agent/src/test/java/openclaw/agent/autoreply/FollowupQueueTest.java
+/root/openclaw-java/openclaw-agent/src/test/java/openclaw/agent/security/ToolPolicyEnforcerTest.java
+/root/openclaw-java/openclaw-agent/src/test/java/openclaw/agent/heartbeat/HeartbeatProcessorTest.java
+/root/openclaw-java/openclaw-agent/src/test/java/openclaw/agent/event/AgentEventEmitterTest.java
+/root/openclaw-java/openclaw-agent/src/test/java/openclaw/agent/context/ContextCompactionNotifierTest.java

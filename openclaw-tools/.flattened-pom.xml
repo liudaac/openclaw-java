@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>ai.openclaw</groupId>
+    <artifactId>openclaw</artifactId>
+    <version>2026.3.14-SNAPSHOT</version>
+  </parent>
+  <artifactId>openclaw-tools</artifactId>
+  <version>2026.3.14-SNAPSHOT</version>
+  <name>OpenClaw Tools</name>
+  <description>Tools and skills for OpenClaw Java Edition</description>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+  <dependencies>
+    <dependency>
+      <groupId>ai.openclaw</groupId>
+      <artifactId>openclaw-plugin-sdk</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ai.openclaw</groupId>
+      <artifactId>openclaw-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ai.openclaw</groupId>
+      <artifactId>openclaw-cron</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ai.openclaw</groupId>
+      <artifactId>openclaw-browser</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ai.openclaw</groupId>
+      <artifactId>openclaw-session</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ai.openclaw</groupId>
+      <artifactId>openclaw-provider-brave</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>ai.openclaw</groupId>
+      <artifactId>openclaw-provider-perplexity</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>ai.openclaw</groupId>
+      <artifactId>openclaw-provider-google</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>jakarta.mail</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,8 @@
+/root/openclaw-java/openclaw-secrets/src/main/java/openclaw/secrets/SecretManager.java
+/root/openclaw-java/openclaw-secrets/src/main/java/openclaw/secrets/DefaultSecretManager.java
+/root/openclaw-java/openclaw-secrets/src/main/java/openclaw/secrets/storage/EncryptedStorage.java
+/root/openclaw-java/openclaw-secrets/src/main/java/openclaw/secrets/audit/AuditLog.java
+/root/openclaw-java/openclaw-secrets/src/main/java/openclaw/secrets/config/ConfigIO.java
+/root/openclaw-java/openclaw-secrets/src/main/java/openclaw/secrets/credential/Credential.java
+/root/openclaw-java/openclaw-secrets/src/main/java/openclaw/secrets/audit/DefaultAuditLog.java
+/root/openclaw-java/openclaw-secrets/src/main/java/openclaw/secrets/credential/CredentialMatrix.java
