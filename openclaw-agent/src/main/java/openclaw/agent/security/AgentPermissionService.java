@@ -237,4 +237,9 @@ public class AgentPermissionService {
     /**
      * Exception thrown when a config mutation is not allowed.
      */
-    public static class ConfigMutationException extends
+    public static class ConfigMutationException extends RuntimeException {
+        public ConfigMutationException(String message) {
+            super(message);
+        }
+    }
+}
