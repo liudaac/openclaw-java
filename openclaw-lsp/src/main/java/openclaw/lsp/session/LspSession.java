@@ -2,7 +2,6 @@ package openclaw.lsp.session;
 
 import openclaw.lsp.client.LspClient;
 import openclaw.lsp.protocol.InitializeResult;
-import openclaw.lsp.protocol.ServerCapabilities;
 import openclaw.sdk.tool.AgentTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class LspSession {
 
     private final String serverName;
     private final LspClient client;
-    private ServerCapabilities capabilities;
+    private InitializeResult.ServerCapabilities capabilities;
     private final List<AgentTool> tools = new ArrayList<>();
     private volatile boolean initialized = false;
 
@@ -56,7 +55,7 @@ public class LspSession {
      *
      * @return the capabilities
      */
-    public ServerCapabilities getCapabilities() {
+    public InitializeResult.ServerCapabilities getCapabilities() {
         return capabilities;
     }
 
@@ -65,7 +64,7 @@ public class LspSession {
      *
      * @param capabilities the capabilities
      */
-    public void setCapabilities(ServerCapabilities capabilities) {
+    public void setCapabilities(InitializeResult.ServerCapabilities capabilities) {
         this.capabilities = capabilities;
     }
 

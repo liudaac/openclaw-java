@@ -1,6 +1,6 @@
 package openclaw.lsp.session;
 
-import openclaw.lsp.protocol.ServerCapabilities;
+import openclaw.lsp.protocol.InitializeResult;
 import openclaw.lsp.tool.*;
 import openclaw.sdk.tool.AgentTool;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class LspToolFactory {
      */
     public List<AgentTool> createTools(LspSession session) {
         List<AgentTool> tools = new ArrayList<>();
-        ServerCapabilities caps = session.getCapabilities();
+        InitializeResult.ServerCapabilities caps = session.getCapabilities();
 
         if (caps == null) {
             logger.warn("No capabilities for session: {}", session.getServerName());

@@ -3,7 +3,6 @@ package openclaw.lsp.client;
 import openclaw.lsp.protocol.InitializeParams;
 import openclaw.lsp.protocol.InitializeResult;
 import openclaw.lsp.protocol.JsonRpcMessage;
-import openclaw.lsp.protocol.ServerCapabilities;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -82,14 +81,14 @@ public interface LspClient {
      *
      * @return the server capabilities
      */
-    ServerCapabilities getCapabilities();
+    InitializeResult.ServerCapabilities getCapabilities();
 
     /**
      * Set server capabilities.
      *
      * @param capabilities the capabilities
      */
-    void setCapabilities(ServerCapabilities capabilities);
+    void setCapabilities(InitializeResult.ServerCapabilities capabilities);
 
     /**
      * Check if client is initialized.

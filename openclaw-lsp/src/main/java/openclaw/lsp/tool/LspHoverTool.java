@@ -43,10 +43,12 @@ public class LspHoverTool implements AgentTool {
     @Override
     public ToolParameters getParameters() {
         return ToolParameters.builder()
-                .property("uri", PropertySchema.string("File URI (e.g., file:///path/to/file.ts)"))
-                .property("line", PropertySchema.integer("Line number (0-based)"))
-                .property("character", PropertySchema.integer("Character offset (0-based)"))
-                .required("uri", "line", "character")
+                .properties(Map.of(
+                        "uri", PropertySchema.string("File URI (e.g., file:///path/to/file.ts)"),
+                        "line", PropertySchema.integer("Line number (0-based)"),
+                        "character", PropertySchema.integer("Character offset (0-based)")
+                ))
+                .required(List.of("uri", "line", "character"))
                 .build();
     }
 

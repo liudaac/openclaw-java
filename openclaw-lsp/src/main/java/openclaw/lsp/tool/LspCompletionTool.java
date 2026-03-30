@@ -44,11 +44,13 @@ public class LspCompletionTool implements AgentTool {
     @Override
     public ToolParameters getParameters() {
         return ToolParameters.builder()
-                .property("uri", PropertySchema.string("File URI"))
-                .property("line", PropertySchema.integer("Line number (0-based)"))
-                .property("character", PropertySchema.integer("Character offset (0-based)"))
-                .property("triggerCharacter", PropertySchema.string("Trigger character (optional)"))
-                .required("uri", "line", "character")
+                .properties(Map.of(
+                        "uri", PropertySchema.string("File URI"),
+                        "line", PropertySchema.integer("Line number (0-based)"),
+                        "character", PropertySchema.integer("Character offset (0-based)"),
+                        "triggerCharacter", PropertySchema.string("Trigger character (optional)")
+                ))
+                .required(List.of("uri", "line", "character"))
                 .build();
     }
 

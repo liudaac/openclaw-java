@@ -44,8 +44,10 @@ public class LspDiagnosticsTool implements AgentTool {
     @Override
     public ToolParameters getParameters() {
         return ToolParameters.builder()
-                .property("uri", PropertySchema.string("File URI"))
-                .required("uri")
+                .properties(Map.of(
+                        "uri", PropertySchema.string("File URI")
+                ))
+                .required(List.of("uri"))
                 .build();
     }
 

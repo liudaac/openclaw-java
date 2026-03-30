@@ -28,11 +28,11 @@ public class StdioLspClient implements LspClient {
     private final BufferedWriter writer;
     private final AtomicInteger requestId = new AtomicInteger(0);
     private final Map<Integer, CompletableFuture<JsonRpcMessage>> pendingRequests = new ConcurrentHashMap<>();
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     private volatile boolean connected = false;
     private volatile boolean initialized = false;
-    private volatile ServerCapabilities capabilities;
+    private volatile InitializeResult.ServerCapabilities capabilities;
     private volatile long requestTimeout = 10000; // 10 seconds default
 
     private final StringBuilder readBuffer = new StringBuilder();
