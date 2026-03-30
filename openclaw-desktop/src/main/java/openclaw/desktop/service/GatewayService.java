@@ -1,6 +1,5 @@
 package openclaw.desktop.service;
 
-import openclaw.gateway.GatewayService;
 import openclaw.gateway.NodeInfo;
 import openclaw.gateway.GatewayStatus;
 import org.slf4j.Logger;

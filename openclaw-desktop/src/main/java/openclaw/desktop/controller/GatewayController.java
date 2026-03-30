@@ -95,13 +95,13 @@ public class GatewayController implements Initializable {
 
     private void setupButtons() {
         // Connect button
-        FontIcon connectIcon = new FontIcon(MaterialDesignP.PLUG);
+        FontIcon connectIcon = new FontIcon(MaterialDesignP.POWER_PLUG);
         connectIcon.setIconSize(18);
         connectButton.setGraphic(connectIcon);
         connectButton.setOnAction(e -> connectGateway());
 
         // Disconnect button
-        FontIcon disconnectIcon = new FontIcon(MaterialDesignP.PLUG_OFF);
+        FontIcon disconnectIcon = new FontIcon(MaterialDesignP.POWER_PLUG_OFF);
         disconnectIcon.setIconSize(18);
         disconnectButton.setGraphic(disconnectIcon);
         disconnectButton.setOnAction(e -> disconnectGateway());

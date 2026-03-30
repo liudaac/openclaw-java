@@ -28,6 +28,9 @@ public class SettingsController implements Initializable {
     @Autowired
     private DesktopConfig config;
 
+    @Autowired
+    private SecureStorageService secureStorage;
+
     @FXML private VBox settingsContainer;
     @FXML private ComboBox<String> themeSelector;
     @FXML private Slider fontScaleSlider;
@@ -42,6 +45,12 @@ public class SettingsController implements Initializable {
     @FXML private Button browseExportPathButton;
     @FXML private Button saveButton;
     @FXML private Button resetButton;
+    @FXML private ComboBox<String> providerSelector;
+    @FXML private Label apiKeyStatusLabel;
+    @FXML private Button saveApiKeyButton;
+    @FXML private Button deleteApiKeyButton;
+    @FXML private TextField apiKeyField;
+    @FXML private PasswordField masterPasswordField;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

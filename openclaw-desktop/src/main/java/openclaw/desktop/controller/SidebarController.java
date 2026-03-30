@@ -304,8 +304,9 @@ public class SidebarController implements Initializable {
             }
 
             titleLabel.setText(session.getTitle());
-            metaLabel.setText(session.getLastActivity().format(
-                DateTimeFormatter.ofPattern("MMM d, HH:mm")));
+            metaLabel.setText(DateTimeFormatter.ofPattern("MMM d, HH:mm")
+                .withZone(java.time.ZoneId.systemDefault())
+                .format(session.getLastActivity()));
 
             setGraphic(container);
         }

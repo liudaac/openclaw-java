@@ -36,6 +36,7 @@ public class ToolsController implements Initializable {
     @FXML private TabPane toolTabs;
     @FXML private ListView<ToolExecutorService.CronJobInfo> cronJobList;
     @FXML private TextArea toolOutput;
+    @FXML private VBox resultContainer;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

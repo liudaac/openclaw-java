@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import openclaw.desktop.component.MessageCell;
 import openclaw.desktop.component.AttachmentView;
 import openclaw.desktop.model.UIMessage;
