@@ -159,12 +159,12 @@ public class StdioLspClient implements LspClient {
     }
 
     @Override
-    public ServerCapabilities getCapabilities() {
+    public InitializeResult.ServerCapabilities getCapabilities() {
         return capabilities;
     }
 
     @Override
-    public void setCapabilities(ServerCapabilities capabilities) {
+    public void setCapabilities(InitializeResult.ServerCapabilities capabilities) {
         this.capabilities = capabilities;
     }
 

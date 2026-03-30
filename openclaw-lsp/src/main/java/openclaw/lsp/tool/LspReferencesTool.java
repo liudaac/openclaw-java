@@ -48,7 +48,7 @@ public class LspReferencesTool implements AgentTool {
                         "uri", PropertySchema.string("File URI"),
                         "line", PropertySchema.integer("Line number (0-based)"),
                         "character", PropertySchema.integer("Character offset (0-based)"),
-                        "includeDeclaration", PropertySchema.of("boolean", "Include declaration in results")
+                        "includeDeclaration", PropertySchema.boolean_("Include declaration in results")
                 ))
                 .required(List.of("uri", "line", "character"))
                 .build();
