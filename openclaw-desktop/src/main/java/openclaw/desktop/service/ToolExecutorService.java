@@ -238,7 +238,8 @@ public class ToolExecutorService {
      */
     public CompletableFuture<String> executeJavaScript(String sessionId, String script) {
         return CompletableFuture.supplyAsync(() -> {
-            return browserService.evaluate(sessionId, script).join();
+            Object result = browserService.evaluate(sessionId, script).join();
+            return result != null ? result.toString() : null;
         });
     }
 
