@@ -1,6 +1,7 @@
 package openclaw.channel.wecom;
 
 import openclaw.sdk.channel.ChannelOutboundAdapter;
+import openclaw.sdk.channel.SendResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ public class WecomOutboundAdapter implements ChannelOutboundAdapter {
         return CompletableFuture.supplyAsync(() -> {
             logger.info("Sending text message to WeCom user: {}", to);
             // TODO: Implement actual WeCom API call
-            return new SendResult(true, Optional.empty(), Optional.of("msg-" + System.currentTimeMillis()));
+            return SendResult.success("msg-" + System.currentTimeMillis());
         });
     }
 
@@ -31,7 +32,7 @@ public class WecomOutboundAdapter implements ChannelOutboundAdapter {
         return CompletableFuture.supplyAsync(() -> {
             logger.info("Sending media message to WeCom user: {}", to);
             // TODO: Implement actual WeCom API call
-            return new SendResult(true, Optional.empty(), Optional.of("msg-" + System.currentTimeMillis()));
+            return SendResult.success("msg-" + System.currentTimeMillis());
         });
     }
 

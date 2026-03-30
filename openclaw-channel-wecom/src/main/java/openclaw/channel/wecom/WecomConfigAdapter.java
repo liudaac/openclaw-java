@@ -60,17 +60,18 @@ public class WecomConfigAdapter implements ChannelConfigAdapter<WecomChannelPlug
 
     @Override
     public ChannelConfigSchema getSchema() {
-        return new ChannelConfigSchema(
-                "WeCom Configuration",
-                "Configure WeChat Work (WeCom) integration",
-                Map.of(
-                        "corpId", new ChannelConfigSchema.FieldSchema("Corp ID", "string", true, null),
-                        "agentId", new ChannelConfigSchema.FieldSchema("Agent ID", "string", true, null),
-                        "secret", new ChannelConfigSchema.FieldSchema("Secret", "string", true, null),
-                        "token", new ChannelConfigSchema.FieldSchema("Token", "string", false, null),
-                        "encodingAesKey", new ChannelConfigSchema.FieldSchema("Encoding AES Key", "string", false, null)
-                )
+        Map<String, Object> schema = Map.of(
+                "type", "object",
+                "properties", Map.of(
+                        "corpId", Map.of("type", "string", "description", "Corp ID"),
+                        "agentId", Map.of("type", "string", "description", "Agent ID"),
+                        "secret", Map.of("type", "string", "description", "Secret"),
+                        "token", Map.of("type", "string", "description", "Token"),
+                        "encodingAesKey", Map.of("type", "string", "description", "Encoding AES Key")
+                ),
+                "required", java.util.List.of("corpId", "agentId", "secret")
         );
+        return ChannelConfigSchema.of(schema);
     }
 
     @Override

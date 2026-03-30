@@ -42,7 +42,7 @@ public class WecomSecurityAdapter implements ChannelSecurityAdapter<WecomChannel
     }
 
     @Override
-    public CompletableFuture<WebhookValidationResult<WecomChannelPlugin.WecomAccount>> validateWebhook(Map<String, String> headers, String body) {
+    public CompletableFuture<WebhookValidationResult> validateWebhook(Map<String, String> headers, String body) {
         return CompletableFuture.supplyAsync(() -> {
             // TODO: Implement webhook signature validation
             String signature = headers.get("X-WeCom-Signature");
