@@ -111,6 +111,11 @@
             <artifactId>openclaw-cron</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-session</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <!-- Resilience4j -->
         <dependency>
