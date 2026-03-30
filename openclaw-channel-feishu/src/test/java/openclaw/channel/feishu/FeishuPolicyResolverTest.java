@@ -96,8 +96,9 @@ class FeishuPolicyResolverTest {
 
     @Test
     void testResolveGroupConfig_ExactMatch() {
-        FeishuGroupConfig groupConfig = new FeishuGroupConfig();
-        groupConfig.setEnabled(true);
+        FeishuGroupConfig groupConfig = FeishuGroupConfig.builder()
+                .groupId("group123")
+                .build();
 
         Map<String, FeishuGroupConfig> groups = Map.of(
                 "group123", groupConfig
@@ -105,13 +106,14 @@ class FeishuPolicyResolverTest {
 
         Optional<FeishuGroupConfig> result = resolver.resolveGroupConfig(groups, "group123");
         assertTrue(result.isPresent());
-        assertTrue(result.get().getEnabled().orElse(false));
+        assertEquals("group123", result.get().getGroupId());
     }
 
     @Test
     void testResolveGroupConfig_Wildcard() {
-        FeishuGroupConfig wildcardConfig = new FeishuGroupConfig();
-        wildcardConfig.setEnabled(true);
+        FeishuGroupConfig wildcardConfig = FeishuGroupConfig.builder()
+                .groupId("*")
+                .build();
 
         Map<String, FeishuGroupConfig> groups = Map.of(
                 "*", wildcardConfig
@@ -119,13 +121,14 @@ class FeishuPolicyResolverTest {
 
         Optional<FeishuGroupConfig> result = resolver.resolveGroupConfig(groups, "unknownGroup");
         assertTrue(result.isPresent());
-        assertTrue(result.get().getEnabled().orElse(false));
+        assertEquals("*", result.get().getGroupId());
     }
 
     @Test
     void testResolveGroupConfig_CaseInsensitive() {
-        FeishuGroupConfig groupConfig = new FeishuGroupConfig();
-        groupConfig.setEnabled(true);
+        FeishuGroupConfig groupConfig = FeishuGroupConfig.builder()
+                .groupId("GroupABC")
+                .build();
 
         Map<String, FeishuGroupConfig> groups = Map.of(
                 "GroupABC", groupConfig
@@ -240,8 +243,10 @@ class FeishuPolicyResolverTest {
 
     @Test
     void testResolveReplyPolicy_GroupConfigOverride() {
-        FeishuGroupConfig groupConfig = new FeishuGroupConfig();
-        groupConfig.setRequireMention(false);
+        FeishuGroupConfig groupConfig = FeishuGroupConfig.builder()
+                .groupId("test-group")
+                .requireMention(false)
+                .build();
 
         FeishuPolicyResolver.ReplyPolicy policy = resolver.resolveReplyPolicy(
                 false, // isDirectMessage
