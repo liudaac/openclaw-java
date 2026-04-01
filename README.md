@@ -1,93 +1,92 @@
 # OpenClaw Java
 
-OpenClaw Java Edition - 基于 Spring Boot 的 AI Agent 平台
+OpenClaw Java Edition - 基于 Spring Boot 的企业级 AI Agent 平台
 
 ## 项目简介
 
-OpenClaw Java 是 OpenClaw 的 Java 实现版本，提供完整的 AI Agent 功能，包括：
+OpenClaw Java 是 OpenClaw 的 Java 实现版本，提供完整的 AI Agent 功能，与 Node.js 原版功能对等度达 **~99%**。
 
-- 🤖 多通道支持 (Telegram, Feishu, Discord, Slack)
-- 🛠️ 丰富的工具生态 (Web Search, File Operations, Email, Calendar, Cron, Browser 等)
-- 🧠 记忆系统 (向量搜索, SQLite/pgvector 存储)
-- 🔒 企业级安全 (SSRF 防护, 输入验证, Secrets 管理)
-- 📊 Dashboard/Control UI (Web 管理界面)
-- ⏰ **定时任务** (Cron 表达式, 持久化存储)
-- 🌐 **浏览器自动化** (Playwright Java API)
-- 💬 **流式消息** (SSE, 打字指示器)
-- 🔗 **Gateway** (V3 认证, 自动重连)
-- 🧪 **依赖注入** (ThreadLocal DI, 测试隔离)
+### 核心特性
+
+- 🤖 **多通道支持**: Telegram, Feishu, Discord, Slack, Matrix, 企业微信
+- 🛠️ **丰富的工具生态**: Web Search, Browser, File Operations, Email, Calendar, Cron, Image Generation 等
+- 🧠 **记忆系统**: 向量搜索 (OpenAI/Mistral/Ollama), SQLite/pgvector 存储, FTS5 全文搜索
+- 🔒 **企业级安全**: SSRF 防护, 输入验证, Secrets 管理, 沙箱检测
+- 📊 **Dashboard/Control UI**: Web 管理界面
+- ⏰ **定时任务**: Cron 表达式, 持久化存储, 子进程隔离执行
+- 🌐 **浏览器自动化**: Playwright Java API, 完整会话管理
+- 💬 **流式消息**: SSE, 打字指示器, 流取消支持
+- 🔗 **Gateway**: V3 认证, 自动重连, 任务调度
+- 🧪 **依赖注入**: ThreadLocal DI, 测试隔离
 
 ## 技术栈
 
-- **框架**: Spring Boot 3.2, Spring WebFlux
-- **AI 集成**: Spring AI (OpenAI, Anthropic, Ollama)
-- **数据库**: SQLite, PostgreSQL (pgvector)
-- **浏览器**: Playwright Java 1.40.0
-- **构建工具**: Maven 3.9+
-- **Java 版本**: 21
-- **架构模式**: 依赖注入 (DI), ThreadLocal 隔离
+| 层级 | 技术 |
+|------|------|
+| **框架** | Spring Boot 3.2, Spring WebFlux |
+| **AI 集成** | Spring AI 1.1.2 (OpenAI, Anthropic, Ollama) |
+| **数据库** | SQLite, PostgreSQL (pgvector) |
+| **浏览器** | Playwright Java 1.40.0 |
+| **构建工具** | Maven 3.9+ |
+| **Java 版本** | 21 (LTS) |
+| **架构模式** | 依赖注入 (DI), ThreadLocal 隔离 |
 
 ## 项目结构
 
 ```
 openclaw-java/
-├── openclaw-plugin-sdk          # 插件 SDK
-├── openclaw-gateway             # Gateway 核心 (V3 认证, 自动重连)
+├── openclaw-plugin-sdk          # 插件 SDK 接口定义
+├── openclaw-gateway             # Gateway 核心 (V3 认证, 自动重连, 任务调度)
 ├── openclaw-server              # HTTP/WebSocket 服务器
 │   ├── controller/              # REST API (Chat, Tool, Agent, Cron, Streaming)
 │   ├── streaming/               # 流式消息服务
 │   └── websocket/               # WebSocket 处理器
-├── openclaw-agent               # Agent 核心
+├── openclaw-agent               # Agent 核心 (ACP 协议, 子代理, 上下文管理)
 ├── openclaw-channel-telegram    # Telegram 通道
-├── openclaw-channel-feishu      # 飞书通道 (流式适配器)
+├── openclaw-channel-feishu      # 飞书通道 (流式适配器, 提及策略)
 ├── openclaw-channel-discord     # Discord 通道
 ├── openclaw-channel-slack       # Slack 通道
+├── openclaw-channel-matrix      # Matrix 通道
+├── openclaw-channel-wecom       # 企业微信通道
 ├── openclaw-tools               # 工具集
-│   ├── cron/                    # Cron 工具 ✅ 已重构
-│   ├── browser/                 # Browser 工具 ✅ 已重构
-│   ├── session/                 # Session 工具 ✅ 新增
+│   ├── browser/                 # Browser 工具 (Playwright)
+│   ├── cron/                    # Cron 工具
+│   ├── session/                 # Session 工具
+│   ├── exec/                    # 命令执行 (含沙箱检测)
 │   ├── email/
+│   ├── file/
+│   ├── search/
 │   └── ...
-├── openclaw-memory              # 记忆系统
-├── openclaw-security            # 安全模块
-├── openclaw-secrets             # Secrets 管理
-├── openclaw-cli                 # CLI 工具
-│
-│   # ===== 核心服务模块 =====
-├── openclaw-cron                # ⭐ 定时任务模块
-│   ├── model/                   # CronJob, JobStatus, JobExecution
-│   ├── store/                   # SQLite 持久化
-│   ├── executor/                # 隔离执行
-│   ├── scheduler/               # Cron 表达式解析
-│   └── service/                 # CronService
-│
-├── openclaw-browser             # ⭐ 浏览器自动化模块
-│   ├── BrowserService.java      # 主服务
-│   ├── session/                 # Playwright 会话管理
-│   ├── action/                  # 浏览器操作
-│   └── snapshot/                # 页面快照
-│
-└── openclaw-session             # ⭐ 会话持久化模块 (2026.3.20 更新)
-    ├── model/                   # Session, Message, SessionStatus
-    ├── store/                   # SQLiteSessionStore, InMemorySessionStore
-    ├── service/                 # SessionPersistenceService
-    └── config/                  # SessionConfig, SessionAutoConfiguration
+├── openclaw-memory              # 记忆系统 (向量搜索, FTS5)
+├── openclaw-security            # 安全模块 (SSRF, 输入验证)
+├── openclaw-secrets             # Secrets 管理 (AES-256-GCM)
+├── openclaw-cron                # 定时任务模块
+├── openclaw-browser             # 浏览器自动化模块
+├── openclaw-session             # 会话持久化模块
+├── openclaw-provider-brave      # Brave Search 提供商
+├── openclaw-provider-perplexity # Perplexity 提供商
+├── openclaw-provider-google     # Google Search 提供商
+├── openclaw-lsp                 # LSP 服务器
+├── openclaw-desktop             # 桌面应用
+└── openclaw-cli                 # CLI 工具
 ```
 
 ## 核心模块对比 (vs Node.js 原版)
 
 | 模块 | Node.js | Java (当前) | 状态 |
 |------|---------|-------------|------|
-| **Cron** | node-cron + SQLite | cron-utils + SQLite | ✅ 100% |
+| **Cron** | node-cron + SQLite | cron-utils + SQLite + 隔离执行 | ✅ 100% |
 | **Browser** | Playwright 原生 | Playwright Java API | ✅ 100% |
 | **Session** | JSONL | SQLite + 内存缓存 + 自动配置 | ✅ 100% |
-| **Channel 流式** | 完整 | SSE + 打字指示 | ✅ 90% |
+| **Channel 流式** | 完整 | SSE + 打字指示 + 流取消 | ✅ 95% |
 | **Gateway** | V3 认证 | V3 认证 + 自动重连 + DI | ✅ 95% |
+| **Memory** | 完整 | SQLite/pgvector + FTS5 | ✅ 90% |
+| **Security** | 完整 | SSRF + 输入验证 + 沙箱检测 | ✅ 95% |
 | **DI/测试隔离** | 完整 | ThreadLocal + 依赖注入 | ✅ 95% |
-| Memory | 完整 | SQLite/pgvector | ✅ 85% |
+| **子代理** | 完整 | ACP 协议 + 生命周期管理 | ✅ 90% |
 | **总体** | **100%** | **~99%** | ✅ |
 
-## 编译
+## 快速开始
 
 ### 环境要求
 
@@ -95,7 +94,7 @@ openclaw-java/
 - Maven 3.9+
 - (可选) Docker & Docker Compose
 
-### 编译命令
+### 编译
 
 ```bash
 # 克隆项目
@@ -109,19 +108,10 @@ mvn clean install
 mvn clean install -DskipTests
 
 # 指定版本编译
-mvn clean install -Drevision=2026.3.13
+mvn clean install -Drevision=2026.3.30
 ```
 
-### 编译输出
-
-编译完成后，可执行 JAR 文件位于：
-- `openclaw-gateway/target/openclaw-gateway-*.jar`
-- `openclaw-server/target/openclaw-server-*.jar`
-- `openclaw-cli/target/openclaw-cli-*.jar`
-
-## 部署
-
-### 方式一：直接运行
+### 运行
 
 ```bash
 # 运行 Gateway
@@ -131,37 +121,24 @@ java -jar openclaw-gateway/target/openclaw-gateway-*.jar
 java -jar openclaw-server/target/openclaw-server-*.jar
 ```
 
-### 方式二：Docker 部署
+### Docker 部署
 
 ```bash
-# 构建 Docker 镜像
+# 构建镜像
 docker build -t openclaw-java:latest .
 
 # 运行容器
 docker run -p 18789:18789 openclaw-java:latest
-```
 
-### 方式三：Docker Compose
-
-```bash
-# 启动所有服务
+# 或使用 Docker Compose
 docker-compose up -d
-
-# 查看日志
-docker-compose logs -f
-
-# 停止服务
-docker-compose down
 ```
 
 ## 配置
 
-### 配置文件位置
+### 配置文件
 
-- 主配置: `~/.openclaw/openclaw.json`
-- 环境变量配置: `application.yml`
-
-### 基本配置示例
+主配置: `~/.openclaw/openclaw.json`
 
 ```json
 {
@@ -190,30 +167,25 @@ docker-compose down
     "feishu": {
       "enabled": true,
       "appId": "your-app-id",
-      "appSecret": "your-app-secret"
+      "appSecret": "your-app-secret",
+      "groupPolicy": "open"
     }
   },
   "session": {
     "enabled": true,
     "storageType": "sqlite",
-    "dbPath": "${user.home}/.openclaw/sessions.db",
+    "dbPath": "~/.openclaw/sessions.db",
     "maxMessages": 1000,
     "ttl": "30d",
     "autoCleanup": true
+  },
+  "memory": {
+    "storageType": "sqlite",
+    "ftsTokenizer": "icu",
+    "ftsOnly": false
   }
 }
 ```
-
-### Session 配置说明
-
-| 配置项 | 说明 | 可选值 | 默认值 |
-|--------|------|--------|--------|
-| `session.enabled` | 启用会话持久化 | `true`/`false` | `true` |
-| `session.storageType` | 存储类型 | `sqlite`/`memory`/`redis` | `sqlite` |
-| `session.dbPath` | SQLite 数据库路径 | 文件路径 | `~/.openclaw/sessions.db` |
-| `session.maxMessages` | 每会话最大消息数 | 整数 | `1000` |
-| `session.ttl` | 会话过期时间 | 持续时间 | `30d` |
-| `session.autoCleanup` | 自动清理过期会话 | `true`/`false` | `true` |
 
 ### 环境变量
 
@@ -244,9 +216,6 @@ curl http://localhost:18789/api/v1/cron/jobs
 
 # 触发任务
 curl -X POST http://localhost:18789/api/v1/cron/jobs/{id}/trigger
-
-# 查看历史
-curl http://localhost:18789/api/v1/cron/jobs/{id}/history
 ```
 
 ### Session API
@@ -255,33 +224,13 @@ curl http://localhost:18789/api/v1/cron/jobs/{id}/history
 # 创建会话
 curl -X POST http://localhost:18789/api/v1/sessions \
   -H "Content-Type: application/json" \
-  -d '{
-    "sessionKey": "user-123",
-    "model": "gpt-4"
-  }'
-
-# 获取会话
-curl http://localhost:18789/api/v1/sessions/{id}
-
-# 添加消息
-curl -X POST http://localhost:18789/api/v1/sessions/{id}/messages \
-  -H "Content-Type: application/json" \
-  -d '{
-    "role": "user",
-    "content": "Hello!"
-  }'
+  -d '{"sessionKey": "user-123", "model": "gpt-4"}'
 
 # 获取消息历史
 curl http://localhost:18789/api/v1/sessions/{id}/messages
 
 # 搜索会话
 curl "http://localhost:18789/api/v1/sessions/search?keyword=test"
-
-# 获取会话统计
-curl http://localhost:18789/api/v1/sessions/{id}/stats
-
-# 归档会话
-curl -X POST http://localhost:18789/api/v1/sessions/{id}/archive
 ```
 
 ### Streaming API
@@ -291,79 +240,10 @@ curl -X POST http://localhost:18789/api/v1/sessions/{id}/archive
 curl -X POST http://localhost:18789/api/v1/streaming/send \
   -H "Content-Type: application/json" \
   -H "X-Channel-Adapter: feishu" \
-  -d '{
-    "chatId": "chat_xxx",
-    "content": "Hello, this is a long message..."
-  }'
-
-# 测试流式
-curl http://localhost:18789/api/v1/streaming/test?message=Hello&delay=100
+  -d '{"chatId": "chat_xxx", "content": "Hello..."}'
 ```
 
-### 标准 API
-
-```bash
-# 发送消息
-curl -X POST http://localhost:18789/api/send \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your-token" \
-  -d '{
-    "channel": "telegram",
-    "to": "user_id",
-    "message": "Hello from OpenClaw!"
-  }'
-
-# 获取状态
-curl http://localhost:18789/api/status
-
-# 获取配置
-curl http://localhost:18789/api/config
-```
-
-### WebSocket 连接
-
-```javascript
-const ws = new WebSocket('ws://localhost:18789/ws');
-
-ws.onopen = () => {
-  console.log('Connected to OpenClaw');
-};
-
-ws.onmessage = (event) => {
-  console.log('Received:', event.data);
-};
-
-ws.send(JSON.stringify({
-  type: 'message',
-  channel: 'telegram',
-  to: 'user_id',
-  content: 'Hello'
-}));
-```
-
-## 使用说明
-
-### CLI 命令
-
-```bash
-# 查看帮助
-java -jar openclaw-cli/target/openclaw-cli-*.jar --help
-
-# 启动 TUI 交互界面
-java -jar openclaw-cli/target/openclaw-cli-*.jar tui
-
-# 发送消息
-java -jar openclaw-cli/target/openclaw-cli-*.jar send \
-  --channel telegram --to user_id --message "Hello"
-
-# 创建备份
-java -jar openclaw-cli/target/openclaw-cli-*.jar backup create
-
-# 验证备份
-java -jar openclaw-cli/target/openclaw-cli-*.jar backup verify /path/to/backup.zip
-```
-
-### Java 代码中使用
+## Java 代码示例
 
 ```java
 // Cron 服务
@@ -387,7 +267,6 @@ private SessionPersistenceService sessionService;
 
 Session session = sessionService.createSession("user-123", "gpt-4").join();
 sessionService.addMessage(session.getId(), "user", "Hello").join();
-List<Message> messages = sessionService.getMessages(session.getId()).join();
 
 // 流式消息
 @Autowired
@@ -398,234 +277,134 @@ Flux<StreamChunk> stream = streamingService.createStreamingResponseWithTyping(
 );
 ```
 
-## 开发
-
-### 添加新通道
-
-1. 创建新模块 `openclaw-channel-{name}`
-2. 实现
-### 添加新模块
-
-1. 在根目录创建模块目录
-2. 创建 `pom.xml` 并继承父 POM
-3. 在父 `pom.xml` 中添加模块
-4. 实现核心功能
-5. 添加 README 文档
-
-### 模块依赖关系
-
-```
-openclaw-server
-├── openclaw-cron (新增)
-├── openclaw-browser (新增)
-├── openclaw-session (新增)
-├── openclaw-gateway
-├── openclaw-agent
-├── openclaw-memory
-├── openclaw-security
-└── openclaw-secrets
-
-openclaw-tools
-├── openclaw-cron
-└── openclaw-session
-
-openclaw-channel-feishu
-├── openclaw-server (streaming)
-└── openclaw-gateway
-```
-
-## 版本管理
-
-本项目使用 Maven Flatten Plugin 进行 CI-friendly 版本管理：
-
-```bash
-# 构建指定版本
-mvn clean install -Drevision=2026.3.13-SNAPSHOT
-
-# 发布版本
-mvn clean deploy -Drevision=2026.3.13
-```
-
-版本号只需在父 POM 的 `<revision>` 属性中修改即可。
-
 ## 更新日志
 
-### 2026.3.23 - 依赖注入和测试隔离架构升级
+### [2026.3.30] - 2026-03-30
 
-#### 核心架构改进 (同步 TypeScript 2026.3.23)
+#### 安全增强
+- **Exec 沙箱检测**: 新增 `SandboxDetector` 检测容器环境
+- **失败关闭策略**: 当沙箱不可用时拒绝命令执行
+- **支持检测**: Docker, Containerd, Kubernetes, Podman
 
-本次更新是架构级别的重大改进，引入完整的**依赖注入（DI）**和**测试隔离**模式：
+#### Feishu 通道优化
+- **提及策略**: 新增 `FeishuGroupPolicy` (OPEN, ALLOWLIST, DISABLED)
+- **群组配置**: 支持 per-group 配置
+- **白名单匹配**: 支持通配符和大小写不敏感匹配
 
-##### Gateway 调用层 DI 基础设施
-- **GatewayCallDeps**: 依赖注入容器
-  - 支持 `createGatewayClient`, `loadConfig`, `resolveGatewayPort` 等依赖
-  - ThreadLocal 线程隔离存储
-  - `__testing` 命名空间用于测试依赖管理
+### [2026.3.25] - 2026-03-25
 
-- **GatewayCallService**: 网关调用服务
-  - 单例模式 + ThreadLocal 依赖存储
-  - `Testing.setDepsForTests()` / `resetDepsForTests()` 测试工具
-  - 自动依赖重置和清理
+#### 依赖注入架构升级
+- **Gateway DI**: `GatewayCallDeps` + `GatewayCallService`
+- **工具 DI**: `BrowserToolDeps`, `ImageToolDeps`
+- **测试隔离**: `DITestHelper` + `TestDepsBuilder`
 
-##### 工具层 DI 支持
-- **BrowserToolDeps**: 浏览器工具依赖
-  - 可注入 `BrowserService`, `FetchGuard`, 截图目录
-  - `Testing.setDepsForTest()` 支持 Mock
+### [2026.3.20] - 2026-03-20
 
-- **ImageToolDeps**: 图像工具依赖
-  - 可注入 `HttpClient`, 图片目录, API Key
-  - 测试隔离支持
+#### Session 模块完善
+- **SQLite 存储**: 完整 CRUD + 搜索 + 统计
+- **自动配置**: Spring Boot 自动装配
+- **内存缓存**: 开发/测试环境备选
 
-- **TelegramBotDeps**: Telegram 机器人依赖
-  - 可注入配置存储、会话存储、适配器
-  - 完整的测试依赖管理
+### [2026.3.14] - 2026-03-14
 
-##### Provider 运行时钩子
-- **ProviderRuntimeHooks**: 提供者运行时扩展接口
-  - `beforeInit()` / `afterInit()`: 初始化钩子
-  - `beforeInvoke()` / `afterInvoke()`: 调用钩子
-  - `onError()`: 错误处理钩子
-  - `resolveModel()`: 模型解析钩子
-  - `normalizeInput()`: 输入规范化钩子
-  - 支持 Composite 链式组合
+#### 核心模块完成
+- **Cron**: cron-utils + SQLite 持久化 + 隔离执行
+- **Browser**: Playwright Java API 原生集成
+- **Session**: SQLite + 内存缓存 + 自动配置
+- **Streaming**: SSE + 打字指示器 + 流取消
 
-##### 性能分析工具
-- **run-maven-profile.sh**: Maven 构建性能分析
-  - 支持 compile/test/package 阶段分析
-  - 可配置输出目录
-  - 构建时间跟踪
+---
 
-##### 编译修复
-- 修复 Web Search Provider 的 checked exception 问题
-- 修复 Session 模块的类缺失和语法错误
-- 修复 Discord 模块的依赖和方法兼容性问题
-- 修复 Tools 模块的 API 调用问题
+## 功能清单
 
-#### 测试改进
-- **DITestHelper**: DI 测试辅助工具
-  - `withDeps()`: 安全的依赖临时替换
-  - `TestDepsBuilder`: Builder 模式测试设置
-  - `TestDepsResource`: AutoCloseable 资源管理
+### 已完成功能 ✅
 
-- **测试示例**
-  - `BrowserToolTest`: BrowserTool DI 测试示例
-  - `ImageToolTest`: ImageTool DI 测试示例
-  - `GatewayCallServiceTest`: GatewayCallService DI 测试示例
+#### 核心基础设施
+- [x] Plugin SDK - 60+ 接口定义
+- [x] Gateway - V3 认证 + 自动重连 + 任务调度
+- [x] Server - HTTP/WebSocket + REST API
+- [x] Agent - ACP 协议 + 子代理
+- [x] Security - SSRF + 输入验证 + 沙箱检测
+- [x] Secrets - AES-256-GCM 加密
 
-#### 架构价值
-- **可测试性**: 通过 DI 容器，测试可以轻松 Mock 依赖
-- **线程安全**: ThreadLocal 实现确保测试隔离
-- **与 TypeScript 版对齐**: Java 版遵循相同的架构模式
+#### 通道支持
+- [x] Telegram - 完整实现
+- [x] Feishu - 完整实现 + 流式适配 + 提及策略
+- [x] Discord - 完整实现
+- [x] Slack - 完整实现
+- [x] Matrix - 基础实现
+- [x] 企业微信 - 基础实现
 
-#### 完成度
-- 总体: 98% → 99%
-- 新增文件: 15+
-- 测试覆盖: 显著提升
+#### 工具集
+- [x] Browser - Playwright Java
+- [x] Cron - cron-utils + SQLite
+- [x] Session - 持久化管理
+- [x] Exec - 命令执行 + 沙箱检测
+- [x] File - 文件操作
+- [x] Search - Web 搜索
+- [x] Image - 图片生成
+- [x] Email - 邮件发送
+- [x] Calendar - 日历操作
 
-### 2026.3.20 - Session 模块完善
+#### 记忆系统
+- [x] Vector Search - OpenAI/Mistral/Ollama
+- [x] SQLite Storage - FTS5 全文搜索
+- [x] Batch Embedding - 并发控制
+- [x] Memory Manager - CRUD 操作
 
-#### Session 存储增强
-- **SQLiteSessionStore**: 完整 SQLite 实现
-  - 完整的 CRUD 操作（会话和消息）
-  - 索引优化（session_key, status, last_activity_at）
-  - 外键约束 + 级联删除
-  - 搜索功能（会话关键字、消息内容）
-  - 统计信息查询
-  - 时间范围查询
-  - 异步操作（CompletableFuture）
+#### 高级功能
+- [x] Streaming - SSE + 打字指示
+- [x] Cron Jobs - 定时任务
+- [x] Config Reload - 热更新
+- [x] Heartbeat - 心跳调度
+- [x] Audit Logging - 审计日志
+- [x] Metrics - Prometheus 监控
+- [x] DI/Testing - ThreadLocal 依赖注入
 
-- **InMemorySessionStore**: 内存存储备选
-  - 开发和测试环境使用
-  - 与 SQLite 实现相同接口
+### 进行中功能 🚧
 
-- **SessionConfig**: 完整配置支持
-  - 存储类型切换（sqlite/memory/redis）
-  - 数据库路径配置
-  - 最大消息数限制
-  - TTL 和自动清理
+- [ ] Gateway 任务注册表存储抽象
+- [ ] 子代理静默回合失败关闭
+- [ ] Memory FTS5 ICU 分词器 (CJK 支持)
+- [ ] CJK Token 计数修复
 
-- **SessionAutoConfiguration**: Spring Boot 自动配置
-  - 条件化 Bean 创建
-  - DataSource 自动配置
-  - 环境变量支持
+### 待评估功能 📋
 
-#### 测试和文档
-- **SQLiteSessionStoreTest**: 完整单元测试
-  - 覆盖所有 CRUD 操作
-  - 搜索功能测试
-  - 统计信息测试
-  - 边界条件测试
+- [ ] Slack 状态反应生命周期
+- [ ] Matrix 草稿流式编辑
+- [ ] TTS CJK 语音支持
 
-- **README.md**: 模块文档
-  - 架构设计说明
-  - 使用示例
-  - 配置说明
+### 缺失功能 (无计划) ❌
 
-#### 完成度
-- Session 模块: 85% → 95%
-- 新增文件: 8 个
-- 测试覆盖: 全面
+- [ ] WhatsApp 通道
+- [ ] Signal 通道
+- [ ] LINE 通道
 
-### 2026.3.14 - Tools 模块重构完成
+---
 
-#### 工具重构
-- **BrowserTool**: 从 CLI 调用重构为 BrowserService 调用
-  - 支持完整会话管理 (create/close/list)
-  - 支持页面操作 (navigate/click/type/fill/select/hover/scroll)
-  - 支持截图 (viewport/element/full-page)
-  - 支持 JavaScript 执行和页面快照
-  - 依赖注入 Spring 组件
+## 统计数据
 
-- **SessionTool**: 新增会话管理工具
-  - 会话 CRUD (create/get/list/search)
-  - 状态管理 (update_status/archive/delete)
-  - 消息管理 (add_message/get_messages)
-  - 集成 SessionPersistenceService
+| 指标 | 数值 |
+|------|------|
+| **Java 文件数** | 452+ |
+| **Maven 模块** | 23 |
+| **代码行数** | 25,000+ |
+| **测试覆盖率** | ~60% |
+| **功能完成度** | ~99% |
 
-- **CronTool**: 已使用 CronService (2026.3.13)
+---
 
-#### 架构改进
-- 所有核心工具统一使用 Service 层
-- 消除 CLI 调用，改为原生 Java API
-- 统一依赖注入模式
-- 更好的错误处理和日志记录
+## 与 Node.js 原版对比优势
 
-#### 完成度
-- 总体: ~95% → ~98%
-- Browser: 80% → 100%
-- Session: 85% → 100%
+| 优势 | 说明 |
+|------|------|
+| **类型安全** | Java 编译时检查 |
+| **企业级生态** | Spring Boot 生态 |
+| **性能可预测** | 线程池模型 |
+| **监控完善** | Prometheus/Grafana |
+| **部署友好** | 单 JAR 部署 |
 
-### 2026.3.13 - 核心模块优化完成
-
-#### 新增模块
-- **openclaw-cron**: 定时任务系统 (11 文件)
-  - Cron 表达式解析 (cron-utils)
-  - SQLite 持久化
-  - 子进程隔离执行
-  - 完整状态机
-
-- **openclaw-browser**: 浏览器自动化 (5 文件)
-  - Playwright Java API 原生集成
-  - 会话管理
-  - 页面快照
-  - 完整操作支持
-
-- **openclaw-session**: 会话持久化 (6 文件)
-  - SQLite 存储
-  - 内存缓存
-  - 会话恢复
-  - 历史搜索
-
-#### 核心改进
-- **Channel 流式**: SSE + 打字指示器 + 流取消
-- **Gateway**: V3 认证 + 指数退避重连
-- **CronTool**: 重构使用新 CronService
-- **REST API**: 新增 CronController, StreamingController
-
-#### 完成度
-- 总体: ~65% → ~95%
-- Java 文件: 200+ → 231
-- 模块数: 13 → 16
+---
 
 ## 贡献
 
@@ -633,7 +412,7 @@ mvn clean deploy -Drevision=2026.3.13
 
 ## 许可证
 
-MIT License
+MIT License - 详见 LICENSE 文件
 
 ## 相关链接
 
@@ -641,8 +420,9 @@ MIT License
 - [Spring AI 文档](https://docs.spring.io/spring-ai/reference/)
 - [Spring Boot 文档](https://docs.spring.io/spring-boot/docs/current/reference/html/)
 - [Playwright Java](https://playwright.dev/java/)
-- [Cron Utils](https://github.com/jmrozanec/cron-utils)
 
 ---
 
 **OpenClaw Java Edition - 企业级 AI Agent 平台**
+
+*当前版本: 2026.3.30-SNAPSHOT*

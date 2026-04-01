@@ -37,6 +37,8 @@
         <module>openclaw-gateway</module>
         <module>openclaw-server</module>
         <module>openclaw-agent</module>
+        <module>openclaw-tasks</module>
+        <module>openclaw-acp</module>
         <module>openclaw-channel-telegram</module>
         <module>openclaw-channel-feishu</module>
         <module>openclaw-channel-discord</module>
