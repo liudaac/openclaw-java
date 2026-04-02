@@ -70,6 +70,14 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- OpenClaw LSP - Language Server Protocol support -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-lsp</artifactId>
+            <version>${revision}</version>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Spring Boot Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

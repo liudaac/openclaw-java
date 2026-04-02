@@ -35,6 +35,20 @@
             <artifactId>openclaw-memory</artifactId>
         </dependency>
 
+        <!-- OpenClaw ACP - Tool approval classification -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-acp</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- OpenClaw Tasks - Task flow management -->
+        <dependency>
+            <groupId>ai.openclaw</groupId>
+            <artifactId>openclaw-tasks</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- jtokkit - Token counting -->
         <dependency>
             <groupId>com.knuddels</groupId>
