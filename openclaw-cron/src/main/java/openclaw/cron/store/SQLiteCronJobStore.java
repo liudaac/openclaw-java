@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import openclaw.cron.model.CronJob;
 import openclaw.cron.model.JobExecution;
 import openclaw.cron.model.JobStatus;
+import openclaw.cron.util.JobIdentityNormalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -389,9 +390,10 @@ public class SQLiteCronJobStore implements CronJobStore {
     }
     
     // Helper methods
-    
+
     private CronJob mapResultSetToJob(ResultSet rs) throws SQLException {
         CronJob job = new CronJob();
+        // Note: id is set via reflection in CronJob constructor, but we ensure it's set from DB
         job.setName(rs.getString("name"));
         job.setSchedule(rs.getString("schedule"));
         job.setCommand(rs.getString("command"));
@@ -401,6 +403,10 @@ public class SQLiteCronJobStore implements CronJobStore {
         if (lastRun > 0) job.setLastRun(Instant.ofEpochMilli(lastRun));
         long nextRun = rs.getLong("next_run");
         if (nextRun > 0) job.setNextRun(Instant.ofEpochMilli(nextRun));
+        // Deserialize metadata with jobId normalization
+        Map<String, Object> metadata = deserializeMetadata(rs.getString("metadata"));
+        metadata = JobIdentityNormalizer.normalize(metadata);
+        job.setMetadata(metadata);
         return job;
     }
     
