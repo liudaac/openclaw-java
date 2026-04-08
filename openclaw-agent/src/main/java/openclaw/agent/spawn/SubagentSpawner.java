@@ -69,15 +69,58 @@ public interface SubagentSpawner {
      * @param systemPrompt the system prompt
      * @param timeoutMs the timeout
      * @param tools the tools available
+     * @param lightContext whether to use light context mode (omit full conversation history)
      */
     record SpawnOptions(
             String model,
             String systemPrompt,
             long timeoutMs,
-            Map<String, Object> tools
+            Map<String, Object> tools,
+            boolean lightContext
     ) {
         public static SpawnOptions defaults() {
-            return new SpawnOptions("gpt-4", null, 60000, Map.of());
+            return new SpawnOptions("gpt-4", null, 60000, Map.of(), false);
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public static class Builder {
+            private String model = "gpt-4";
+            private String systemPrompt;
+            private long timeoutMs = 60000;
+            private Map<String, Object> tools = Map.of();
+            private boolean lightContext = false;
+
+            public Builder model(String model) {
+                this.model = model;
+                return this;
+            }
+
+            public Builder systemPrompt(String systemPrompt) {
+                this.systemPrompt = systemPrompt;
+                return this;
+            }
+
+            public Builder timeoutMs(long timeoutMs) {
+                this.timeoutMs = timeoutMs;
+                return this;
+            }
+
+            public Builder tools(Map<String, Object> tools) {
+                this.tools = tools != null ? tools : Map.of();
+                return this;
+            }
+
+            public Builder lightContext(boolean lightContext) {
+                this.lightContext = lightContext;
+                return this;
+            }
+
+            public SpawnOptions build() {
+                return new SpawnOptions(model, systemPrompt, timeoutMs, tools, lightContext);
+            }
         }
     }
 

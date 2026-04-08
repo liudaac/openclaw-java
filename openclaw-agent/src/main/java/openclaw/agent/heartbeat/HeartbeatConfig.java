@@ -51,6 +51,7 @@ public class HeartbeatConfig {
     private int ackMaxChars = DEFAULT_HEARTBEAT_ACK_MAX_CHARS;
     private String prompt = DEFAULT_HEARTBEAT_PROMPT;
     private String target = "last"; // "last", "none", or specific channel
+    private boolean includeSystemPromptSection = true; // Include Heartbeats system prompt section
 
     public HeartbeatConfig() {
     }
@@ -146,6 +147,24 @@ public class HeartbeatConfig {
     }
 
     /**
+     * Check if system prompt section is included.
+     *
+     * @return true if included
+     */
+    public boolean isIncludeSystemPromptSection() {
+        return includeSystemPromptSection;
+    }
+
+    /**
+     * Set whether to include system prompt section.
+     *
+     * @param includeSystemPromptSection true to include
+     */
+    public void setIncludeSystemPromptSection(boolean includeSystemPromptSection) {
+        this.includeSystemPromptSection = includeSystemPromptSection;
+    }
+
+    /**
      * Get the effective heartbeat prompt.
      *
      * @return the resolved prompt
@@ -158,8 +177,8 @@ public class HeartbeatConfig {
     @Override
     public String toString() {
         return String.format(
-            "HeartbeatConfig{enabled=%s, every=%s, ackMaxChars=%d, target='%s'}",
-            enabled, every, ackMaxChars, target
+            "HeartbeatConfig{enabled=%s, every=%s, ackMaxChars=%d, target='%s', includeSystemPromptSection=%s}",
+            enabled, every, ackMaxChars, target, includeSystemPromptSection
         );
     }
 }

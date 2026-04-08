@@ -23,6 +23,7 @@ public record AgentConfig(
         String blockReplyBreak,
         String[] ownerNumbers,
         String extraSystemPrompt,
+        String systemPromptOverride,
         boolean enforceFinalTag,
         Map<String, Object> additionalConfig
 ) {
@@ -44,6 +45,7 @@ public record AgentConfig(
         private String blockReplyBreak;
         private String[] ownerNumbers = new String[0];
         private String extraSystemPrompt;
+        private String systemPromptOverride;
         private boolean enforceFinalTag = false;
         private Map<String, Object> additionalConfig = Map.of();
 
@@ -112,6 +114,11 @@ public record AgentConfig(
             return this;
         }
 
+        public Builder systemPromptOverride(String systemPromptOverride) {
+            this.systemPromptOverride = systemPromptOverride;
+            return this;
+        }
+
         public Builder enforceFinalTag(boolean enforceFinalTag) {
             this.enforceFinalTag = enforceFinalTag;
             return this;
@@ -137,6 +144,7 @@ public record AgentConfig(
                     blockReplyBreak,
                     ownerNumbers,
                     extraSystemPrompt,
+                    systemPromptOverride,
                     enforceFinalTag,
                     additionalConfig
             );

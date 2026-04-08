@@ -38,6 +38,16 @@ public class MemoryConfig {
      */
     private FtsConfig fts = new FtsConfig();
 
+    /**
+     * Memory slot configuration for slot-aware operations
+     */
+    private SlotConfig slot = new SlotConfig();
+
+    /**
+     * Dreaming configuration for session ingestion
+     */
+    private DreamingConfig dreaming = new DreamingConfig();
+
     // Getters and Setters
 
     public String getStorageType() {
@@ -78,6 +88,22 @@ public class MemoryConfig {
 
     public void setFts(FtsConfig fts) {
         this.fts = fts;
+    }
+
+    public SlotConfig getSlot() {
+        return slot;
+    }
+
+    public void setSlot(SlotConfig slot) {
+        this.slot = slot;
+    }
+
+    public DreamingConfig getDreaming() {
+        return dreaming;
+    }
+
+    public void setDreaming(DreamingConfig dreaming) {
+        this.dreaming = dreaming;
     }
 
     /**
@@ -218,6 +244,63 @@ public class MemoryConfig {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+    }
+
+    /**
+     * Memory slot configuration for slot-aware operations
+     */
+    public static class SlotConfig {
+        private String defaultSlot = "default";
+        private boolean slotAwarePaths = true;
+
+        public String getDefaultSlot() {
+            return defaultSlot;
+        }
+
+        public void setDefaultSlot(String defaultSlot) {
+            this.defaultSlot = defaultSlot;
+        }
+
+        public boolean isSlotAwarePaths() {
+            return slotAwarePaths;
+        }
+
+        public void setSlotAwarePaths(boolean slotAwarePaths) {
+            this.slotAwarePaths = slotAwarePaths;
+        }
+    }
+
+    /**
+     * Dreaming configuration for session ingestion
+     */
+    public static class DreamingConfig {
+        private boolean enabled = true;
+        private boolean respectMemorySlot = true;
+        private String ingestionMode = "daily"; // "daily", "realtime", "disabled"
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public boolean isRespectMemorySlot() {
+            return respectMemorySlot;
+        }
+
+        public void setRespectMemorySlot(boolean respectMemorySlot) {
+            this.respectMemorySlot = respectMemorySlot;
+        }
+
+        public String getIngestionMode() {
+            return ingestionMode;
+        }
+
+        public void setIngestionMode(String ingestionMode) {
+            this.ingestionMode = ingestionMode;
         }
     }
 }

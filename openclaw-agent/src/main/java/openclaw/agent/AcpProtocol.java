@@ -118,6 +118,7 @@ public interface AcpProtocol {
      * @param model the model to use
      * @param tools the tools available
      * @param metadata additional metadata
+     * @param lightContext whether to use light context mode (omit full conversation history)
      */
     record SpawnRequest(
             String sessionKey,
@@ -125,7 +126,8 @@ public interface AcpProtocol {
             String userMessage,
             String model,
             Map<String, Object> tools,
-            Map<String, Object> metadata
+            Map<String, Object> metadata,
+            boolean lightContext
     ) {
         public static Builder builder() {
             return new Builder();
@@ -137,6 +139,7 @@ public interface AcpProtocol {
             private String model = "gpt-4";
             private Map<String, Object> tools = Map.of();
             private Map<String, Object> metadata = Map.of();
+            private boolean lightContext = false;
             public Builder sessionKey(String sessionKey) {
                 this.sessionKey = sessionKey;
                 return this;
@@ -161,6 +164,10 @@ public interface AcpProtocol {
                 this.metadata = metadata != null ? metadata : Map.of();
                 return this;
             }
+            public Builder lightContext(boolean lightContext) {
+                this.lightContext = lightContext;
+                return this;
+            }
             public SpawnRequest build() {
                 return new SpawnRequest(
                         sessionKey,
@@ -168,7 +175,8 @@ public interface AcpProtocol {
                         userMessage,
                         model,
                         tools,
-                        metadata
+                        metadata,
+                        lightContext
                 );
             }
         }

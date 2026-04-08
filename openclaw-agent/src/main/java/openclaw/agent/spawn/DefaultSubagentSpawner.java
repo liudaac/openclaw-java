@@ -50,6 +50,7 @@ public class DefaultSubagentSpawner implements SubagentSpawner {
                             "parentSession", parentSession,
                             "subagentId", subagentId
                     ))
+                    .lightContext(options.lightContext())
                     .build();
 
             try {
