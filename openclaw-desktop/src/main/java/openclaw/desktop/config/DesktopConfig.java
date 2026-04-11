@@ -2,6 +2,10 @@ package openclaw.desktop.config;
 
 import openclaw.agent.AcpProtocol;
 import openclaw.agent.DefaultAcpProtocol;
+import openclaw.session.config.SessionConfig;
+import openclaw.session.service.SessionPersistenceService;
+import openclaw.session.store.InMemorySessionStore;
+import openclaw.session.store.SessionStore;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -209,5 +213,29 @@ public class DesktopConfig {
         // Initialize with default config
         protocol.initialize(AcpProtocol.AcpConfig.builder().build());
         return protocol;
+    }
+
+    /**
+     * Session configuration bean.
+     */
+    @Bean
+    public SessionConfig sessionConfig() {
+        return new SessionConfig();
+    }
+
+    /**
+     * Session store bean (in-memory for desktop).
+     */
+    @Bean
+    public SessionStore sessionStore(SessionConfig sessionConfig) {
+        return new InMemorySessionStore(sessionConfig);
+    }
+
+    /**
+     * Session persistence service bean.
+     */
+    @Bean
+    public SessionPersistenceService sessionPersistenceService(SessionStore sessionStore) {
+        return new SessionPersistenceService(sessionStore);
     }
 }
