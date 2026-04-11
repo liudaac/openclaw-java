@@ -1,6 +1,9 @@
 package openclaw.desktop.config;
 
+import openclaw.agent.AcpProtocol;
+import openclaw.agent.DefaultAcpProtocol;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
@@ -195,5 +198,16 @@ public class DesktopConfig {
 
     public void setCompactMode(boolean compactMode) {
         this.compactMode = compactMode;
+    }
+
+    /**
+     * ACP Protocol bean for agent communication.
+     */
+    @Bean
+    public AcpProtocol acpProtocol() {
+        DefaultAcpProtocol protocol = new DefaultAcpProtocol();
+        // Initialize with default config
+        protocol.initialize(AcpProtocol.AcpConfig.builder().build());
+        return protocol;
     }
 }
