@@ -52,10 +52,10 @@ public class LspToolConfiguration {
          * Get all LSP tools for a session.
          */
         public List<AgentTool> getToolsForSession(String sessionId) {
-            LspSession session = sessionManager.getSession(sessionId);
+            LspSession session = sessionManager.getSession(sessionId).orElse(null);
             if (session == null) {
-                // Return default session tools
-                session = sessionManager.getDefaultSession();
+                // Return default session tools (first available)
+                session = sessionManager.getAllSessions().stream().findFirst().orElse(null);
             }
             
             if (session == null) {
@@ -75,13 +75,13 @@ public class LspToolConfiguration {
          * Get default LSP tools.
          */
         public List<AgentTool> getDefaultTools() {
-            LspSession session = sessionManager.getDefaultSession();
+            LspSession session = sessionManager.getAllSessions().stream().findFirst().orElse(null);
             if (session == null) {
                 logger.warn("No default LSP session available");
                 return List.of();
             }
 
-            return getToolsForSession(session.getSessionId());
+            return getToolsForSession(session.getServerName());
         }
     }
 }
