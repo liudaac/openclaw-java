@@ -25,11 +25,20 @@ import java.nio.file.Paths;
  * @version 2026.3.20
  */
 @Configuration
-@EnableConfigurationProperties(SessionConfig.class)
+@EnableConfigurationProperties
 @ConditionalOnProperty(prefix = "openclaw.session", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class SessionAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionAutoConfiguration.class);
+
+    /**
+     * Creates SessionConfig bean.
+     */
+    @Bean
+    @ConditionalOnMissingBean(SessionConfig.class)
+    public SessionConfig sessionConfig() {
+        return new SessionConfig();
+    }
 
     /**
      * Creates SQLite DataSource for session storage.
