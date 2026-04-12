@@ -217,14 +217,6 @@ public class DesktopConfig {
     }
 
     /**
-     * Session configuration bean.
-     */
-    @Bean
-    public SessionConfig sessionConfig() {
-        return new SessionConfig();
-    }
-
-    /**
      * Session store bean (in-memory for desktop).
      * Only used when no other SessionStore bean is defined.
      */
@@ -236,8 +228,10 @@ public class DesktopConfig {
 
     /**
      * Session persistence service bean.
+     * Only used when no other SessionPersistenceService bean is defined.
      */
     @Bean
+    @ConditionalOnMissingBean(SessionPersistenceService.class)
     public SessionPersistenceService sessionPersistenceService(SessionStore sessionStore) {
         return new SessionPersistenceService(sessionStore);
     }
