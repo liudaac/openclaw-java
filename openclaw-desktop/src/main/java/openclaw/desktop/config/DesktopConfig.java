@@ -6,6 +6,7 @@ import openclaw.session.config.SessionConfig;
 import openclaw.session.service.SessionPersistenceService;
 import openclaw.session.store.InMemorySessionStore;
 import openclaw.session.store.SessionStore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -225,8 +226,10 @@ public class DesktopConfig {
 
     /**
      * Session store bean (in-memory for desktop).
+     * Only used when no other SessionStore bean is defined.
      */
     @Bean
+    @ConditionalOnMissingBean(SessionStore.class)
     public SessionStore sessionStore(SessionConfig sessionConfig) {
         return new InMemorySessionStore(sessionConfig);
     }
