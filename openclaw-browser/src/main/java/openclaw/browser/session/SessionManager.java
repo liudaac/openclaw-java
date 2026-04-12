@@ -27,6 +27,7 @@ public class SessionManager {
     private Playwright playwright;
     private Browser browser;
     private final Map<String, BrowserSession> sessions;
+    private boolean initialized = false;
     
     public SessionManager() {
         this.sessions = new ConcurrentHashMap<>();
@@ -34,21 +35,30 @@ public class SessionManager {
     
     @PostConstruct
     public void initialize() {
-        logger.info("Initializing Playwright...");
-        this.playwright = Playwright.create();
-        this.browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
-            .setHeadless(true)
-            .setArgs(java.util.List.of(
-                "--disable-dev-shm-usage",
-                "--no-sandbox",
-                "--disable-setuid-sandbox"
-            ))
-        );
-        logger.info("Playwright initialized successfully");
+        try {
+            logger.info("Initializing Playwright...");
+            this.playwright = Playwright.create();
+            this.browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
+                .setHeadless(true)
+                .setArgs(java.util.List.of(
+                    "--disable-dev-shm-usage",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox"
+                ))
+            );
+            this.initialized = true;
+            logger.info("Playwright initialized successfully");
+        } catch (Exception e) {
+            logger.error("Failed to initialize Playwright. Browser functionality will be disabled.", e);
+            this.initialized = false;
+        }
     }
     
     @PreDestroy
     public void shutdown() {
+        if (!initialized) {
+            return;
+        }
         logger.info("Shutting down Playwright...");
         sessions.values().forEach(BrowserSession::close);
         sessions.clear();
@@ -62,9 +72,19 @@ public class SessionManager {
     }
     
     /**
+     * Check if Playwright is initialized.
+     */
+    public boolean isInitialized() {
+        return initialized;
+    }
+    
+    /**
      * Create a new browser session.
      */
     public BrowserSession createSession(String profile, SessionOptions options) {
+        if (!initialized) {
+            throw new IllegalStateException("Playwright is not initialized. Browser functionality is disabled.");
+        }
         BrowserContext context = browser.newContext(new Browser.NewContextOptions()
             .setViewportSize(options.viewportWidth(), options.viewportHeight())
             .setUserAgent(options.userAgent())
