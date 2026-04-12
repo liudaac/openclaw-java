@@ -28,7 +28,7 @@ import java.util.Objects;
  * @author OpenClaw Team
  * @version 2026.3.24
  */
-@SpringBootApplication(scanBasePackages = {"openclaw.desktop", "openclaw.server"})
+@SpringBootApplication(scanBasePackages = {"openclaw.desktop", "openclaw.server", "openclaw.cron", "openclaw.browser", "openclaw.session", "openclaw.memory"})
 public class OpenClawApp extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenClawApp.class);
