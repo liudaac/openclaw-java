@@ -1,19 +1,22 @@
 package openclaw.gateway.call;
 
+import openclaw.gateway.auth.DeviceAuthV3;
 import openclaw.gateway.client.GatewayClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * Service for making gateway calls with dependency injection support.
  *
  * <p>This service provides a centralized way to make gateway calls with
- * configurable dependencies for testing and runtime flexibility.</p>
+ * configurable dependencies for testing and runtime flexibility. Following
+ * the TypeScript call.ts pattern with comprehensive DI support.</p>
  *
  * @author OpenClaw Team
- * @version 2026.3.23
+ * @version 2026.4.12
  */
 public class GatewayCallService {
 
@@ -105,6 +108,74 @@ public class GatewayCallService {
     }
 
     /**
+     * Makes a gateway call with automatic device identity resolution.
+     *
+     * @param options the call options with device identity
+     * @return the call result
+     */
+    public CompletableFuture<GatewayCallResult> callWithIdentity(GatewayCallWithIdentityOptions options) {
+        GatewayCallDeps deps = getDeps();
+
+        try {
+            // Load or create device identity
+            Optional<DeviceAuthV3.DeviceCredentials> identity = deps.getDeviceIdentityLoader().loadOrCreate(
+                deps.getConfigLoader().load()
+            );
+
+            if (identity.isEmpty()) {
+                return CompletableFuture.completedFuture(
+                        new GatewayCallResult(false, null, "Failed to load device identity")
+                );
+            }
+
+            DeviceAuthV3.DeviceCredentials creds = identity.get();
+            
+            // Build auth request
+            DeviceAuthV3.AuthRequest authRequest = deps.getAuthRequestBuilder().build(
+                creds.deviceId(), 
+                options.scopes()
+            );
+
+            // Create client and make call
+            GatewayClient client = deps.getCreateGatewayClient().apply(
+                    new GatewayCallDeps.GatewayClientOptions(options.url(), authRequest)
+            );
+
+            return client.request(options.method(), options.params())
+                    .thenApply(result -> new GatewayCallResult(true, result, null))
+                    .exceptionally(e -> {
+                        logger.error("Gateway call failed: {}", e.getMessage(), e);
+                        return new GatewayCallResult(false, null, e.getMessage());
+                    });
+
+        } catch (Exception e) {
+            logger.error("Failed to make gateway call with identity: {}", e.getMessage(), e);
+            return CompletableFuture.completedFuture(
+                    new GatewayCallResult(false, null, e.getMessage())
+            );
+        }
+    }
+
+    /**
+     * Resolves the gateway URL from configuration.
+     *
+     * @param config the OpenClaw configuration
+     * @return the resolved gateway URL
+     */
+    public String resolveGatewayUrl(GatewayCallDeps.OpenClawConfig config) {
+        GatewayCallDeps deps = getDeps();
+        
+        String host = config.getGatewayHost().orElse("localhost");
+        int port = deps.getPortResolver().resolve(config);
+        boolean tlsEnabled = config.isGatewayTlsEnabled().orElse(false);
+        
+        String protocol = tlsEnabled ? "wss" : "ws";
+        return String.format("%s://%s:%d", protocol, host, port);
+    }
+
+    // Records
+
+    /**
      * Gateway call options.
      *
      * @param url the gateway URL
@@ -114,7 +185,22 @@ public class GatewayCallService {
      */
     public record GatewayCallOptions(
             String url,
-            openclaw.gateway.auth.DeviceAuthV3.AuthRequest authRequest,
+            DeviceAuthV3.AuthRequest authRequest,
+            String method,
+            Object params
+    ) {}
+
+    /**
+     * Gateway call options with automatic identity resolution.
+     *
+     * @param url the gateway URL
+     * @param scopes the requested scopes
+     * @param method the method to call
+     * @param params the method parameters
+     */
+    public record GatewayCallWithIdentityOptions(
+            String url,
+            String[] scopes,
             String method,
             Object params
     ) {}
