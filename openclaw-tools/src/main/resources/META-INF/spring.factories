@@ -1,3 +1,4 @@
 # Spring Boot Auto-Configuration
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-openclaw.tools.search.WebSearchAutoConfiguration
+openclaw.tools.search.WebSearchAutoConfiguration,\
+openclaw.tools.ToolsAutoConfiguration

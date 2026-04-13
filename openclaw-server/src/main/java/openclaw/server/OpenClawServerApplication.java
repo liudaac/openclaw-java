@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @author OpenClaw Team
  * @version 2026.3.9
  */
-@SpringBootApplication(scanBasePackages = {"openclaw.server", "openclaw.gateway", "openclaw.agent"})
+@SpringBootApplication(scanBasePackages = {"openclaw.server", "openclaw.gateway", "openclaw.agent", "openclaw.tools"})
 @EnableAsync
 public class OpenClawServerApplication {
 
