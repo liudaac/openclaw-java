@@ -1,11 +1,9 @@
 package openclaw.desktop.service;
 
-import openclaw.gateway.GatewayService;
 import openclaw.gateway.NodeInfo;
 import openclaw.gateway.GatewayStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -21,9 +19,6 @@ import java.util.concurrent.CompletableFuture;
 public class DesktopGatewayService {
 
     private static final Logger logger = LoggerFactory.getLogger(DesktopGatewayService.class);
-
-    @Autowired
-    private GatewayService gatewayService;
 
     private String currentUrl;
     private String authToken;
