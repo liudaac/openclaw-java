@@ -8,8 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import openclaw.desktop.service.DesktopGatewayService;
-import openclaw.gateway.GatewayStatus;
+import openclaw.gateway.GatewayService;
 import openclaw.gateway.NodeInfo;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
@@ -39,7 +38,7 @@ public class GatewayController implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(GatewayController.class);
 
     @Autowired
-    private DesktopGatewayService gatewayService;
+    private GatewayService gatewayService;
 
     @FXML
     private VBox gatewayContainer;
@@ -128,7 +127,7 @@ public class GatewayController implements Initializable {
             });
     }
 
-    private void updateStatusUI(GatewayStatus status) {
+    private void updateStatusUI(GatewayService.GatewayStatus status) {
         statusLabel.setText(status.isConnected() ? "Connected" : "Disconnected");
         statusLabel.getStyleClass().setAll(status.isConnected() ? "status-connected" : "status-disconnected");
 

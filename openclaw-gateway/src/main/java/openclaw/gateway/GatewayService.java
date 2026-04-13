@@ -4,6 +4,7 @@ import openclaw.gateway.node.NodeRegistry;
 import openclaw.gateway.queue.WorkQueue;
 import openclaw.gateway.work.WorkDispatcher;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -28,6 +29,37 @@ public interface GatewayService {
      * @return completion future
      */
     CompletableFuture<Void> shutdown();
+
+    /**
+     * Connects to the gateway with the given URL and token.
+     *
+     * @param url the gateway URL
+     * @param token the authentication token
+     * @param autoReconnect whether to auto-reconnect on disconnect
+     * @return true if connected successfully
+     */
+    CompletableFuture<Boolean> connect(String url, String token, boolean autoReconnect);
+
+    /**
+     * Disconnects from the gateway.
+     *
+     * @return completion future
+     */
+    CompletableFuture<Void> disconnect();
+
+    /**
+     * Gets the current connection status.
+     *
+     * @return the gateway status
+     */
+    CompletableFuture<GatewayStatus> getStatus();
+
+    /**
+     * Gets the list of registered nodes.
+     *
+     * @return the list of nodes
+     */
+    CompletableFuture<List<NodeInfo>> getNodes();
 
     /**
      * Gets the node registry.
@@ -165,6 +197,79 @@ public interface GatewayService {
                     5,
                     null
             );
+        }
+    }
+
+    /**
+     * Gateway status.
+     *
+     * @param connected whether the gateway is connected
+     * @param url the gateway URL
+     * @param version the gateway version
+     * @param lastConnectedAt the last connected timestamp
+     * @param reconnectAttempts the number of reconnect attempts
+     * @param nodes the list of connected nodes
+     */
+    record GatewayStatus(
+            boolean connected,
+            String url,
+            String version,
+            java.time.Instant lastConnectedAt,
+            int reconnectAttempts,
+            List<NodeInfo> nodes
+    ) {
+        /**
+         * Gets the URL.
+         *
+         * @return the URL
+         */
+        public String getUrl() {
+            return url;
+        }
+
+        /**
+         * Gets the version.
+         *
+         * @return the version
+         */
+        public String getVersion() {
+            return version;
+        }
+
+        /**
+         * Gets the last connected timestamp.
+         *
+         * @return the last connected timestamp
+         */
+        public java.time.Instant getLastConnectedAt() {
+            return lastConnectedAt;
+        }
+
+        /**
+         * Gets the reconnect attempts.
+         *
+         * @return the reconnect attempts
+         */
+        public int getReconnectAttempts() {
+            return reconnectAttempts;
+        }
+
+        /**
+         * Checks if connected.
+         *
+         * @return true if connected
+         */
+        public boolean isConnected() {
+            return connected;
+        }
+
+        /**
+         * Gets the nodes.
+         *
+         * @return the nodes
+         */
+        public List<NodeInfo> getNodes() {
+            return nodes;
         }
     }
 

@@ -1,6 +1,7 @@
 package openclaw.server.service;
 
 import openclaw.gateway.GatewayService;
+import openclaw.gateway.NodeInfo;
 import openclaw.gateway.node.NodeRegistry;
 import openclaw.gateway.queue.WorkQueue;
 import openclaw.gateway.work.WorkDispatcher;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,29 +18,106 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class GatewayServiceImpl implements GatewayService {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(GatewayServiceImpl.class);
-    
+
     private final NodeRegistry nodeRegistry;
     private final WorkQueue workQueue;
     private final WorkDispatcher workDispatcher;
-    
+
+    // Connection state
+    private String currentUrl;
+    private String authToken;
+    private boolean autoReconnect;
+    private boolean connected;
+    private String version;
+    private Instant lastConnectedAt;
+    private int reconnectAttempts;
+
     public GatewayServiceImpl() {
         this.nodeRegistry = new InMemoryNodeRegistry();
         this.workQueue = new InMemoryWorkQueue();
         this.workDispatcher = new InMemoryWorkDispatcher();
+        this.version = "2026.3.24";
     }
-    
+
     @Override
     public CompletableFuture<Void> initialize(GatewayConfig config) {
         logger.info("Initializing gateway service with config: {}", config);
         return CompletableFuture.completedFuture(null);
     }
-    
+
     @Override
     public CompletableFuture<Void> shutdown() {
         logger.info("Shutting down gateway service");
-        return CompletableFuture.completedFuture(null);
+        return disconnect();
+    }
+
+    @Override
+    public CompletableFuture<Boolean> connect(String url, String token, boolean autoReconnect) {
+        this.currentUrl = url;
+        this.authToken = token;
+        this.autoReconnect = autoReconnect;
+
+        logger.info("Connecting to Gateway: {}", url);
+
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                // TODO: Implement actual connection logic
+                this.connected = true;
+                this.lastConnectedAt = Instant.now();
+                this.reconnectAttempts = 0;
+                logger.info("Connected to Gateway");
+                return true;
+            } catch (Exception e) {
+                logger.error("Failed to connect to Gateway", e);
+                this.connected = false;
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public CompletableFuture<Void> disconnect() {
+        return CompletableFuture.runAsync(() -> {
+            logger.info("Disconnecting from Gateway");
+            this.connected = false;
+            this.currentUrl = null;
+            this.authToken = null;
+        });
+    }
+
+    @Override
+    public CompletableFuture<GatewayStatus> getStatus() {
+        return CompletableFuture.supplyAsync(() -> {
+            List<openclaw.gateway.NodeInfo> nodes = connected ? getNodes().join() : List.of();
+            return new GatewayStatus(
+                connected,
+                currentUrl,
+                version,
+                lastConnectedAt,
+                reconnectAttempts,
+                nodes
+            );
+        });
+    }
+
+    @Override
+    public CompletableFuture<List<openclaw.gateway.NodeInfo>> getNodes() {
+        return nodeRegistry.listNodes()
+            .thenApply(registryNodes -> registryNodes.stream()
+                .map(this::convertNodeInfo)
+                .toList());
+    }
+
+    private openclaw.gateway.NodeInfo convertNodeInfo(openclaw.gateway.node.NodeRegistry.NodeInfo registryNode) {
+        return new openclaw.gateway.NodeInfo(
+            registryNode.id(),
+            registryNode.name(),
+            registryNode.status().name().toLowerCase(),
+            "2026.3.24",
+            registryNode.lastHeartbeat()
+        );
     }
     
     @Override
