@@ -64,8 +64,8 @@ public class OpenShellTool implements AgentTool {
             boolean strictHostKeyChecking) {
         this.workingDir = workingDir;
         this.defaultTimeout = defaultTimeout;
-        this.allowedCommands = allowedCommands != null ? allowedCommands : Set.of();
-        this.blockedCommands = blockedCommands != null ? blockedCommands : Set.of();
+        this.allowedCommands = allowedCommands != null ? new HashSet<>(allowedCommands) : new HashSet<>();
+        this.blockedCommands = blockedCommands != null ? new HashSet<>(blockedCommands) : new HashSet<>();
         this.requireApproval = requireApproval;
         this.sshKeyPath = sshKeyPath;
         this.strictHostKeyChecking = strictHostKeyChecking;
