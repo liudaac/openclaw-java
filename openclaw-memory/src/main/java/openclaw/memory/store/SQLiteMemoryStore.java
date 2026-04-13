@@ -10,6 +10,7 @@ import openclaw.memory.config.MemoryConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
@@ -24,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
+@Primary
 @ConditionalOnProperty(name = "openclaw.memory.storage-type", havingValue = "sqlite", matchIfMissing = true)
 public class SQLiteMemoryStore implements MemoryStore {
     
