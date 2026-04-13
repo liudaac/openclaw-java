@@ -31,11 +31,8 @@ import java.util.Optional;
 @EnableScheduling
 public class OpenClawConfig {
 
-    @Bean
-    @Primary
-    public GatewayService gatewayService() {
-        return new GatewayServiceImpl();
-    }
+    // GatewayService is provided by GatewayServiceImpl with @Service annotation
+    // No need to define it here to avoid circular dependency
 
     @Bean
     @Primary
