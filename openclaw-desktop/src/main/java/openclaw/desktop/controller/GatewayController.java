@@ -8,7 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import openclaw.desktop.service.GatewayService;
+import openclaw.desktop.service.DesktopGatewayService;
 import openclaw.gateway.GatewayStatus;
 import openclaw.gateway.NodeInfo;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -39,7 +39,7 @@ public class GatewayController implements Initializable {
     private static final Logger logger = LoggerFactory.getLogger(GatewayController.class);
 
     @Autowired
-    private GatewayService gatewayService;
+    private DesktopGatewayService gatewayService;
 
     @FXML
     private VBox gatewayContainer;

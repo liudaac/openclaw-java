@@ -1,5 +1,6 @@
 package openclaw.desktop.service;
 
+import openclaw.gateway.GatewayService;
 import openclaw.gateway.NodeInfo;
 import openclaw.gateway.GatewayStatus;
 import org.slf4j.Logger;
@@ -17,9 +18,9 @@ import java.util.concurrent.CompletableFuture;
  * <p>Provides high-level Gateway operations with JavaFX-friendly callbacks.</p>
  */
 @Service
-public class GatewayService {
+public class DesktopGatewayService {
 
-    private static final Logger logger = LoggerFactory.getLogger(GatewayService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DesktopGatewayService.class);
 
     @Autowired
     private GatewayService gatewayService;
